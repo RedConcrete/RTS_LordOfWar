@@ -79,6 +79,7 @@ public class OptionScreen extends Screens implements Screen {
         Slider slider = new Slider(0f,100f,5f,false,skin);
 
 
+
         TextButton musikButton = new TextButton("Music ON / OFF", skin);
         musikButton.getLabel().setFontScale(3f);
 
@@ -132,10 +133,8 @@ public class OptionScreen extends Screens implements Screen {
             }
         });
 
-
-
-
         windowOptionen.defaults().pad(20f);
+
         windowOptionen.add(slider).row();
         windowOptionen.add(musikButton).row();
         windowOptionen.add(fpsButton).row();
@@ -145,7 +144,7 @@ public class OptionScreen extends Screens implements Screen {
 
         windowOptionen.setPosition(stage.getWidth() / 2f - windowOptionen.getWidth() / 2f,
                 stage.getHeight() / 2f - windowOptionen.getHeight() / 2f);
-        windowOptionen.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
+        windowOptionen.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(0.25f)));
         stage.addActor(windowOptionen);
 
 

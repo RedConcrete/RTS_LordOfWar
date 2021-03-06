@@ -139,7 +139,7 @@ public class LoginScreen extends Screens implements Screen {
         window.pack();
         window.setPosition(stage.getWidth() / 2f - window.getWidth() / 2f,
                 stage.getHeight() / 2f - window.getHeight() / 2f);
-        window.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
+        window.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(0.25f)));
         stage.addActor(window);
 
         stage.setDebugAll(false);

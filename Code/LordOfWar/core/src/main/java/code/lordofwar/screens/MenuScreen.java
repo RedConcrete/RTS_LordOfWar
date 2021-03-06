@@ -92,10 +92,11 @@ public class MenuScreen extends Screens implements Screen {
         ExitButton.getLabel().setFontScale(3f);
 
         Window windowMenu = new Window("", skin, "border");
+        windowMenu.setMovable(false);
         windowMenu.defaults().pad(20f);
 
-
         Window windowExit = new Window("Exit?",skin, "border");
+        windowExit.setMovable(false);
         windowExit.defaults().pad(20f);
 
 
@@ -212,14 +213,13 @@ public class MenuScreen extends Screens implements Screen {
 
         windowMenu.setPosition(stage.getWidth() / 2f - windowMenu.getWidth() / 2f,
                 stage.getHeight() / 2f - windowMenu.getHeight() / 2f);
-        windowMenu.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
+        windowMenu.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(0.25f)));
 
         windowExit.setPosition(stage.getWidth() / 2f - windowExit.getWidth() / 2f,
                 stage.getHeight() / 2f - windowExit.getHeight() / 2f);
-        windowExit.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
+        windowExit.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(0.25f)));
 
         stage.addActor(windowMenu);
-
 
         stage.setDebugAll(false);
     }

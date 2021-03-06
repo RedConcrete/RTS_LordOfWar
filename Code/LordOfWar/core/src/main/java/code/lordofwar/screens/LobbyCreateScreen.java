@@ -8,10 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -77,43 +74,49 @@ public class LobbyCreateScreen extends Screens implements Screen {
 
     private void setupUI() {
 
-        TextButton gameStartButton = new TextButton("Lobby erstellen",skin);
-        gameStartButton.getLabel().setFontScale(3f);
+        Window windowLobbyCreate = new Window("", skin, "border");
+        windowLobbyCreate.defaults().pad(20f);
+        windowLobbyCreate.setMovable(false);
+
+        TextButton lobbyCreateButton = new TextButton("Lobby erstellen",skin);
+        lobbyCreateButton.getLabel().setFontScale(3f);
 
         TextButton backButton = backButton(stage,skin,game);
 
+        Label lobbyNameLabel = new Label("Lobby name",skin);
+        lobbyNameLabel.setFontScale(2f);
 
-        gameStartButton.addListener(new InputListener(){
+        TextField lobbyName = new TextField("",skin);
+
+        lobbyCreateButton.addListener(new InputListener(){
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("LobbyErstellen");
-                //Todo Abfrage entwickeln!!!
+                //Todo server muss wissen das eine Lobby erstellt wurde!
 
-                if(true){
-                    game.setScreen(new LobbyScreen(game, skin));
-                }
-                else{
+                game.setScreen(new LobbyScreen(game, skin));
 
-                }
             }
 
             @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
                 return true;
             }
         });
 
-        Window windowLobbyCreate = new Window("", skin, "border");
-        windowLobbyCreate.defaults().pad(20f);
+
+        windowLobbyCreate.add(lobbyNameLabel).row();
+        windowLobbyCreate.add(lobbyName).row();
 
 
-        windowLobbyCreate.add(gameStartButton).row();
-        windowLobbyCreate.add(backButton).row();
+        windowLobbyCreate.add(backButton).padRight(180f);
+        windowLobbyCreate.add(lobbyCreateButton);
+
         windowLobbyCreate.pack();
 
         windowLobbyCreate.setPosition(stage.getWidth() / 2f - windowLobbyCreate.getWidth() / 2f,
                 stage.getHeight() / 2f - windowLobbyCreate.getHeight() / 2f);
-        windowLobbyCreate.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
+        windowLobbyCreate.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(0.25f)));
         stage.addActor(windowLobbyCreate);
 
         stage.setDebugAll(true);
