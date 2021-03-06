@@ -42,6 +42,8 @@ public class MenuScreen extends Screens implements Screen {
 
         clearStage();
 
+        fps(stage,skin);
+
         stage.act();
         stage.draw();
     }
@@ -101,7 +103,7 @@ public class MenuScreen extends Screens implements Screen {
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("Lobby beitretten");
-                game.setScreen(new LobbyBeitretenScreen(game, skin));
+                game.setScreen(new LobbyBrowserScreen(game, skin));
                 //Todo server muss daten von erstellten lobbys senden!
 
             }
@@ -151,6 +153,17 @@ public class MenuScreen extends Screens implements Screen {
                 TextButton yesButton = new TextButton("Yes",skin);
                 yesButton.getLabel().setFontScale(2f);
 
+                yesButton.addListener(new InputListener(){
+                    @Override
+                    public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+                        System.exit(0);
+                    }
+
+                    @Override
+                    public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+                        return true;
+                    }
+                });
 
 
                 TextButton noButton = new TextButton("No",skin);
@@ -170,7 +183,7 @@ public class MenuScreen extends Screens implements Screen {
                 });
 
 
-                Label exitLabel = new Label("do you realy want to exit?",skin);
+                Label exitLabel = new Label("Do you realy want to Exit?",skin);
                 exitLabel.setFontScale(3f);
 
 

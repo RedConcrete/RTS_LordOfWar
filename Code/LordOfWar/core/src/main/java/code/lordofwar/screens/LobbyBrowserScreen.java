@@ -1,8 +1,10 @@
 package code.lordofwar.screens;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -12,13 +14,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-public class LobbyBeitretenScreen extends Screens implements Screen {
+public class LobbyBrowserScreen extends Screens implements Screen {
 
     private Stage stage;
     private Game game;
     private Skin skin;
 
-    public LobbyBeitretenScreen(Game aGame, Skin aSkin) {
+    public LobbyBrowserScreen(Game aGame, Skin aSkin) {
         game = aGame;
         skin = aSkin;
         stage = new Stage(new ScreenViewport());
@@ -31,7 +33,7 @@ public class LobbyBeitretenScreen extends Screens implements Screen {
 
     @Override
     public void show() {
-
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
@@ -60,31 +62,18 @@ public class LobbyBeitretenScreen extends Screens implements Screen {
     }
 
     @Override
-    public void hide() {
-
-    }
+    public void hide() {stage.clear();}
 
     @Override
-    public void dispose() {
+    public void dispose() {stage.dispose();}
 
-    }
 
     private void setupUI() {
 
-
-        TextButton backButton = new TextButton("Back", skin);
-        backButton.getLabel().setFontScale(3f);
-
         Window windowLobbyBrowser = new Window("", skin, "border");
         windowLobbyBrowser.defaults().pad(20f);
-
-
-
-
-
-
-
-
+        TextButton backButton = backButton(stage,skin,game);
+        windowLobbyBrowser.add(backButton).row();
         windowLobbyBrowser.pack();
 
         windowLobbyBrowser.setPosition(stage.getWidth() / 2f - windowLobbyBrowser.getWidth() / 2f,

@@ -74,14 +74,15 @@ public class OptionScreen extends Screens implements Screen {
 
     private void setupUI() {
 
+
+        Window windowOptionen = new Window("", skin, "border");
         Slider slider = new Slider(0f,100f,5f,false,skin);
 
 
         TextButton musikButton = new TextButton("Music ON / OFF", skin);
         musikButton.getLabel().setFontScale(3f);
 
-        TextButton backButton = new TextButton("Back", skin);
-        backButton.getLabel().setFontScale(3f);
+        TextButton backButton = backButton(stage,skin,game);
 
         TextButton fpsButton = new TextButton("FPS OFF", skin);
         fpsButton.getLabel().setFontScale(3f);
@@ -131,25 +132,9 @@ public class OptionScreen extends Screens implements Screen {
             }
         });
 
-        backButton.addListener(new InputListener(){
-            @Override
-            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
 
-                System.out.println("back2Menu");
 
-                game.setScreen(new MenuScreen(game, skin));
-                //removet alle actors von der stage
-                stage.dispose();
 
-            }
-
-            @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
-                return true;
-            }
-        });
-
-        Window windowOptionen = new Window("", skin, "border");
         windowOptionen.defaults().pad(20f);
         windowOptionen.add(slider).row();
         windowOptionen.add(musikButton).row();

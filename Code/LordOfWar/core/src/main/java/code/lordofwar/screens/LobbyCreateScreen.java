@@ -80,8 +80,8 @@ public class LobbyCreateScreen extends Screens implements Screen {
         TextButton gameStartButton = new TextButton("Lobby erstellen",skin);
         gameStartButton.getLabel().setFontScale(3f);
 
-        TextButton backButton = new TextButton("Back", skin);
-        backButton.getLabel().setFontScale(3f);
+        TextButton backButton = backButton(stage,skin,game);
+
 
         gameStartButton.addListener(new InputListener(){
             @Override
@@ -98,7 +98,7 @@ public class LobbyCreateScreen extends Screens implements Screen {
             }
 
             @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });
@@ -107,8 +107,8 @@ public class LobbyCreateScreen extends Screens implements Screen {
         windowLobbyCreate.defaults().pad(20f);
 
 
-        windowLobbyCreate.add(gameStartButton);
-
+        windowLobbyCreate.add(gameStartButton).row();
+        windowLobbyCreate.add(backButton).row();
         windowLobbyCreate.pack();
 
         windowLobbyCreate.setPosition(stage.getWidth() / 2f - windowLobbyCreate.getWidth() / 2f,
