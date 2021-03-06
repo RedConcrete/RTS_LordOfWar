@@ -4,6 +4,8 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -78,13 +80,31 @@ public class LobbyScreen extends Screens implements Screen {
         TextButton backButton = backButton(stage,skin,game);
         backButton.getLabel().setFontScale(3f);
 
+        TextButton startButton = new TextButton("Start Game",skin);
+        startButton.getLabel().setFontScale(3f);
 
         Window windowLobby = new Window("", skin, "border");
         windowLobby.defaults().pad(20f);
 
+        startButton.addListener(new InputListener(){
+            @Override
+            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+                System.out.println("LobbyErstellen");
+                //Todo server muss wissen das die Lobby gestartet wurde!
+
+                game.setScreen(new GameScreen(game, skin));
+
+            }
+            @Override
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+                return true;
+            }
+
+        });
 
 
-        windowLobby.add(backButton).row();
+        windowLobby.add(backButton);
+        windowLobby.add(startButton);
         windowLobby.pack();
 
         windowLobby.setPosition(stage.getWidth() / 2f - windowLobby.getWidth() / 2f,

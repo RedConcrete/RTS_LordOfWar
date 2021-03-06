@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class GameScreen extends Screens implements Screen {
@@ -88,18 +89,30 @@ public class GameScreen extends Screens implements Screen {
          }
          */
 
-
         Label label = new Label("GameScreen", skin);
         label.setFontScale(4f);
         label.setX(Gdx.graphics.getWidth()*7/16);
         label.setY(Gdx.graphics.getHeight()/2);
         stage.addActor(label);
 
-        Window gameWindow = new Window("",skin);
+        Window gameWindow1 = new Window("",skin);
+        Window gameWindow2 = new Window("",skin);
+        Window gameWindow3 = new Window("",skin);
 
-        gameWindow.pack();
+        gameWindow1.setMovable(false);
+        gameWindow2.setMovable(false);
+        gameWindow3.setMovable(false);
 
-        stage.addActor(gameWindow);
+        gameWindow1.setPosition(0,0);
+        gameWindow1.setSize(stage.getWidth() * 1/10,stage.getHeight());
+        gameWindow2.setPosition(0,0);
+        gameWindow2.setSize(stage.getWidth(),stage.getHeight() * 1/6);
+        gameWindow3.setPosition(stage.getWidth() * 7/10,0);
+        gameWindow3.setSize(stage.getWidth()* 2/10,stage.getHeight() * 2/6);
+
+        stage.addActor(gameWindow1);
+        stage.addActor(gameWindow2);
+        stage.addActor(gameWindow3);
 
         stage.setDebugAll(true);
     }
