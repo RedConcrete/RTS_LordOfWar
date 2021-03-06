@@ -74,6 +74,20 @@ public class GameScreen extends Screens implements Screen {
     private void setupUI(){
 
 
+        //Todo https://www.youtube.com/watch?v=qik60F5I6J4&list=PLXY8okVWvwZ0qmqSBhOtqYRjzWtUCWylb <---------
+
+        //Todo später inGame um tasten zu belegen!!
+        /*
+        public void actionPerformed(ActionEvent e) {
+            if(e.getSource() == btn1) {
+             area.requestFocusInWindow();
+            }
+            if(e.getSource() == btn2) {
+             fld.requestFocusInWindow();
+            }
+         }
+         */
+
 
         Label label = new Label("GameScreen", skin);
         label.setFontScale(4f);

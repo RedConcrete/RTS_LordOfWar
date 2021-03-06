@@ -27,6 +27,8 @@ public class LobbyCreateScreen extends Screens implements Screen {
         skin = aSkin;
         stage = new Stage(new ScreenViewport());
 
+        createBackground(stage);
+
         setupUI();
 
     }
@@ -78,6 +80,9 @@ public class LobbyCreateScreen extends Screens implements Screen {
         TextButton gameStartButton = new TextButton("Lobby erstellen",skin);
         gameStartButton.getLabel().setFontScale(3f);
 
+        TextButton backButton = new TextButton("Back", skin);
+        backButton.getLabel().setFontScale(3f);
+
         gameStartButton.addListener(new InputListener(){
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
@@ -85,7 +90,7 @@ public class LobbyCreateScreen extends Screens implements Screen {
                 //Todo Abfrage entwickeln!!!
 
                 if(true){
-                    game.setScreen(new GameScreen(game, skin));
+                    game.setScreen(new LobbyScreen(game, skin));
                 }
                 else{
 

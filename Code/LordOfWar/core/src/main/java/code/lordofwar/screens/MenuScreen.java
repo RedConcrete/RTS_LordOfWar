@@ -23,6 +23,11 @@ public class MenuScreen extends Screens implements Screen {
         game = aGame;
         skin = aSkin;
         stage = new Stage(new ScreenViewport());
+
+
+        fps(stage,skin);
+        createBackground(stage);
+
         setupUI();
 
     }
@@ -36,8 +41,6 @@ public class MenuScreen extends Screens implements Screen {
     public void render(float delta) {
 
         clearStage();
-
-        fps(stage,skin);
 
         stage.act();
         stage.draw();
@@ -77,42 +80,30 @@ public class MenuScreen extends Screens implements Screen {
         TextButton lobbyErstellenButton = new TextButton("Lobby erstellen",skin);
         lobbyErstellenButton.getLabel().setFontScale(3f);
 
-        lobbyErstellenButton.addListener(new InputListener(){
-            @Override
-            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("LobbyErstellen");
-                //Todo Abfrage entwickeln!!!
-
-                if(true){
-                    game.setScreen(new LobbyCreateScreen(game, skin));
-                }
-                else{
-
-                }
-            }
-
-            @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
-                return true;
-            }
-        });
-
         TextButton lobbyBeitrettenButton = new TextButton("Lobby beitretten",skin);
         lobbyBeitrettenButton.getLabel().setFontScale(3f);
+
+        TextButton optionButton = new TextButton("Optionen",skin);
+        optionButton.getLabel().setFontScale(3f);
+
+        TextButton ExitButton = new TextButton("Exit",skin);
+        ExitButton.getLabel().setFontScale(3f);
+
+        Window windowMenu = new Window("", skin, "border");
+        windowMenu.defaults().pad(20f);
+
+
+        Window windowExit = new Window("Exit?",skin, "border");
+        windowExit.defaults().pad(20f);
+
 
         lobbyBeitrettenButton.addListener(new InputListener(){
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("Lobby beitretten");
+                game.setScreen(new LobbyBeitretenScreen(game, skin));
+                //Todo server muss daten von erstellten lobbys senden!
 
-                //Todo Abfrage entwickeln!!!
-
-                if(true){
-                    game.setScreen(new LobbyBeitretenScreen(game, skin));
-                }
-                else{
-
-                }
             }
 
             @Override
@@ -121,22 +112,25 @@ public class MenuScreen extends Screens implements Screen {
             }
         });
 
-        TextButton optionButton = new TextButton("Optionen",skin);
-        optionButton.getLabel().setFontScale(3f);
+        lobbyErstellenButton.addListener(new InputListener(){
+            @Override
+            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+                System.out.println("LobbyErstellen");
+                game.setScreen(new LobbyCreateScreen(game, skin));
+            }
+
+            @Override
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+                return true;
+            }
+        });
 
         optionButton.addListener(new InputListener(){
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("OptionsScreen");
+                game.setScreen(new OptionScreen(game, skin));
 
-                //Todo Abfrage entwickeln!!!
-
-                if(true){
-                    game.setScreen(new OptionScreen(game, skin));
-                }
-                else{
-
-                }
             }
             //was macht diese Methode??
             @Override
@@ -145,24 +139,41 @@ public class MenuScreen extends Screens implements Screen {
             }
         });
 
-        TextButton ExitButton = new TextButton("Exit",skin);
-        ExitButton.getLabel().setFontScale(3f);
-
         ExitButton.addListener(new InputListener(){
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("OptionsScreen");
+
+
+                System.out.println("ExitWindow");
+                windowMenu.setVisible(false);
+                windowExit.setVisible(true);
 
                 TextButton yesButton = new TextButton("Yes",skin);
                 yesButton.getLabel().setFontScale(2f);
 
+
+
                 TextButton noButton = new TextButton("No",skin);
                 noButton.getLabel().setFontScale(2f);
+
+                noButton.addListener(new InputListener(){
+                    @Override
+                    public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+                        windowMenu.setVisible(true);
+                        windowExit.setVisible(false);
+                    }
+                    //was macht diese Methode??
+                    @Override
+                    public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+                        return true;
+                    }
+                });
+
 
                 Label exitLabel = new Label("do you realy want to exit?",skin);
                 exitLabel.setFontScale(3f);
 
-                Window windowExit = new Window("Exit?",skin, "border");
+
 
                 windowExit.add(exitLabel).row();
                 windowExit.add(yesButton);
@@ -180,10 +191,6 @@ public class MenuScreen extends Screens implements Screen {
         });
 
 
-        Window windowMenu = new Window("", skin, "border");
-        windowMenu.defaults().pad(20f);
-
-
         windowMenu.add(lobbyErstellenButton).row();
         windowMenu.add(lobbyBeitrettenButton).row();
         windowMenu.add(optionButton).row();
@@ -193,9 +200,14 @@ public class MenuScreen extends Screens implements Screen {
         windowMenu.setPosition(stage.getWidth() / 2f - windowMenu.getWidth() / 2f,
                 stage.getHeight() / 2f - windowMenu.getHeight() / 2f);
         windowMenu.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
+
+        windowExit.setPosition(stage.getWidth() / 2f - windowExit.getWidth() / 2f,
+                stage.getHeight() / 2f - windowExit.getHeight() / 2f);
+        windowExit.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
+
         stage.addActor(windowMenu);
 
 
-        stage.setDebugAll(true);
+        stage.setDebugAll(false);
     }
 }

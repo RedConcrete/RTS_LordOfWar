@@ -4,6 +4,7 @@ import code.lordofwar.backend.Constants;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -21,6 +22,8 @@ public class OptionScreen extends Screens implements Screen {
         game = aGame;
         skin = aSkin;
         stage = new Stage(new ScreenViewport());
+
+        createBackground(stage);
 
         setupUI();
 
@@ -71,19 +74,53 @@ public class OptionScreen extends Screens implements Screen {
 
     private void setupUI() {
 
-        TextButton textButton = new TextButton("FPS OFF", skin);
-        textButton.getLabel().setFontScale(3f);
-        textButton.addListener(new InputListener(){
+        Slider slider = new Slider(0f,100f,5f,false,skin);
+
+
+        TextButton musikButton = new TextButton("Music ON / OFF", skin);
+        musikButton.getLabel().setFontScale(3f);
+
+        TextButton backButton = new TextButton("Back", skin);
+        backButton.getLabel().setFontScale(3f);
+
+        TextButton fpsButton = new TextButton("FPS OFF", skin);
+        fpsButton.getLabel().setFontScale(3f);
+
+
+        musikButton.addListener(new InputListener(){
+            @Override
+            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+
+                //Todo musik muss an und aus gehen können
+
+                if(getMUSIC()){
+                    System.out.println("music off");
+                    setMUSIC(false);
+                }
+                else{
+                    System.out.println("music on");
+                    setMUSIC(true);
+                }
+
+            }
+
+            @Override
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+                return true;
+            }
+        });
+
+        fpsButton.addListener(new InputListener(){
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
 
                 //Todo Abfrage entwickeln!!!
                 if(!getFPS()){
-                    textButton.setText("FPS ON");
+                    fpsButton.setText("FPS ON");
                     setFPS(true);
                 }
                 else {
-                    textButton.setText("FPS OFF");
+                    fpsButton.setText("FPS OFF");
                     setFPS(false);
                 }
             }
@@ -94,29 +131,38 @@ public class OptionScreen extends Screens implements Screen {
             }
         });
 
-        Window windowMenu = new Window("", skin, "border");
-        windowMenu.defaults().pad(20f);
-        windowMenu.add(textButton);
-        windowMenu.pack();
+        backButton.addListener(new InputListener(){
+            @Override
+            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
 
-        windowMenu.setPosition(stage.getWidth() / 2f - windowMenu.getWidth() / 2f,
-                stage.getHeight() / 2f - windowMenu.getHeight() / 2f);
-        windowMenu.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
-        stage.addActor(windowMenu);
+                System.out.println("back2Menu");
 
+                game.setScreen(new MenuScreen(game, skin));
+                //removet alle actors von der stage
+                stage.dispose();
 
-
-        //Todo später inGame um tasten zu belegen!!
-        /*
-        public void actionPerformed(ActionEvent e) {
-            if(e.getSource() == btn1) {
-             area.requestFocusInWindow();
             }
-            if(e.getSource() == btn2) {
-             fld.requestFocusInWindow();
+
+            @Override
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+                return true;
             }
-         }
-         */
+        });
+
+        Window windowOptionen = new Window("", skin, "border");
+        windowOptionen.defaults().pad(20f);
+        windowOptionen.add(slider).row();
+        windowOptionen.add(musikButton).row();
+        windowOptionen.add(fpsButton).row();
+        windowOptionen.add(backButton).row();
+
+        windowOptionen.pack();
+
+        windowOptionen.setPosition(stage.getWidth() / 2f - windowOptionen.getWidth() / 2f,
+                stage.getHeight() / 2f - windowOptionen.getHeight() / 2f);
+        windowOptionen.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
+        stage.addActor(windowOptionen);
+
 
         stage.setDebugAll(true);
     }

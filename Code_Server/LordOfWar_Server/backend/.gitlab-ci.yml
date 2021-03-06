@@ -1,0 +1,25 @@
+variables:
+# This template uses jdk8 for verifying and deploying images
+image: registry.it.hs-heilbronn.de/it/development/git-runners/itadmin-openjdk11_repo-hhnit
+
+stages:
+  - build
+  - test
+  - deploy
+  
+
+  
+build:
+  stage: build
+  script:
+  - "cd exercise2/code/backend"   
+  - "./gradlew clean build"
+  artifacts:
+   paths:
+    - exercise2/code/backend/build
+
+deploy:
+  stage: deploy
+  script:
+    - 'curl -s -F "branch=$CI_COMMIT_REF_NAME" -F "file=@exercise2/code/backend/build/backend-1.0-SNAPSHOT-runner.jar" -H "Token:$Token" https://mgmt.swlab.it.hs-heilbronn.de/api/file/upload'
+

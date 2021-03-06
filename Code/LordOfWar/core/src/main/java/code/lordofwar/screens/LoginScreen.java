@@ -4,12 +4,14 @@ import code.lordofwar.backend.Constants;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class LoginScreen extends Screens implements Screen {
@@ -23,6 +25,10 @@ public class LoginScreen extends Screens implements Screen {
         game = aGame;
         skin = aSkin;
         stage = new Stage(new ScreenViewport());
+
+
+        fps(stage,skin);
+        createBackground(stage);
 
         setupUI();
 
@@ -38,9 +44,11 @@ public class LoginScreen extends Screens implements Screen {
     public void render(float delta) {
 
         //Todo Background hinzufügen!
+
+
         clearStage();
 
-        fps(stage,skin);
+
 
         stage.act();
         stage.draw();
@@ -73,26 +81,21 @@ public class LoginScreen extends Screens implements Screen {
 
     private void setupUI(){
 
-
         Label name = new Label("Username", skin);
         name.setAlignment(Align.center);
         name.setFontScale(4f);
         name.setWidth(Gdx.graphics.getWidth());
-        //stage.addActor(name);
 
         TextField usernameTextField = new TextField("Username",skin); //Todo wie kann man die Font größe ändern???
-        //stage.addActor(usernameTextField);
 
         Label password = new Label("Passwort", skin);
         password.setAlignment(Align.center);
         password.setFontScale(4f);
         password.setWidth(Gdx.graphics.getWidth());
-        //stage.addActor(password);
 
         TextField passwordTextField = new TextField("Password",skin); //Todo wie kann man die Font größe ändern???
         passwordTextField.setPasswordCharacter('*');
         passwordTextField.setPasswordMode(true);
-        //stage.addActor(passwordTextField);
 
         TextButton loginButton = new TextButton("Login!",skin);
         loginButton.getLabel().setFontScale(3f);
@@ -101,17 +104,9 @@ public class LoginScreen extends Screens implements Screen {
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("Login");
 
-                //Todo Abfrage entwickeln!!!
+                //Todo Loginabfrage entwickeln!!!
 
                 if(true){
-
-                    /*
-                    for (Actor actor: stage.getActors()) {
-                        Array<Actor> actorArrayList = new Array<>(); //Todo geht nicht warum ?
-                        actorArrayList.add(actor);
-                        stage.getActors().removeAll(actorArrayList,true);
-                    }
-                     */
 
                     game.setScreen(new MenuScreen(game, skin));
                     //removet alle actors von der stage
@@ -128,10 +123,12 @@ public class LoginScreen extends Screens implements Screen {
                 return true;
             }
         });
-        //stage.addActor(loginButton);
 
         Window window = new Window("", skin, "border");
         window.defaults().pad(10f);
+        window.defaults().padLeft(40f);
+        window.defaults().padRight(40f);
+        window.setMovable(false);
 
         window.add(name).row();
         window.add(usernameTextField).row();
