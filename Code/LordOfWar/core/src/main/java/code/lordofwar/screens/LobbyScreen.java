@@ -3,22 +3,22 @@ package code.lordofwar.screens;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-public class LobbyBeitretenScreen extends Screens implements Screen {
+public class LobbyScreen extends Screens implements Screen {
 
     private Stage stage;
     private Game game;
     private Skin skin;
 
-    public LobbyBeitretenScreen(Game aGame, Skin aSkin) {
+    public LobbyScreen(Game aGame, Skin aSkin) {
+
         game = aGame;
         skin = aSkin;
         stage = new Stage(new ScreenViewport());
@@ -36,12 +36,7 @@ public class LobbyBeitretenScreen extends Screens implements Screen {
 
     @Override
     public void render(float delta) {
-        clearStage();
 
-        fps(stage,skin);
-
-        stage.act();
-        stage.draw();
     }
 
     @Override
@@ -75,24 +70,18 @@ public class LobbyBeitretenScreen extends Screens implements Screen {
         TextButton backButton = new TextButton("Back", skin);
         backButton.getLabel().setFontScale(3f);
 
-        Window windowLobbyBrowser = new Window("", skin, "border");
-        windowLobbyBrowser.defaults().pad(20f);
 
+        Window windowLobby = new Window("", skin, "border");
+        windowLobby.defaults().pad(20f);
 
+        windowLobby.pack();
 
-
-
-
-
-
-        windowLobbyBrowser.pack();
-
-        windowLobbyBrowser.setPosition(stage.getWidth() / 2f - windowLobbyBrowser.getWidth() / 2f,
-                stage.getHeight() / 2f - windowLobbyBrowser.getHeight() / 2f);
-        windowLobbyBrowser.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
-        stage.addActor(windowLobbyBrowser);
-
+        windowLobby.setPosition(stage.getWidth() / 2f - windowLobby.getWidth() / 2f,
+                stage.getHeight() / 2f - windowLobby.getHeight() / 2f);
+        windowLobby.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
+        stage.addActor(windowLobby);
 
         stage.setDebugAll(true);
     }
+
 }
