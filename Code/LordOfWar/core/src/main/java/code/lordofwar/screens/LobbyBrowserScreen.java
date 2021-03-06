@@ -72,8 +72,7 @@ public class LobbyBrowserScreen extends Screens implements Screen {
 
         Window windowLobbyBrowser = new Window("", skin, "border");
         windowLobbyBrowser.defaults().pad(20f);
-        TextButton backButton = backButton(stage,skin,game);
-        windowLobbyBrowser.add(backButton).row();
+        backButton(stage,skin,game,windowLobbyBrowser);
         windowLobbyBrowser.pack();
 
         windowLobbyBrowser.setPosition(stage.getWidth() / 2f - windowLobbyBrowser.getWidth() / 2f,

@@ -80,7 +80,7 @@ public class LobbyCreateScreen extends Screens implements Screen {
         TextButton gameStartButton = new TextButton("Lobby erstellen",skin);
         gameStartButton.getLabel().setFontScale(3f);
 
-        TextButton backButton = backButton(stage,skin,game);
+
 
 
         gameStartButton.addListener(new InputListener(){
@@ -108,7 +108,7 @@ public class LobbyCreateScreen extends Screens implements Screen {
 
 
         windowLobbyCreate.add(gameStartButton).row();
-        windowLobbyCreate.add(backButton).row();
+        backButton(stage,skin,game,windowLobbyCreate);
         windowLobbyCreate.pack();
 
         windowLobbyCreate.setPosition(stage.getWidth() / 2f - windowLobbyCreate.getWidth() / 2f,

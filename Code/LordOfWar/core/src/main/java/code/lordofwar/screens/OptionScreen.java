@@ -82,7 +82,7 @@ public class OptionScreen extends Screens implements Screen {
         TextButton musikButton = new TextButton("Music ON / OFF", skin);
         musikButton.getLabel().setFontScale(3f);
 
-        TextButton backButton = backButton(stage,skin,game);
+
 
         TextButton fpsButton = new TextButton("FPS OFF", skin);
         fpsButton.getLabel().setFontScale(3f);
@@ -139,7 +139,7 @@ public class OptionScreen extends Screens implements Screen {
         windowOptionen.add(slider).row();
         windowOptionen.add(musikButton).row();
         windowOptionen.add(fpsButton).row();
-        windowOptionen.add(backButton).row();
+        backButton(stage,skin,game,windowOptionen);
 
         windowOptionen.pack();
 

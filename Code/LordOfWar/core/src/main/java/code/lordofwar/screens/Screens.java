@@ -8,10 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 
 public abstract class Screens extends Constants{
 
@@ -50,7 +47,7 @@ public abstract class Screens extends Constants{
         }
     }
 
-    protected TextButton backButton(Stage stage, Skin skin, Game game){
+    protected void backButton(Stage stage, Skin skin, Game game, Window window){
         TextButton backButton = new TextButton("Back", skin);
         backButton.getLabel().setFontScale(3f);
 
@@ -71,7 +68,9 @@ public abstract class Screens extends Constants{
                 return true;
             }
         });
-        return backButton;
+
+        window.add(backButton).row();
+
     }
 
 
