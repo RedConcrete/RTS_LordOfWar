@@ -1,10 +1,9 @@
 package code.lordofwar.screens;
 
-import code.lordofwar.backend.Constants;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -106,7 +105,7 @@ public class OptionScreen extends Screens implements Screen {
             }
 
             @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });
@@ -127,7 +126,7 @@ public class OptionScreen extends Screens implements Screen {
             }
 
             @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });
@@ -140,15 +139,10 @@ public class OptionScreen extends Screens implements Screen {
         windowOptionen.add(musikButton).row();
         windowOptionen.add(fpsButton).row();
         backButton(stage,skin,game,windowOptionen);
-
-        windowOptionen.pack();
-
-        windowOptionen.setPosition(stage.getWidth() / 2f - windowOptionen.getWidth() / 2f,
-                stage.getHeight() / 2f - windowOptionen.getHeight() / 2f);
-        windowOptionen.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
-        stage.addActor(windowOptionen);
+        packAndSetWindow(windowOptionen,stage);
 
 
-        stage.setDebugAll(true);
+
+        stage.setDebugAll(false);
     }
 }

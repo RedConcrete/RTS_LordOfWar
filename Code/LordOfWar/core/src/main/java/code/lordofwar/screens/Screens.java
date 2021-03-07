@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 
 public abstract class Screens extends Constants{
@@ -36,8 +37,8 @@ public abstract class Screens extends Constants{
             //Todo fps muss richtig ausgegeben werden (überschreibt sich selbst)
             Label fps = new Label("fps: "+ Gdx.graphics.getFramesPerSecond(),skin);
             fps.setFontScale(2f);
-            fps.setX(Gdx.graphics.getWidth()*19/20);
-            fps.setY(Gdx.graphics.getHeight()*19/20);
+            fps.setX(Gdx.graphics.getWidth()*19f/20f);
+            fps.setY(Gdx.graphics.getHeight()*19f/20f);
             stage.addActor(fps);
             fps.setText("fps: "+ Gdx.graphics.getFramesPerSecond());
 
@@ -47,6 +48,11 @@ public abstract class Screens extends Constants{
         }
     }
 
+    /*
+    Creates an backButton and adds an InputListener to it. If Button pressed Game will return to MenuScreen.
+    @author Robin Hefner
+     */
+
     protected void backButton(Stage stage, Skin skin, Game game, Window window){
         TextButton backButton = new TextButton("Back", skin);
         backButton.getLabel().setFontScale(3f);
@@ -54,8 +60,6 @@ public abstract class Screens extends Constants{
         backButton.addListener(new InputListener(){
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-
-                System.out.println("back2Menu");
 
                 game.setScreen(new MenuScreen(game, skin));
                 //removet alle actors von der stage
@@ -71,6 +75,19 @@ public abstract class Screens extends Constants{
 
         window.add(backButton).row();
 
+    }
+
+    /*
+    Packs the passed Window and sets its position.
+    @author Robin Hefner
+     */
+    protected void packAndSetWindow(Window window, Stage stage){
+        window.pack();
+
+        window.setPosition(stage.getWidth() / 2f - window.getWidth() / 2f,
+                stage.getHeight() / 2f - window.getHeight() / 2f);
+        window.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
+        stage.addActor(window);
     }
 
 

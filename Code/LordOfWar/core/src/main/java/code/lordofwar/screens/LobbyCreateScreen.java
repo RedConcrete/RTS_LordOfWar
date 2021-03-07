@@ -1,5 +1,6 @@
 package code.lordofwar.screens;
 
+import code.lordofwar.backend.events.LobbyCreateScreenEvent;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -7,19 +8,16 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class LobbyCreateScreen extends Screens implements Screen {
 
-    private Stage stage;
-    private Game game;
-    private Skin skin;
+    private final Stage stage;
+    private final Game game;
+    private final Skin skin;
 
     public LobbyCreateScreen(Game aGame, Skin aSkin) {
 
@@ -87,9 +85,9 @@ public class LobbyCreateScreen extends Screens implements Screen {
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("LobbyErstellen");
-                //Todo Abfrage entwickeln!!!
 
-                if(true){
+
+                if(LobbyCreateScreenEvent.isGameStart()){
                     game.setScreen(new LobbyScreen(game, skin));
                 }
                 else{
@@ -109,14 +107,13 @@ public class LobbyCreateScreen extends Screens implements Screen {
 
         windowLobbyCreate.add(gameStartButton).row();
         backButton(stage,skin,game,windowLobbyCreate);
-        windowLobbyCreate.pack();
+        packAndSetWindow(windowLobbyCreate,stage);
 
-        windowLobbyCreate.setPosition(stage.getWidth() / 2f - windowLobbyCreate.getWidth() / 2f,
-                stage.getHeight() / 2f - windowLobbyCreate.getHeight() / 2f);
-        windowLobbyCreate.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
-        stage.addActor(windowLobbyCreate);
 
-        stage.setDebugAll(true);
+
+
+
+        stage.setDebugAll(false);
     }
 
 }

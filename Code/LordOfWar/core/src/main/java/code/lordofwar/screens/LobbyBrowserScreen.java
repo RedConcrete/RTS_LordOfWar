@@ -81,6 +81,6 @@ public class LobbyBrowserScreen extends Screens implements Screen {
         stage.addActor(windowLobbyBrowser);
 
 
-        stage.setDebugAll(true);
+        stage.setDebugAll(false);
     }
 }

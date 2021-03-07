@@ -1,6 +1,7 @@
 package code.lordofwar.screens;
 
 import code.lordofwar.backend.Constants;
+import code.lordofwar.backend.events.LoginScreenEvent;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -104,9 +105,7 @@ public class LoginScreen extends Screens implements Screen {
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("Login");
 
-                //Todo Loginabfrage entwickeln!!!
-
-                if(true){
+                if(LoginScreenEvent.isLoginValid()){
 
                     game.setScreen(new MenuScreen(game, skin));
                     //removet alle actors von der stage
@@ -119,7 +118,7 @@ public class LoginScreen extends Screens implements Screen {
             }
 
             @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });
@@ -135,12 +134,7 @@ public class LoginScreen extends Screens implements Screen {
         window.add(password).row();
         window.add(passwordTextField).row();
         window.add(loginButton).row();
-
-        window.pack();
-        window.setPosition(stage.getWidth() / 2f - window.getWidth() / 2f,
-                stage.getHeight() / 2f - window.getHeight() / 2f);
-        window.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
-        stage.addActor(window);
+        packAndSetWindow(window,stage);
 
         stage.setDebugAll(false);
     }

@@ -91,8 +91,8 @@ public class GameScreen extends Screens implements Screen {
 
         Label label = new Label("GameScreen", skin);
         label.setFontScale(4f);
-        label.setX(Gdx.graphics.getWidth()*7/16);
-        label.setY(Gdx.graphics.getHeight()/2);
+        label.setX(Gdx.graphics.getWidth()*7f/16f);
+        label.setY(Gdx.graphics.getHeight()/2f);
         stage.addActor(label);
 
         Window gameWindow = new Window("",skin);
@@ -101,6 +101,6 @@ public class GameScreen extends Screens implements Screen {
 
         stage.addActor(gameWindow);
 
-        stage.setDebugAll(true);
+        stage.setDebugAll(false);
     }
 }

@@ -75,7 +75,7 @@ public class MenuScreen extends Screens implements Screen {
         Label lordOfWarLabel = new Label("Lord of War", skin);
         lordOfWarLabel.setAlignment(Align.center);
         lordOfWarLabel.setFontScale(6f);
-        lordOfWarLabel.setY(Gdx.graphics.getHeight()*18/20);
+        lordOfWarLabel.setY(Gdx.graphics.getHeight()*18f/20f);
         lordOfWarLabel.setWidth(Gdx.graphics.getWidth());
         stage.addActor(lordOfWarLabel);
 
@@ -99,6 +99,8 @@ public class MenuScreen extends Screens implements Screen {
         windowExit.defaults().pad(20f);
 
 
+
+
         lobbyBeitrettenButton.addListener(new InputListener(){
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
@@ -109,7 +111,7 @@ public class MenuScreen extends Screens implements Screen {
             }
 
             @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });
@@ -122,7 +124,7 @@ public class MenuScreen extends Screens implements Screen {
             }
 
             @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });
@@ -134,9 +136,9 @@ public class MenuScreen extends Screens implements Screen {
                 game.setScreen(new OptionScreen(game, skin));
 
             }
-            //was macht diese Methode??
+
             @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });
@@ -160,7 +162,7 @@ public class MenuScreen extends Screens implements Screen {
                     }
 
                     @Override
-                    public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+                    public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                         return true;
                     }
                 });
@@ -175,9 +177,9 @@ public class MenuScreen extends Screens implements Screen {
                         windowMenu.setVisible(true);
                         windowExit.setVisible(false);
                     }
-                    //was macht diese Methode??
+
                     @Override
-                    public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+                    public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                         return true;
                     }
                 });
@@ -198,7 +200,7 @@ public class MenuScreen extends Screens implements Screen {
             }
             //was macht diese Methode??
             @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });
