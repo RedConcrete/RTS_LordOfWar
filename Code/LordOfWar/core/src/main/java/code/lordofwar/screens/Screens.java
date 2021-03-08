@@ -3,6 +3,7 @@ package code.lordofwar.screens;
 import code.lordofwar.backend.Constants;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -62,7 +63,6 @@ public abstract class Screens extends Constants{
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
 
                 game.setScreen(new MenuScreen(game, skin));
-                //removet alle actors von der stage
                 stage.dispose();
 
             }

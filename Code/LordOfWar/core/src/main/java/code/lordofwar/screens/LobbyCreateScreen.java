@@ -24,9 +24,7 @@ public class LobbyCreateScreen extends Screens implements Screen {
         game = aGame;
         skin = aSkin;
         stage = new Stage(new ScreenViewport());
-
         createBackground(stage);
-
         setupUI();
 
     }
@@ -77,9 +75,6 @@ public class LobbyCreateScreen extends Screens implements Screen {
 
         TextButton gameStartButton = new TextButton("Lobby erstellen",skin);
         gameStartButton.getLabel().setFontScale(3f);
-
-
-
 
         gameStartButton.addListener(new InputListener(){
             @Override
