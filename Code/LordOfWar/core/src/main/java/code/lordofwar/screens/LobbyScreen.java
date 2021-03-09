@@ -112,7 +112,7 @@ public class LobbyScreen extends Screens implements Screen {
         windowLobby.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(0.25f)));
         stage.addActor(windowLobby);
 
-        stage.setDebugAll(true);
+        stage.setDebugAll(false);
     }
 
 }

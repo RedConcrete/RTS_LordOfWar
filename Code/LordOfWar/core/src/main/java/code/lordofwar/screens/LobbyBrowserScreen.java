@@ -69,8 +69,9 @@ public class LobbyBrowserScreen extends Screens implements Screen {
         Window windowLobbyBrowser = new Window("", skin, "border");
         windowLobbyBrowser.defaults().pad(20f);
 
-        TextButton backButton = backButton(stage,skin,game);
+        backButton(stage,skin,game,windowLobbyBrowser);
 
+        /*
         Array<Label> labelArray = new Array<>();
         labelArray.add(new Label("Test2",skin));
 
@@ -98,6 +99,8 @@ public class LobbyBrowserScreen extends Screens implements Screen {
 
         windowLobbyBrowser.add(scroll).row();
         windowLobbyBrowser.add(backButton).row();
+        
+         */
         windowLobbyBrowser.pack();
 
 
@@ -105,6 +108,7 @@ public class LobbyBrowserScreen extends Screens implements Screen {
                 stage.getHeight() / 2f - windowLobbyBrowser.getHeight() / 2f);
         windowLobbyBrowser.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
         stage.addActor(windowLobbyBrowser);
+
 
         stage.setDebugAll(true);
     }

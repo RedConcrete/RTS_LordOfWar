@@ -1,24 +1,22 @@
 package code.lordofwar.screens;
 
-import code.lordofwar.backend.Constants;
+
+import code.lordofwar.backend.events.LoginScreenEvent;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class LoginScreen extends Screens implements Screen {
 
-    private Stage stage;
-    private Game game;
-    private Skin skin;
+    private final Stage stage;
+    private final Game game;
+    private final Skin skin;
 
 
     public LoginScreen(Game aGame, Skin aSkin) {
@@ -104,9 +102,7 @@ public class LoginScreen extends Screens implements Screen {
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("Login");
 
-                //Todo Loginabfrage entwickeln!!!
-
-                if(true){
+                if(LoginScreenEvent.isLoginValid()){
 
                     game.setScreen(new MenuScreen(game, skin));
                     //removet alle actors von der stage
@@ -124,6 +120,30 @@ public class LoginScreen extends Screens implements Screen {
             }
         });
 
+        Label noAccountLabel = new Label("No Account ? Register here",skin);
+        noAccountLabel.setAlignment(Align.center);
+        noAccountLabel.setFontScale(1f);
+        noAccountLabel.setWidth(Gdx.graphics.getWidth());
+
+
+
+        TextButton registerButton = new TextButton("Register",skin);
+        registerButton.getLabel().setFontScale(3f);
+        registerButton.addListener(new InputListener(){
+            @Override
+            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+                System.out.println("Register");
+                    game.setScreen(new RegisterScreen(game, skin));
+                    stage.dispose();
+            }
+
+            @Override
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+        });
+
+
         Window window = new Window("", skin, "border");
         window.defaults().pad(10f);
         window.defaults().padLeft(40f);
@@ -135,12 +155,9 @@ public class LoginScreen extends Screens implements Screen {
         window.add(password).row();
         window.add(passwordTextField).row();
         window.add(loginButton).row();
-
-        window.pack();
-        window.setPosition(stage.getWidth() / 2f - window.getWidth() / 2f,
-                stage.getHeight() / 2f - window.getHeight() / 2f);
-        window.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(0.25f)));
-        stage.addActor(window);
+        window.add(noAccountLabel).row();
+        window.add(registerButton).row();
+        packAndSetWindow(window,stage);
 
         stage.setDebugAll(false);
     }

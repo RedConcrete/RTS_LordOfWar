@@ -1,10 +1,9 @@
 package code.lordofwar.screens;
 
-import code.lordofwar.backend.Constants;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -79,11 +78,10 @@ public class OptionScreen extends Screens implements Screen {
         Slider slider = new Slider(0f,100f,5f,false,skin);
 
 
-
         TextButton musikButton = new TextButton("Music ON / OFF", skin);
         musikButton.getLabel().setFontScale(3f);
 
-        TextButton backButton = backButton(stage,skin,game);
+
 
         TextButton fpsButton = new TextButton("FPS OFF", skin);
         fpsButton.getLabel().setFontScale(3f);
@@ -133,19 +131,15 @@ public class OptionScreen extends Screens implements Screen {
             }
         });
 
-        windowOptionen.defaults().pad(20f);
 
+
+
+        windowOptionen.defaults().pad(20f);
         windowOptionen.add(slider).row();
         windowOptionen.add(musikButton).row();
         windowOptionen.add(fpsButton).row();
-        windowOptionen.add(backButton).row();
-
-        windowOptionen.pack();
-
-        windowOptionen.setPosition(stage.getWidth() / 2f - windowOptionen.getWidth() / 2f,
-                stage.getHeight() / 2f - windowOptionen.getHeight() / 2f);
-        windowOptionen.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(0.25f)));
-        stage.addActor(windowOptionen);
+        backButton(stage,skin,game,windowOptionen);
+        packAndSetWindow(windowOptionen,stage);
 
 
         stage.setDebugAll(true);
