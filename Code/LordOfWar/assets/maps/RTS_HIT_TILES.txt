@@ -1,0 +1,12 @@
+RTS_HIT_TILES.png
+size: 320, 64
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Outbreaks
+  rotate: false
+  xy: 0, 0
+  size: 320, 64
+  orig: 320, 64
+  offset: 0, 0
+  index: -1
