@@ -84,8 +84,8 @@ public class LobbyCreateScreen extends Screens implements Screen {
         lobbyNameLabel.setFontScale(2f);
 
         TextField lobbyName = new TextField("",skin);
-        
-        gameStartButton.addListener(new InputListener(){
+
+        lobbyCreateButton.addListener(new InputListener(){
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("LobbyErstellen");
@@ -111,7 +111,7 @@ public class LobbyCreateScreen extends Screens implements Screen {
         windowLobbyCreate.add(lobbyName).row();
 
 
-        windowLobbyCreate.add(gameStartButton).row();
+        windowLobbyCreate.add(lobbyCreateButton).row();
         backButton(stage,skin,game,windowLobbyCreate);
         packAndSetWindow(windowLobbyCreate,stage);
 

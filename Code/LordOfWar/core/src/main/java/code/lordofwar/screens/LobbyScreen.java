@@ -76,15 +76,14 @@ public class LobbyScreen extends Screens implements Screen {
 
     private void setupUI() {
 
+        Window windowLobby = new Window("", skin, "border");
+        windowLobby.defaults().pad(20f);
 
-        TextButton backButton = backButton(stage,skin,game);
-        backButton.getLabel().setFontScale(3f);
+
 
         TextButton startButton = new TextButton("Start Game",skin);
         startButton.getLabel().setFontScale(3f);
 
-        Window windowLobby = new Window("", skin, "border");
-        windowLobby.defaults().pad(20f);
 
         startButton.addListener(new InputListener(){
             @Override
@@ -102,15 +101,10 @@ public class LobbyScreen extends Screens implements Screen {
 
         });
 
-
-        windowLobby.add(backButton);
         windowLobby.add(startButton);
-        windowLobby.pack();
 
-        windowLobby.setPosition(stage.getWidth() / 2f - windowLobby.getWidth() / 2f,
-                stage.getHeight() / 2f - windowLobby.getHeight() / 2f);
-        windowLobby.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(0.25f)));
-        stage.addActor(windowLobby);
+        backButton(stage,skin,game,windowLobby);
+        packAndSetWindow(windowLobby,stage);
 
         stage.setDebugAll(false);
     }

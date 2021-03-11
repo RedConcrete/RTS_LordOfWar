@@ -1,24 +1,35 @@
 package code.lordofwar.screens;
 
+import code.lordofwar.backend.Unit;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-public class GameScreen extends Screens implements Screen {
+public class GameScreen extends Screens implements Screen  {
 
     private Stage stage;
     private Game game;
     private Skin skin;
+
+    private TiledMap map;
+    private OrthogonalTiledMapRenderer renderer;
+    private OrthographicCamera camera;
+
+    private Unit unit;
+
 
     public GameScreen(Game aGame, Skin aSkin) {
 
@@ -33,6 +44,21 @@ public class GameScreen extends Screens implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
+
+        TmxMapLoader loader = new TmxMapLoader();
+        map = loader.load("assets/maps/map_1.tmx");
+
+        renderer = new OrthogonalTiledMapRenderer(map);
+
+        camera =  new OrthographicCamera();
+
+        TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("assets/maps/RTS_UNITS_TILES.txt"));
+        unit = new Unit(new Sprite(atlas.findRegion("Character_Green")),(TiledMapTileLayer) map.getLayers().get(0));
+
+        unit.setPosition(unit.getCollisionLayer().getTileWidth(), 2 * unit.getCollisionLayer().getTileHeight());
+        Vector2 vector2 = new Vector2();
+        vector2.x = 150;
+        unit.setVelocity(vector2);
     }
 
     @Override
@@ -43,13 +69,22 @@ public class GameScreen extends Screens implements Screen {
 
         fps(stage,skin);
 
+        renderer.setView(camera);
+        renderer.render();
+
+        renderer.getBatch().begin();
+        unit.draw(renderer.getBatch());
+        renderer.getBatch().end();
+
         stage.act();
         stage.draw();
     }
 
     @Override
     public void resize(int width, int height) {
-
+        camera.viewportWidth = width;
+        camera.viewportHeight = height;
+        camera.update();
     }
 
     @Override
@@ -70,6 +105,8 @@ public class GameScreen extends Screens implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
+        map.dispose();
+        renderer.dispose();
     }
 
     private void setupUI(){
@@ -107,7 +144,7 @@ public class GameScreen extends Screens implements Screen {
         gameWindow1.setSize(stage.getWidth() * 1/10,stage.getHeight());
         gameWindow2.setPosition(0,0);
         gameWindow2.setSize(stage.getWidth(),stage.getHeight() * 1/6);
-        gameWindow3.setPosition(stage.getWidth() * 7/10,0);
+        gameWindow3.setPosition(stage.getWidth() * 8/10,0);
         gameWindow3.setSize(stage.getWidth()* 2/10,stage.getHeight() * 2/6);
 
         stage.addActor(gameWindow1);

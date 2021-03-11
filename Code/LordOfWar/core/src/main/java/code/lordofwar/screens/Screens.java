@@ -86,7 +86,7 @@ public abstract class Screens extends Constants{
 
         window.setPosition(stage.getWidth() / 2f - window.getWidth() / 2f,
                 stage.getHeight() / 2f - window.getHeight() / 2f);
-        window.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
+        window.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(.25f)));
         stage.addActor(window);
     }
 
