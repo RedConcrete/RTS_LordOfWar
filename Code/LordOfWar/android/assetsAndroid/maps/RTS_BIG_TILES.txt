@@ -1,0 +1,19 @@
+RTS_BIG_TILES.png
+size: 1024, 512
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Circle
+  rotate: false
+  xy: 0, 0
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: -1
+GroundTexture
+  rotate: false
+  xy: 512, 0
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: -1

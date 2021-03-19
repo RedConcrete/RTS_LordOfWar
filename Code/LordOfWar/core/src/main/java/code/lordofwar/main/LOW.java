@@ -1,23 +1,19 @@
 package code.lordofwar.main;
 
-import code.lordofwar.backend.Constants;
 import code.lordofwar.screens.LoginScreen;
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import okhttp3.*;
+import okio.ByteString;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static code.lordofwar.backend.Constants.WORLD_HEIGHT_PIXEL;
 import static code.lordofwar.backend.Constants.WORLD_WIDTH_PIXEL;
+
 
 /*
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms.
@@ -27,6 +23,41 @@ import static code.lordofwar.backend.Constants.WORLD_WIDTH_PIXEL;
 public class LOW extends Game {
 	private Stage stage;
 	private Skin skin;
+	WebSocketListener listener = new WebSocketListener() {
+
+		@Override
+		public void onClosed(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
+			super.onClosed(webSocket, code, reason);
+		}
+
+		@Override
+		public void onClosing(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
+			super.onClosing(webSocket, code, reason);
+		}
+
+		@Override
+		public void onFailure(@NotNull WebSocket webSocket, @NotNull Throwable t, @Nullable Response response) {
+			super.onFailure(webSocket, t, response);
+		}
+
+		@Override
+		public void onMessage(@NotNull WebSocket webSocket, @NotNull String text) {
+			super.onMessage(webSocket, text);
+		}
+
+		@Override
+		public void onMessage(@NotNull WebSocket webSocket, @NotNull ByteString bytes) {
+			super.onMessage(webSocket, bytes);
+		}
+
+		@Override
+		public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
+			webSocket.send("Hello...");
+			webSocket.send("...World!");
+			webSocket.send(ByteString.decodeHex("deadbeef"));
+			webSocket.close(10, "Goodbye, World!");
+		}
+	};
 
 	@Override
 	public void create() {
@@ -37,9 +68,12 @@ public class LOW extends Game {
 
 		 //TODO progressbar machen !! und Assetloader
 
+		buildWebSocketConnection();
+
 		this.setScreen(new LoginScreen(this, skin));
 
 	}
+
 
 	@Override
 	public void render() {
@@ -48,6 +82,21 @@ public class LOW extends Game {
 
 	@Override
 	public void dispose() {
+
+	}
+
+	public void buildWebSocketConnection(){
+
+		OkHttpClient client = new OkHttpClient();
+
+		HttpUrl httpUrl = HttpUrl.parse("http://localhost:8080/");
+
+		Request request = new Request.Builder()
+				.url(httpUrl)
+				.build();
+
+		WebSocket webSocket = client.newWebSocket(request,listener);
+
 
 	}
 }
