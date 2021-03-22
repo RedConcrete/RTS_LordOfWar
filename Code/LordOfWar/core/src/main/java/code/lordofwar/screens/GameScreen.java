@@ -6,7 +6,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -20,9 +19,9 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class GameScreen extends Screens implements Screen  {
 
-    private Stage stage;
-    private Game game;
-    private Skin skin;
+    private final Stage stage;
+    private final Game game;
+    private final Skin skin;
 
     private TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
@@ -59,12 +58,13 @@ public class GameScreen extends Screens implements Screen  {
         Vector2 vector2 = new Vector2();
         vector2.x = 150;
         unit.setVelocity(vector2);
+
+
     }
 
     @Override
     public void render(float delta) {
         Gdx.graphics.getGL20().glClearColor( 0, 0, 0, 1 );
-        //es muss alles übermalt werden anders können aneblich die actors nicht entfernt werden :|
         Gdx.graphics.getGL20().glClear( GL20.GL_COLOR_BUFFER_BIT |  GL20.GL_DEPTH_BUFFER_BIT );
 
         fps(stage,skin);
@@ -82,6 +82,7 @@ public class GameScreen extends Screens implements Screen  {
 
     @Override
     public void resize(int width, int height) {
+        camera.position.set(width/2f,height/2f,0);
         camera.viewportWidth = width;
         camera.viewportHeight = height;
         camera.update();
@@ -126,11 +127,7 @@ public class GameScreen extends Screens implements Screen  {
          }
          */
 
-        Label label = new Label("GameScreen", skin);
-        label.setFontScale(4f);
-        label.setX(Gdx.graphics.getWidth()*7f/16f);
-        label.setY(Gdx.graphics.getHeight()/2f);
-        stage.addActor(label);
+
 
         Window gameWindow1 = new Window("",skin);
         Window gameWindow2 = new Window("",skin);
@@ -147,9 +144,9 @@ public class GameScreen extends Screens implements Screen  {
         gameWindow3.setPosition(stage.getWidth() * 8/10,0);
         gameWindow3.setSize(stage.getWidth()* 2/10,stage.getHeight() * 2/6);
 
-        stage.addActor(gameWindow1);
-        stage.addActor(gameWindow2);
-        stage.addActor(gameWindow3);
+        //stage.addActor(gameWindow1);
+        //stage.addActor(gameWindow2);
+        //stage.addActor(gameWindow3);
 
         stage.setDebugAll(false);
     }
