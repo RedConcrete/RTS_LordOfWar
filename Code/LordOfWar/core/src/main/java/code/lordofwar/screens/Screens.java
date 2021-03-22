@@ -90,7 +90,6 @@ public abstract class Screens extends Constants{
         stage.addActor(window);
     }
 
-
 }
 
 

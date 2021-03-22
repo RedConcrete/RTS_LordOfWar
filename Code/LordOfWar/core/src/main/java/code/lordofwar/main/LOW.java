@@ -1,15 +1,19 @@
 package code.lordofwar.main;
 
+import code.lordofwar.backend.CommunicationHandler;
+import code.lordofwar.backend.GameWebSocketListener;
 import code.lordofwar.screens.LoginScreen;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import okhttp3.*;
-import okio.ByteString;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.WebSocket;
+
+import java.util.concurrent.TimeUnit;
 
 import static code.lordofwar.backend.Constants.WORLD_HEIGHT_PIXEL;
 import static code.lordofwar.backend.Constants.WORLD_WIDTH_PIXEL;
@@ -23,44 +27,17 @@ import static code.lordofwar.backend.Constants.WORLD_WIDTH_PIXEL;
 public class LOW extends Game {
 	private Stage stage;
 	private Skin skin;
-	WebSocketListener listener = new WebSocketListener() {
+	private WebSocket webSocket;
 
-		@Override
-		public void onClosed(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
-			super.onClosed(webSocket, code, reason);
-		}
-
-		@Override
-		public void onClosing(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
-			super.onClosing(webSocket, code, reason);
-		}
-
-		@Override
-		public void onFailure(@NotNull WebSocket webSocket, @NotNull Throwable t, @Nullable Response response) {
-			super.onFailure(webSocket, t, response);
-		}
-
-		@Override
-		public void onMessage(@NotNull WebSocket webSocket, @NotNull String text) {
-			super.onMessage(webSocket, text);
-		}
-
-		@Override
-		public void onMessage(@NotNull WebSocket webSocket, @NotNull ByteString bytes) {
-			super.onMessage(webSocket, bytes);
-		}
-
-		@Override
-		public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
-			webSocket.send("Hello...");
-			webSocket.send("...World!");
-			webSocket.send(ByteString.decodeHex("deadbeef"));
-			webSocket.close(10, "Goodbye, World!");
-		}
-	};
+	public LOW() {
+		buildWebSocketConnection();
+	}
 
 	@Override
 	public void create() {
+
+
+
 		skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 
 		FitViewport fitViewport = new FitViewport(WORLD_WIDTH_PIXEL, WORLD_HEIGHT_PIXEL);
@@ -68,12 +45,11 @@ public class LOW extends Game {
 
 		 //TODO progressbar machen !! und Assetloader
 
-		buildWebSocketConnection();
+
 
 		this.setScreen(new LoginScreen(this, skin));
 
 	}
-
 
 	@Override
 	public void render() {
@@ -87,17 +63,35 @@ public class LOW extends Game {
 
 	public void buildWebSocketConnection(){
 
-		OkHttpClient client = new OkHttpClient();
+		OkHttpClient client = new OkHttpClient.Builder()
+				.readTimeout(0, TimeUnit.MILLISECONDS)
+				.build();
 
-		HttpUrl httpUrl = HttpUrl.parse("http://localhost:8080/");
+		HttpUrl httpUrl = HttpUrl.parse("http://localhost:8080/api/v1/ws");
+
 
 		Request request = new Request.Builder()
 				.url(httpUrl)
+				.addHeader("Authorization", "Basic " + "MToxMjM0")
 				.build();
 
-		WebSocket webSocket = client.newWebSocket(request,listener);
+		GameWebSocketListener gameWebSocketListener = new GameWebSocketListener(this);
+		webSocket = client.newWebSocket(request,gameWebSocketListener);
+		CommunicationHandler cHandler = new CommunicationHandler();
+
+		gameWebSocketListener.setCommunicationHandler(cHandler);
+		gameWebSocketListener.setWebSocket(webSocket);
+		cHandler.setGameWebSocketListener(gameWebSocketListener);
 
 
+	}
+
+	public WebSocket getWebSocket() {
+		if(webSocket == null){
+			System.out.println("ist Null");
+			return webSocket;
+		}
+		return webSocket;
 	}
 }
 

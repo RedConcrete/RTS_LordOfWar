@@ -150,7 +150,5 @@ public class Unit extends Sprite {
           velocity.y = 0;
         }
 
-
-
     }
 }
