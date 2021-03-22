@@ -6,14 +6,13 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class LobbyBrowserScreen extends Screens implements Screen {
 
-    private Stage stage;
-    private Game game;
-    private Skin skin;
+    private final Stage stage;
+    private final Game game;
+    private final Skin skin;
 
 
     public LobbyBrowserScreen(Game aGame, Skin aSkin) {
