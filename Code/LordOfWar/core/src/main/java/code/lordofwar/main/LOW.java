@@ -1,23 +1,23 @@
 package code.lordofwar.main;
 
-import code.lordofwar.backend.Constants;
+import code.lordofwar.backend.CommunicationHandler;
+import code.lordofwar.backend.GameWebSocketListener;
 import code.lordofwar.screens.LoginScreen;
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.WebSocket;
+
+import java.util.concurrent.TimeUnit;
 
 import static code.lordofwar.backend.Constants.WORLD_HEIGHT_PIXEL;
 import static code.lordofwar.backend.Constants.WORLD_WIDTH_PIXEL;
+
 
 /*
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms.
@@ -27,15 +27,25 @@ import static code.lordofwar.backend.Constants.WORLD_WIDTH_PIXEL;
 public class LOW extends Game {
 	private Stage stage;
 	private Skin skin;
+	private WebSocket webSocket;
+
+	public LOW() {
+		buildWebSocketConnection();
+	}
 
 	@Override
 	public void create() {
+
+
+
 		skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 
 		FitViewport fitViewport = new FitViewport(WORLD_WIDTH_PIXEL, WORLD_HEIGHT_PIXEL);
 		stage = new Stage(fitViewport);
 
 		 //TODO progressbar machen !! und Assetloader
+
+
 
 		this.setScreen(new LoginScreen(this, skin));
 
@@ -49,6 +59,39 @@ public class LOW extends Game {
 	@Override
 	public void dispose() {
 
+	}
+
+	public void buildWebSocketConnection(){
+
+		OkHttpClient client = new OkHttpClient.Builder()
+				.readTimeout(0, TimeUnit.MILLISECONDS)
+				.build();
+
+		HttpUrl httpUrl = HttpUrl.parse("http://localhost:8080/api/v1/ws");
+
+
+		Request request = new Request.Builder()
+				.url(httpUrl)
+				.addHeader("Authorization", "Basic " + "MToxMjM0")
+				.build();
+
+		GameWebSocketListener gameWebSocketListener = new GameWebSocketListener(this);
+		webSocket = client.newWebSocket(request,gameWebSocketListener);
+		CommunicationHandler cHandler = new CommunicationHandler();
+
+		gameWebSocketListener.setCommunicationHandler(cHandler);
+		gameWebSocketListener.setWebSocket(webSocket);
+		cHandler.setGameWebSocketListener(gameWebSocketListener);
+
+
+	}
+
+	public WebSocket getWebSocket() {
+		if(webSocket == null){
+			System.out.println("ist Null");
+			return webSocket;
+		}
+		return webSocket;
 	}
 }
 

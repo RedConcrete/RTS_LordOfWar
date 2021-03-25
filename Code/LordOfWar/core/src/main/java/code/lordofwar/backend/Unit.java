@@ -3,7 +3,6 @@ package code.lordofwar.backend;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.maps.tiled.TiledMapImageLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
 
@@ -24,6 +23,7 @@ public class Unit extends Sprite {
     @Override
     public void draw(Batch batch) {
         update(Gdx.graphics.getDeltaTime());
+        // System.out.println("X: " + getX() + "Y: " + getY());
         super.draw(batch);
     }
 
@@ -65,6 +65,19 @@ public class Unit extends Sprite {
 
         setX(getX() + velocity.x * deltaTime);
 
+        //Todo timer um nur für 2 sec die Unit von dem Map ende weg zu schieben
+        if(getX() <= 0 ){
+            Vector2 vX =  new Vector2();
+            vX.x = 0;
+            setVelocity(vX);
+        }
+
+        if(getY() <= 0 ){
+            Vector2 vY =  new Vector2();
+            vY.y = 0;
+            setVelocity(vY);
+        }
+
         if (velocity.x < 0) {
 
             //Top left
@@ -93,6 +106,7 @@ public class Unit extends Sprite {
                         .getTile().getProperties().containsKey("blocked");
 
         }
+
 
         if(collisionX){
             setX(oldX);
@@ -135,8 +149,6 @@ public class Unit extends Sprite {
           setY(oldY);
           velocity.y = 0;
         }
-
-
 
     }
 }

@@ -1,0 +1,8 @@
+"id" + "//" + "data" + // + "data2" etc...
+z.B.:
+
+0001//Franz//password --> Login
+0002//Franz//password --> Register
+
+0003//..
+0004//..
