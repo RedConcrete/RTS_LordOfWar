@@ -5,6 +5,11 @@ import java.util.Map;
 
 import static de.main.MessageIdentifier.LOGIN_VALID;
 
+/**
+ * //todo kurz erklären!
+ *
+ * @author Franz Klose
+ */
 public class Login extends LowServer{
 
     private boolean loginValdi = true;
@@ -15,6 +20,11 @@ public class Login extends LowServer{
         dataPacker = new DataPacker();
     }
 
+    /**
+     * //todo kurz erklären!
+     *
+     * @author Franz Klose
+     */
     public void isLoginValid(String[] strings, Session session) {
 
 
@@ -22,11 +32,10 @@ public class Login extends LowServer{
 
 
         if(loginValdi){
-
             session.getAsyncRemote().sendObject(dataPacker.packData(LOGIN_VALID,"true"));
         }
         else{
-
+            session.getAsyncRemote().sendObject(dataPacker.packData(LOGIN_VALID,"false"));
         }
     }
 
