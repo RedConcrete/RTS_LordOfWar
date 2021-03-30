@@ -1,8 +1,7 @@
 package code.lordofwar.screens;
 
-import code.lordofwar.backend.events.LoginScreenEvent;
 import code.lordofwar.backend.events.RegisterScreenEvent;
-import com.badlogic.gdx.Game;
+import code.lordofwar.main.LOW;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -21,10 +20,10 @@ The class Register Screen allows the User to create a Account, that he can use t
 public class RegisterScreen extends Screens implements Screen {
 
     private final Stage stage;
-    private final Game game;
+    private final LOW game;
     private final Skin skin;
 
-    public RegisterScreen(Game aGame, Skin aSkin){
+    public RegisterScreen(LOW aGame, Skin aSkin){
 
         game = aGame;
         skin = aSkin;

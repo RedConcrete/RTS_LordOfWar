@@ -2,7 +2,7 @@ package code.lordofwar.screens;
 
 
 import code.lordofwar.backend.events.LoginScreenEvent;
-import com.badlogic.gdx.Game;
+import code.lordofwar.main.LOW;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -12,18 +12,22 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+
 public class LoginScreen extends Screens implements Screen {
 
     private final Stage stage;
-    private final Game game;
+    private final LOW game;
     private final Skin skin;
+    LoginScreenEvent loginScreenEvent;
 
 
-    public LoginScreen(Game aGame, Skin aSkin) {
+    public LoginScreen(LOW aGame, Skin aSkin) {
         game = aGame;
         skin = aSkin;
         stage = new Stage(new ScreenViewport());
-
+        loginScreenEvent = new LoginScreenEvent(game);
 
         fps(stage,skin);
         createBackground(stage);
@@ -41,13 +45,7 @@ public class LoginScreen extends Screens implements Screen {
     @Override
     public void render(float delta) {
 
-        //Todo Background hinzufügen!
-
-
         clearStage();
-
-
-
         stage.act();
         stage.draw();
     }
@@ -101,8 +99,19 @@ public class LoginScreen extends Screens implements Screen {
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("Login");
+                ArrayList<String> loginArray= new ArrayList<>();
+                loginArray.add(usernameTextField.getText());
+                loginArray.add(passwordTextField.getText());
 
-                if(LoginScreenEvent.isLoginValid()){
+                loginScreenEvent.sendUserData(loginArray);
+
+                try {
+                    TimeUnit.SECONDS.sleep(1); // todo schauen ob delay immer ausreicht!
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                if(loginScreenEvent.isLoginAnswer()){
 
                     game.setScreen(new MenuScreen(game, skin));
                     //removet alle actors von der stage
@@ -110,7 +119,7 @@ public class LoginScreen extends Screens implements Screen {
 
                 }
                 else{
-
+                    //todo zeige fehler an!!! in cooler Arte und Weise
                 }
             }
 
@@ -160,5 +169,9 @@ public class LoginScreen extends Screens implements Screen {
         packAndSetWindow(window,stage);
 
         stage.setDebugAll(false);
+    }
+
+    public LoginScreenEvent getLoginScreenEvent() {
+        return loginScreenEvent;
     }
 }

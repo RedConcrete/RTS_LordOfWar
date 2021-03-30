@@ -19,7 +19,7 @@ public abstract class Screens extends Constants{
     }
 
     protected void createBackground(Stage stage){
-        Texture texture = new Texture("assets\\ui\\background.jpg");
+        Texture texture = new Texture("ui\\background.jpg");
         Image image = new Image(texture);
         image.setSize(WORLD_WIDTH_PIXEL,WORLD_HEIGHT_PIXEL);
         stage.addActor(image);
@@ -87,7 +87,6 @@ public abstract class Screens extends Constants{
         window.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(.25f)));
         stage.addActor(window);
     }
-
 
 }
 

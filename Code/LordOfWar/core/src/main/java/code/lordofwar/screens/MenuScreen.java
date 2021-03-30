@@ -1,5 +1,6 @@
 package code.lordofwar.screens;
 
+import code.lordofwar.backend.Constants;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -7,6 +8,11 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -97,8 +103,6 @@ public class MenuScreen extends Screens implements Screen {
         windowExit.defaults().pad(20f);
 
 
-
-
         lobbyJoinButton.addListener(new InputListener(){
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
@@ -156,6 +160,8 @@ public class MenuScreen extends Screens implements Screen {
                 yesButton.addListener(new InputListener(){
                     @Override
                     public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+                        Constants constants = new Constants();
+                        constants.setCLOSEWEBSOCKET(true);
                         System.exit(0);
                     }
 
