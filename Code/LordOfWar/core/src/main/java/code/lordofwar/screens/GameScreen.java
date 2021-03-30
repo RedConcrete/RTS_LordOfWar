@@ -3,7 +3,6 @@ package code.lordofwar.screens;
 import code.lordofwar.backend.Villager;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -18,7 +17,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
@@ -60,7 +59,6 @@ public class GameScreen extends Screens implements Screen {
         collisionUnitLayer = (TiledMapTileLayer) map.getLayers().get(1);
 
         setupUI();
-
     }
 
     @Override
@@ -74,7 +72,6 @@ public class GameScreen extends Screens implements Screen {
 
         camera = new OrthographicCamera();
 
-
         for (int i = 0; i < startingVillager; i++) {
             Villager villager = new Villager(new Sprite(atlas.findRegion("Character_Green_B")), collisionUnitLayer);
             villagerArrayList.add(villager);
@@ -82,14 +79,6 @@ public class GameScreen extends Screens implements Screen {
             vectorSpeed.x = 100;
             villager.setVelocity(new Vector2(vectorSpeed));
         }
-        for (int i = 0; i < startingVillager; i++) {
-            Villager villager = new Villager(new Sprite(atlas.findRegion("Character_Green_B")), collisionUnitLayer);
-            villagerArrayList.add(villager);
-            villager.setPosition(villager.getCollisionLayer().getTileWidth(), i * villager.getCollisionLayer().getTileHeight());
-            vectorSpeed.x = 100;
-            villager.setVelocity(new Vector2(vectorSpeed));
-        }
-
 
     }
 
@@ -111,11 +100,6 @@ public class GameScreen extends Screens implements Screen {
         }
 
         renderer.getBatch().end();
-
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-            onMouseDown();
-        }
-
 
         stage.act();
         stage.draw();
@@ -156,10 +140,33 @@ public class GameScreen extends Screens implements Screen {
 
         //Todo https://www.youtube.com/watch?v=qik60F5I6J4&list=PLXY8okVWvwZ0qmqSBhOtqYRjzWtUCWylb <---------
 
-        //Todo später inGame um tasten zu belegen!!
-
+        //Todo später inGame um tasten zu belegen!
 
         Window gameWindow1 = new Window("left corner top", skin);
+        Window gameWindow2 = new Window("test", skin);
+//        Window gameWindow3 = new Window("right corner bottom",skin);
+
+        Button exitGameButton = new Button(skin);
+        exitGameButton.setSize(exitGameButton.getWidth() * 2, exitGameButton.getHeight() * 2);
+        exitGameButton.setPosition(stage.getWidth(), stage.getHeight());
+
+        gameWindow1.setMovable(false);
+        gameWindow2.setMovable(false);
+//        gameWindow3.setMovable(false);
+
+        exitGameButton.addListener(new InputListener() {
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                game.setScreen(new MenuScreen(game, skin));
+                stage.dispose();
+            }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+        });
+
 
         TextButton backButton = new TextButton("Villager", skin);
         backButton.getLabel().setFontScale(3f);
@@ -181,64 +188,20 @@ public class GameScreen extends Screens implements Screen {
         });
 
         gameWindow1.add(backButton).row();
-
-//        Window gameWindow2 = new Window("middle bottom",skin);
-//        Window gameWindow3 = new Window("right corner bottom",skin);
-
-        gameWindow1.setMovable(false);
-//        gameWindow2.setMovable(false);
-//        gameWindow3.setMovable(false);
-
-        gameWindow1.setPosition(0, 0);
+        gameWindow1.setPosition(0, stage.getHeight());
         gameWindow1.setSize(stage.getWidth() * 1 / 10, stage.getHeight() * 3 / 10);
 
-//        gameWindow2.setPosition(stage.getWidth() * 2/10,0);
-//        gameWindow2.setSize(stage.getWidth() * 3/10,stage.getHeight() * 1/6);
+        gameWindow2.add(exitGameButton);
+        gameWindow2.setPosition(stage.getWidth(), stage.getHeight());
+        gameWindow2.setSize(exitGameButton.getWidth() * 3, exitGameButton.getHeight() * 3);
 //
 //        gameWindow3.setPosition(stage.getWidth() * 2/10,0);
 //        gameWindow3.setSize(stage.getWidth()* 2/10,stage.getHeight() * 2/6);
 
         stage.addActor(gameWindow1);
-//        stage.addActor(gameWindow2);
+        stage.addActor(gameWindow2);
 //        stage.addActor(gameWindow3);
 
         stage.setDebugAll(false);
-    }
-
-
-    private void onMouseDown() {
-        float xClicked, yClicked;
-
-        xClicked = Gdx.input.getX();
-        yClicked = Gdx.input.getY();
-
-
-        //Todo camera movement überarbeiten !! map bewegt sich nicht mit so wie alle anderen objekte
-        //processCameraMovement(xClicked,yClicked);
-        //camera.position.lerp(posCameraDesired,0.1f);//vector of the camera desired position and smoothness of the movement
-
-    }
-
-    private void processCameraMovement(float xClicked, float yClicked) {
-        if (xClicked <= camera.viewportWidth / 2 && yClicked >= camera.viewportHeight / 2) {
-            posCameraDesired.x -= 100.0f * Gdx.graphics.getDeltaTime();
-            posCameraDesired.y -= 100.0f * Gdx.graphics.getDeltaTime();
-            System.out.println("links unten");
-        }
-        if (xClicked >= camera.viewportWidth / 2 && yClicked <= camera.viewportHeight / 2) {
-            posCameraDesired.x += 100.0f * Gdx.graphics.getDeltaTime();
-            posCameraDesired.y += 100.0f * Gdx.graphics.getDeltaTime();
-            System.out.println("rechts oben");
-        }
-        if (xClicked >= camera.viewportWidth / 2 && yClicked >= camera.viewportHeight / 2) {
-            posCameraDesired.x -= 100.0f * Gdx.graphics.getDeltaTime();
-            posCameraDesired.y += 100.0f * Gdx.graphics.getDeltaTime();
-            System.out.println("rechts unten");
-        }
-        if (xClicked <= camera.viewportWidth / 2 && yClicked <= camera.viewportHeight / 2) {
-            posCameraDesired.x += 100.0f * Gdx.graphics.getDeltaTime();
-            posCameraDesired.y -= 100.0f * Gdx.graphics.getDeltaTime();
-            System.out.println("links oben");
-        }
     }
 }
