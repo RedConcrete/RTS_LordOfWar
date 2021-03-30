@@ -117,7 +117,7 @@ public class LobbyCreateScreen extends Screens implements Screen {
 
 
 
-        stage.setDebugAll(true);
+        stage.setDebugAll(false);
     }
 
 }
