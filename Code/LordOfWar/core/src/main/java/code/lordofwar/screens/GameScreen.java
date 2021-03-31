@@ -63,7 +63,8 @@ public class GameScreen extends Screens implements Screen {
         villagerArrayList = new ArrayList<>();
         atlas = new TextureAtlas(Gdx.files.internal("maps/RTS_UNITS_TILES.txt"));
         loader = new TmxMapLoader();
-
+        TmxMapLoader loader = new TmxMapLoader();
+        map = loader.load("maps/map_1.tmx");
 
         camera = new OrthographicCamera();
         collisionUnitLayer = (TiledMapTileLayer) map.getLayers().get(1);
@@ -75,9 +76,6 @@ public class GameScreen extends Screens implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
-
-        TmxMapLoader loader = new TmxMapLoader();
-        map = loader.load("maps/map_1.tmx");
 
         renderer = new OrthogonalTiledMapRenderer(map);
 
