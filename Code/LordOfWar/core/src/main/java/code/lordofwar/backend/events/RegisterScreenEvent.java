@@ -1,8 +1,23 @@
 package code.lordofwar.backend.events;
 
-public class RegisterScreenEvent {
+import code.lordofwar.backend.DataPacker;
+import code.lordofwar.main.LOW;
+import okhttp3.WebSocket;
 
-    public RegisterScreenEvent(){
+import java.util.ArrayList;
+
+import static code.lordofwar.backend.MessageIdentifier.REGISTER;
+
+public class RegisterScreenEvent {
+    WebSocket webSocket;
+    DataPacker dataPacker = new DataPacker();
+    LOW game;
+
+    boolean registerAnswer;
+
+    public RegisterScreenEvent(LOW aGame) {
+        game = aGame;
+        webSocket = aGame.getWebSocket();
 
     }
 
@@ -10,10 +25,17 @@ public class RegisterScreenEvent {
     isRegisterValid checks if the Registration is Valid and creates a new Account.
     @author Robin Hefner
  */
-    public static boolean isRegisterValid(){
 
-        //TODO Register entwickeln
+    public void sendUserData(ArrayList<String> arr) {
+        webSocket.send(dataPacker.packData(REGISTER, dataPacker.stringCombiner(arr)));
+    }
 
-        return true;
+    public boolean isRegisterAnswer() {
+        return registerAnswer;
+    }
+
+    public void setRegisterAnswer(String[] strings) {
+        System.out.println(strings[1]);
+        registerAnswer = strings[1].equals("true");
     }
 }

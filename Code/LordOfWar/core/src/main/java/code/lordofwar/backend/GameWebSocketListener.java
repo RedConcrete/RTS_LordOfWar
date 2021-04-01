@@ -2,6 +2,7 @@ package code.lordofwar.backend;
 
 import code.lordofwar.main.LOW;
 import code.lordofwar.screens.LoginScreen;
+import code.lordofwar.screens.RegisterScreen;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
@@ -13,6 +14,7 @@ import java.util.Arrays;
 
 import static code.lordofwar.backend.Constants.STRINGSEPERATOR;
 import static code.lordofwar.backend.MessageIdentifier.LOGIN_VALID;
+import static code.lordofwar.backend.MessageIdentifier.REGISTER_VALID;
 
 public class GameWebSocketListener extends WebSocketListener {
 
@@ -61,6 +63,10 @@ public class GameWebSocketListener extends WebSocketListener {
                 if(strings[0].equals(LOGIN_VALID.toString())){
                     if(game.getScreen() instanceof LoginScreen){
                         ((LoginScreen) game.getScreen()).getLoginScreenEvent().setLoginAnswer(strings);
+                    }
+                }else if(strings[0].equals(REGISTER_VALID.toString())){
+                    if(game.getScreen() instanceof RegisterScreen){
+                        ((RegisterScreen) game.getScreen()).getRegisterScreenEvent().setRegisterAnswer(strings);
                     }
                 }
             }
