@@ -4,18 +4,12 @@ import java.util.ArrayList;
 
 import static de.main.Constants.STRINGSEPERATOR;
 
-/**
- * //todo kurz erklären!
- *
- * @author Franz Klose
- */
 public class DataPacker {
 
-    /**
-     * //todo kurz erklären!
-     *
-     * @author Franz Klose
-     */
+    public DataPacker() {
+
+    }
+
     public String stringCombiner(ArrayList<String> arrayList){
         StringBuilder newString = new StringBuilder();
 
@@ -26,11 +20,6 @@ public class DataPacker {
         return newString.toString();
     }
 
-    /**
-     * //todo kurz erklären!
-     *
-     * @author Franz Klose
-     */
     public String packData(MessageIdentifier messageIdentifier, String data){
         String dataPackage = "";
         dataPackage = messageIdentifier + STRINGSEPERATOR + data;

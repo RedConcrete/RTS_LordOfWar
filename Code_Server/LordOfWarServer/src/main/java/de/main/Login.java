@@ -1,41 +1,36 @@
 package de.main;
 
 import javax.websocket.Session;
-import java.util.Map;
 
 import static de.main.MessageIdentifier.LOGIN_VALID;
 
-/**
- * //todo kurz erklären!
- *
- * @author Franz Klose
- */
-public class Login extends LowServer{
 
-    private boolean loginValdi = true;
+public class Login{
+
+    private boolean loginValid;
     DataPacker dataPacker;
-
 
     public Login() {
         dataPacker = new DataPacker();
+        loginValid=false;
     }
 
-    /**
-     * //todo kurz erklären!
-     *
-     * @author Franz Klose
-     */
-    public void isLoginValid(String[] strings, Session session) {
 
+    public void isLoginValid(String[] strings, Session session) {
+        if (DataManager.isFile(strings[1])) {//username exists
+
+            User user = DataManager.fileToUser(DataManager.usernameToPath(strings[1]).toFile());
+            if (user!=null){
+                loginValid=strings[2].equals(user.getPassword());
+            }
+        }
 
         //todo überprüfung der angebenen Daten!
-
-
-        if(loginValdi){
+        if(loginValid){
             session.getAsyncRemote().sendObject(dataPacker.packData(LOGIN_VALID,"true"));
         }
         else{
-            session.getAsyncRemote().sendObject(dataPacker.packData(LOGIN_VALID,"false"));
+
         }
     }
 

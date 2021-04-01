@@ -9,16 +9,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static de.main.Constants.STRINGSEPERATOR;
 import static de.main.MessageIdentifier.LOGIN;
+import static de.main.MessageIdentifier.REGISTER;
 
 @ServerEndpoint("/api/v1/ws")
 @ApplicationScoped
 
 
-/**
- * //todo kurz erklären!
- *
- * @author Franz Klose
- */
 public class GameWebSocketHandler {
 
     Map<String, Session> sessions = new ConcurrentHashMap<>();
@@ -28,6 +24,8 @@ public class GameWebSocketHandler {
 
     @OnOpen
     public void onOpen(Session session) {
+        System.out.println("Websocket is Open!");
+        System.out.println(session);
         currentSessionCounter = counter;
         counter++;
         sessions.put(String.valueOf(currentSessionCounter), session);
@@ -57,36 +55,29 @@ public class GameWebSocketHandler {
 
     }
 
-    /**
-     * //todo kurz erklären!
-     *
-     * @author Franz Klose
-     */
     private String[] depackData(String message){
         return message.split(STRINGSEPERATOR);
     }
 
-    /**
-     * //todo kurz erklären!
-     *
-     * @author Franz Klose
-     */
     private void checkDataDir(String[] strings){
         for (MessageIdentifier messageIdentifier : MessageIdentifier.values()) {
             if(strings[0].equals(messageIdentifier.toString())){
                 if(strings[0].equals(LOGIN.toString())){
                     Login login = new Login();
                     login.isLoginValid(strings, sessions.get(String.valueOf(currentSessionCounter)));
+                }else if(strings[0].equals(REGISTER.toString())){
+                    Register register = new Register();
+                    register.isRegisterValid(strings, sessions.get(String.valueOf(currentSessionCounter)));
                 }
             }
         }
     }
 
-    /**
-     * //todo kurz erklären!
-     *
-     * @author Franz Klose
-     */
+    public Map<String, Session> getSessions() {
+        return sessions;
+    }
+
+
     private void broadcast(String message) {
         System.out.println(message);
         /*
@@ -98,9 +89,5 @@ public class GameWebSocketHandler {
             });
         });
         */
-    }
-
-    public Map<String, Session> getSessions() {
-        return sessions;
     }
 }
