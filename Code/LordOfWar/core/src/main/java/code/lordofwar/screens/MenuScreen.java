@@ -7,6 +7,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -17,9 +18,9 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class MenuScreen extends Screens implements Screen {
 
-    private Stage stage;
-    private Game game;
-    private Skin skin;
+    private final Stage stage;
+    private final Game game;
+    private final Skin skin;
 
     public MenuScreen(Game aGame, Skin aSkin) {
         game = aGame;
@@ -81,17 +82,17 @@ public class MenuScreen extends Screens implements Screen {
         lordOfWarLabel.setWidth(Gdx.graphics.getWidth());
         stage.addActor(lordOfWarLabel);
 
-        TextButton lobbyErstellenButton = new TextButton("Lobby erstellen",skin);
-        lobbyErstellenButton.getLabel().setFontScale(3f);
+        TextButton lobbyCreateButton = new TextButton("Lobby erstellen",skin);
+        lobbyCreateButton.getLabel().setFontScale(3f);
 
-        TextButton lobbyBeitrettenButton = new TextButton("Lobby beitretten",skin);
-        lobbyBeitrettenButton.getLabel().setFontScale(3f);
+        TextButton lobbyJoinButton = new TextButton("Lobby beitreten",skin);
+        lobbyJoinButton.getLabel().setFontScale(3f);
 
         TextButton optionButton = new TextButton("Optionen",skin);
         optionButton.getLabel().setFontScale(3f);
 
-        TextButton ExitButton = new TextButton("Exit",skin);
-        ExitButton.getLabel().setFontScale(3f);
+        TextButton exitButton = new TextButton("Exit",skin);
+        exitButton.getLabel().setFontScale(3f);
 
         Window windowMenu = new Window("", skin, "border");
         windowMenu.setMovable(false);
@@ -102,10 +103,10 @@ public class MenuScreen extends Screens implements Screen {
         windowExit.defaults().pad(20f);
 
 
-        lobbyBeitrettenButton.addListener(new InputListener(){
+        lobbyJoinButton.addListener(new InputListener(){
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("Lobby beitretten");
+                System.out.println("Lobby beitreten");
                 game.setScreen(new LobbyBrowserScreen(game, skin));
                 //Todo server muss daten von erstellten lobbys senden!
 
@@ -117,7 +118,7 @@ public class MenuScreen extends Screens implements Screen {
             }
         });
 
-        lobbyErstellenButton.addListener(new InputListener(){
+        lobbyCreateButton.addListener(new InputListener(){
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("LobbyErstellen");
@@ -144,7 +145,7 @@ public class MenuScreen extends Screens implements Screen {
             }
         });
 
-        ExitButton.addListener(new InputListener(){
+        exitButton.addListener(new InputListener(){
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
 
@@ -201,7 +202,7 @@ public class MenuScreen extends Screens implements Screen {
                 stage.addActor(windowExit);
 
             }
-            //was macht diese Methode??
+
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 return true;
@@ -209,20 +210,13 @@ public class MenuScreen extends Screens implements Screen {
         });
 
 
-        windowMenu.add(lobbyErstellenButton).row();
-        windowMenu.add(lobbyBeitrettenButton).row();
+        windowMenu.add(lobbyCreateButton).row();
+        windowMenu.add(lobbyJoinButton).row();
         windowMenu.add(optionButton).row();
-        windowMenu.add(ExitButton).row();
+        windowMenu.add(exitButton).row();
         windowMenu.pack();
 
-        windowMenu.setPosition(stage.getWidth() / 2f - windowMenu.getWidth() / 2f,
-                stage.getHeight() / 2f - windowMenu.getHeight() / 2f);
-        windowMenu.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(0.25f)));
-
-        windowExit.setPosition(stage.getWidth() / 2f - windowExit.getWidth() / 2f,
-                stage.getHeight() / 2f - windowExit.getHeight() / 2f);
-        windowExit.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(0.25f)));
-
+        packAndSetWindow(windowMenu,stage);
         stage.addActor(windowMenu);
 
         stage.setDebugAll(false);

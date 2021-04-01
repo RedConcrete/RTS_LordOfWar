@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
 
-public class Villager extends Sprite {
+public class Soldier extends Sprite {
 
     private Vector2 velocity = new Vector2();
 
@@ -14,7 +14,7 @@ public class Villager extends Sprite {
 
     private TiledMapTileLayer collisionLayer;
 
-    public Villager(Sprite sprite, TiledMapTileLayer collisionLayer) {
+    public Soldier(Sprite sprite, TiledMapTileLayer collisionLayer) {
         super(sprite);
         this.collisionLayer = collisionLayer;
     }

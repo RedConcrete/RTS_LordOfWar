@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
@@ -15,9 +14,9 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class LobbyScreen extends Screens implements Screen {
 
-    private Stage stage;
-    private Game game;
-    private Skin skin;
+    private final Stage stage;
+    private final Game game;
+    private final Skin skin;
 
     public LobbyScreen(Game aGame, Skin aSkin) {
 
@@ -40,7 +39,6 @@ public class LobbyScreen extends Screens implements Screen {
     public void render(float delta) {
 
         Gdx.graphics.getGL20().glClearColor( 0, 0, 0, 1 );
-        //es muss alles übermalt werden anders können aneblich die actors nicht entfernt werden :|
         Gdx.graphics.getGL20().glClear( GL20.GL_COLOR_BUFFER_BIT |  GL20.GL_DEPTH_BUFFER_BIT );
 
         fps(stage,skin);
