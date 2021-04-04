@@ -1,9 +1,6 @@
 package de.main;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
+
 import javax.websocket.Session;
 
 
