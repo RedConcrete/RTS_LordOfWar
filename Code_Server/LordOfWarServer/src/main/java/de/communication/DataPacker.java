@@ -1,8 +1,10 @@
-package de.main;
+package de.communication;
+
+import de.constants.MessageIdentifier;
 
 import java.util.ArrayList;
 
-import static de.main.Constants.STRINGSEPERATOR;
+import static de.constants.Constants.STRINGSEPERATOR;
 
 public class DataPacker {
 

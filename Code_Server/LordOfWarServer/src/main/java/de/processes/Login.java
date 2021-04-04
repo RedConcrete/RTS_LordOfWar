@@ -1,8 +1,11 @@
-package de.main;
+package de.processes;
+
+import de.communication.DataPacker;
+import de.model.User;
 
 import javax.websocket.Session;
 
-import static de.main.MessageIdentifier.LOGIN_VALID;
+import static de.constants.MessageIdentifier.LOGIN_VALID;
 
 
 public class Login{
@@ -25,7 +28,7 @@ public class Login{
             }
         }
 
-        //todo überprüfung der angebenen Daten!
+
         if(loginValid){
             session.getAsyncRemote().sendObject(dataPacker.packData(LOGIN_VALID,"true"));
         }

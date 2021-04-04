@@ -1,4 +1,4 @@
-package de.main;
+package de.constants;
 
 public enum MessageIdentifier {
 

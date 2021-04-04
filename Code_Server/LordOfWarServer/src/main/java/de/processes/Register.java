@@ -1,9 +1,12 @@
-package de.main;
+package de.processes;
+
+import de.communication.DataPacker;
+import de.model.User;
 
 import javax.transaction.Transactional;
 import javax.websocket.Session;
 
-import static de.main.MessageIdentifier.REGISTER_VALID;
+import static de.constants.MessageIdentifier.REGISTER_VALID;
 
 
 public class Register {

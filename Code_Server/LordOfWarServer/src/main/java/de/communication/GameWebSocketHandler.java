@@ -1,5 +1,9 @@
-package de.main;
+package de.communication;
 
+
+import de.processes.Login;
+import de.constants.MessageIdentifier;
+import de.processes.Register;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.websocket.*;
@@ -7,9 +11,9 @@ import javax.websocket.server.ServerEndpoint;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static de.main.Constants.STRINGSEPERATOR;
-import static de.main.MessageIdentifier.LOGIN;
-import static de.main.MessageIdentifier.REGISTER;
+import static de.constants.Constants.STRINGSEPERATOR;
+import static de.constants.MessageIdentifier.LOGIN;
+import static de.constants.MessageIdentifier.REGISTER;
 
 @ServerEndpoint("/api/v1/ws")
 @ApplicationScoped

@@ -1,4 +1,4 @@
-package de.main;
+package de.model;
 
 
 import javax.websocket.Session;
@@ -12,7 +12,10 @@ public class User {
     private final int userID;
     private Session uSession;
 
-    public User(String username, String password, int score, int userID, Session uSession) {
+    public User(String username, String password, Integer score, int userID, Session uSession) {
+        if (score==null){
+            score=0;
+        }
         this.username = username;
         this.password = password;
         this.score = score;
@@ -42,6 +45,19 @@ public class User {
 
     public void setScore(int score) {
         this.score = score;
+    }
+
+    public void addScore(int score) {
+        //TODO add overflow check
+            this.score += score;
+    }
+
+    public void subtractScore(int score) {
+        if (this.score>score) {
+            this.score -= score;
+        }else {
+            this.score=0;//no minus score
+        }
     }
 
     public Session getuSession() {
