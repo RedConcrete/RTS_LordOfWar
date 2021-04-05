@@ -22,10 +22,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.ArrayList;
@@ -177,7 +174,7 @@ public class GameScreen extends Screens implements Screen {
         Window gameWindow2 = new Window("test", skin);
 //      Window gameWindow3 = new Window("right corner bottom",skin);
 
-        Button exitGameButton = new Button(skin);
+        Button exitGameButton = new TextButton("Exit",skin);
         exitGameButton.setSize(exitGameButton.getWidth() * 2, exitGameButton.getHeight() * 2);
         exitGameButton.setPosition(stage.getWidth(), stage.getHeight());
 
@@ -219,6 +216,8 @@ public class GameScreen extends Screens implements Screen {
         });
 
         gameWindow1.add(backButton).row();
+        Label scoreLabel=new Label("",skin);
+
         gameWindow1.setPosition(0, stage.getHeight());
         gameWindow1.setSize(stage.getWidth() * 1 / 10, stage.getHeight() * 3 / 10);
 

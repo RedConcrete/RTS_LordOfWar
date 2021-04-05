@@ -48,8 +48,11 @@ public class User {
     }
 
     public void addScore(int score) {
-        //TODO add overflow check
+        if (score+this.score<this.score){
+            this.score=Integer.MAX_VALUE;
+        }else {
             this.score += score;
+        }
     }
 
     public void subtractScore(int score) {
