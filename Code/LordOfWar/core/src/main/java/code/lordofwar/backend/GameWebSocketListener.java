@@ -1,8 +1,7 @@
 package code.lordofwar.backend;
 
 import code.lordofwar.main.LOW;
-import code.lordofwar.screens.LoginScreen;
-import code.lordofwar.screens.RegisterScreen;
+import code.lordofwar.screens.*;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
@@ -13,8 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 
 import static code.lordofwar.backend.Constants.STRINGSEPERATOR;
-import static code.lordofwar.backend.MessageIdentifier.LOGIN_VALID;
-import static code.lordofwar.backend.MessageIdentifier.REGISTER_VALID;
+import static code.lordofwar.backend.MessageIdentifier.*;
 
 public class GameWebSocketListener extends WebSocketListener {
 
@@ -68,6 +66,14 @@ public class GameWebSocketListener extends WebSocketListener {
                     if(game.getScreen() instanceof RegisterScreen){
                         ((RegisterScreen) game.getScreen()).getRegisterScreenEvent().setRegisterAnswer(strings);
                     }
+                }else if (strings[0].equals(GET_GAME_POINTS.toString())){
+                    if (game.getScreen() instanceof GameScreen){
+                        ((GameScreen) game.getScreen()).getGameScreenEvent().updatePoints(strings);
+                    }
+                }else if (strings[0].equals(CONNECTION.toString())){
+                    game.setSessionID(strings[1]);//set session id
+                }else if (strings[0].equals(CREATE_LOBBY.toString())){
+                    ((LobbyCreateScreen) game.getScreen()).getLobbyCreateScreenEvent().setLobbyID(strings);
                 }
             }
         }

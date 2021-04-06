@@ -66,6 +66,7 @@ public class RegisterScreen extends Screens implements Screen {
                 System.out.println("Register");
                 //TODO Get rid of code copying
                 ArrayList<String> registerArray = new ArrayList<>();
+                registerArray.add(game.getSessionID());
                 registerArray.add(usernameTextField.getText());
                 registerArray.add(passwordTextField.getText());
 

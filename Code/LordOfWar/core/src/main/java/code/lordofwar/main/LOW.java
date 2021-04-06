@@ -28,6 +28,7 @@ public class LOW extends Game {
 	private Stage stage;
 	private Skin skin;
 	private WebSocket webSocket;
+	private String sessionID;
 
 	public LOW() {
 		buildWebSocketConnection();
@@ -82,8 +83,6 @@ public class LOW extends Game {
 		gameWebSocketListener.setCommunicationHandler(cHandler);
 		gameWebSocketListener.setWebSocket(webSocket);
 		cHandler.setGameWebSocketListener(gameWebSocketListener);
-
-
 	}
 
 	public WebSocket getWebSocket() {
@@ -92,6 +91,14 @@ public class LOW extends Game {
 			return webSocket;
 		}
 		return webSocket;
+	}
+
+	public String getSessionID() {
+		return sessionID;
+	}
+
+	public void setSessionID(String sessionID) {
+		this.sessionID = sessionID;
 	}
 }
 

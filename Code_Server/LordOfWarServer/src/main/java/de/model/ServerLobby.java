@@ -1,6 +1,7 @@
 package de.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 //for keeping data about a lobby
@@ -15,12 +16,16 @@ public class ServerLobby {
         joinCounter =0;
         this.players=new ArrayList<>();
         this.joinOrder=new HashMap<>();
-        this.game=null;
         for (int i = 0; i < players.length; i++) {//garantee order
             this.players.add(players[i]);
             joinOrder.put(players[i],joinCounter);
             joinCounter++;
         }
+        this.game=new ServerGame(this.players);
+    }
+
+    public ServerGame getGame() {
+        return game;
     }
 
     //TODO add methods for

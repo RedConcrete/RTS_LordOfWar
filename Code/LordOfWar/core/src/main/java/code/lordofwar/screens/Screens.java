@@ -1,6 +1,7 @@
 package code.lordofwar.screens;
 
 import code.lordofwar.backend.Constants;
+import code.lordofwar.main.LOW;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -52,7 +53,7 @@ public abstract class Screens extends Constants{
     @author Robin Hefner
      */
 
-    protected void backButton(Stage stage, Skin skin, Game game, Window window){
+    protected void backButton(Stage stage, Skin skin, LOW game, Window window){
         TextButton backButton = new TextButton("Back", skin);
         backButton.getLabel().setFontScale(3f);
 

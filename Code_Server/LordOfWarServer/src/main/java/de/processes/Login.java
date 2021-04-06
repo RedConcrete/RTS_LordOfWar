@@ -5,6 +5,8 @@ import de.model.User;
 
 import javax.websocket.Session;
 
+import java.util.ArrayList;
+
 import static de.constants.MessageIdentifier.LOGIN_VALID;
 
 
@@ -19,22 +21,29 @@ public class Login{
     }
 
 
-    public void isLoginValid(String[] strings, Session session) {
-        if (DataManager.isFile(strings[1])) {//username exists
+    public User isLoginValid(String[] strings, Session session) {
+        User validUser=null;
+        if (DataManager.isFile(strings[2])) {//username exists
 
-            User user = DataManager.fileToUser(DataManager.usernameToPath(strings[1]).toFile());
+            User user = DataManager.fileToUser(DataManager.usernameToPath(strings[2]).toFile());
             if (user!=null){
-                loginValid=strings[2].equals(user.getPassword());
+                if (strings[3].equals(user.getPassword())) {
+                    loginValid = true;
+                    validUser=user;
+                    validUser.setuSession(session);
+                }
             }
         }
 
 
         if(loginValid){
             session.getAsyncRemote().sendObject(dataPacker.packData(LOGIN_VALID,"true"));
+
         }
         else{
 
         }
+        return validUser;
     }
 
 }
