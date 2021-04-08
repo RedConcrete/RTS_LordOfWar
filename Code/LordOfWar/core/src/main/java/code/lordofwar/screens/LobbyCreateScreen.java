@@ -1,6 +1,7 @@
 package code.lordofwar.screens;
 
 import code.lordofwar.backend.events.LobbyCreateScreenEvent;
+import code.lordofwar.main.LOW;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -11,15 +12,18 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import java.util.concurrent.TimeUnit;
+
 public class LobbyCreateScreen extends Screens implements Screen {
 
     private final Stage stage;
-    private final Game game;
+    private final LOW game;
     private final Skin skin;
+    private final LobbyCreateScreenEvent lobbyCreateScreenEvent;
 
-    public LobbyCreateScreen(Game aGame, Skin aSkin) {
-
+    public LobbyCreateScreen(LOW aGame, Skin aSkin) {
         game = aGame;
+        lobbyCreateScreenEvent=new LobbyCreateScreenEvent(game);
         skin = aSkin;
         stage = new Stage(new ScreenViewport());
 
@@ -92,8 +96,15 @@ public class LobbyCreateScreen extends Screens implements Screen {
                 //Todo Abfrage entwickeln!!!
 
 
-                if(LobbyCreateScreenEvent.isGameStart()){
-                    game.setScreen(new LobbyScreen(game, skin));
+                lobbyCreateScreenEvent.sendLobbyCreateRequest(lobbyName.getText());
+                try {
+                    TimeUnit.SECONDS.sleep(2); // todo schauen ob delay immer ausreicht!
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                if(lobbyCreateScreenEvent.isCreated()){
+                    game.setScreen(new LobbyScreen(game, skin,lobbyCreateScreenEvent.getLobbyID()));
                 }
                 else{
 
@@ -120,4 +131,7 @@ public class LobbyCreateScreen extends Screens implements Screen {
         stage.setDebugAll(false);
     }
 
+    public LobbyCreateScreenEvent getLobbyCreateScreenEvent() {
+        return lobbyCreateScreenEvent;
+    }
 }

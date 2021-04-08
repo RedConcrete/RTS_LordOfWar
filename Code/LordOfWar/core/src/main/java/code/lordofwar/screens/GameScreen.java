@@ -2,6 +2,9 @@ package code.lordofwar.screens;
 
 import code.lordofwar.backend.Soldier;
 import code.lordofwar.backend.Villager;
+import code.lordofwar.backend.events.GameScreenEvent;
+import code.lordofwar.backend.events.RegisterScreenEvent;
+import code.lordofwar.main.LOW;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -22,10 +25,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ import java.util.ArrayList;
 public class GameScreen extends Screens implements Screen {
 
     private final Stage stage;
-    private final Game game;
+    private final LOW game;
     private final Skin skin;
     private final Vector2 vectorSpeed;
     public Vector3 posCameraDesired;
@@ -49,11 +49,13 @@ public class GameScreen extends Screens implements Screen {
     private final TiledMapTileLayer collisionUnitLayer;
     int startingVillager = 5;
     TmxMapLoader loader;
-
-
-    public GameScreen(Game aGame, Skin aSkin) {
-
+    private float pointTimerCounter;
+    private Label scoreLabel;
+    private GameScreenEvent gameScreenEvent;
+    public GameScreen(LOW aGame, Skin aSkin,String lobbyID) {
+        pointTimerCounter=10;
         game = aGame;
+        gameScreenEvent=new GameScreenEvent(game,lobbyID);
         skin = aSkin;
         stage = new Stage(new ScreenViewport());
         posCameraDesired = new Vector3();
@@ -108,7 +110,13 @@ public class GameScreen extends Screens implements Screen {
         renderer.render();
 
         renderer.getBatch().begin();
+        pointTimerCounter+=delta;
+        if (pointTimerCounter>1){//1 second update
+            gameScreenEvent.sendPointRequest();//TODO move this to server???
+            pointTimerCounter=0;
+        }
 
+        scoreLabel.setText(gameScreenEvent.getPoints());
         for (Villager v : villagerArrayList) {
             v.draw(renderer.getBatch());
         }
@@ -177,7 +185,7 @@ public class GameScreen extends Screens implements Screen {
         Window gameWindow2 = new Window("test", skin);
 //      Window gameWindow3 = new Window("right corner bottom",skin);
 
-        Button exitGameButton = new Button(skin);
+        Button exitGameButton = new TextButton("Exit",skin);
         exitGameButton.setSize(exitGameButton.getWidth() * 2, exitGameButton.getHeight() * 2);
         exitGameButton.setPosition(stage.getWidth(), stage.getHeight());
 
@@ -219,6 +227,9 @@ public class GameScreen extends Screens implements Screen {
         });
 
         gameWindow1.add(backButton).row();
+        scoreLabel=new Label("",skin);
+        gameWindow1.add(scoreLabel).row();
+
         gameWindow1.setPosition(0, stage.getHeight());
         gameWindow1.setSize(stage.getWidth() * 1 / 10, stage.getHeight() * 3 / 10);
 
@@ -324,5 +335,9 @@ public class GameScreen extends Screens implements Screen {
         debugRenderer.line(start, end);
         debugRenderer.end();
         Gdx.gl.glLineWidth(1);
+    }
+
+    public GameScreenEvent getGameScreenEvent() {
+        return gameScreenEvent;
     }
 }

@@ -1,5 +1,6 @@
 package code.lordofwar.screens;
 
+import code.lordofwar.main.LOW;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -15,11 +16,12 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 public class LobbyScreen extends Screens implements Screen {
 
     private final Stage stage;
-    private final Game game;
+    private final LOW game;
     private final Skin skin;
+    private final String lobbyID;
 
-    public LobbyScreen(Game aGame, Skin aSkin) {
-
+    public LobbyScreen(LOW aGame, Skin aSkin,String lobbyID) {
+        this.lobbyID=lobbyID;
         game = aGame;
         skin = aSkin;
         stage = new Stage(new ScreenViewport());
@@ -89,7 +91,7 @@ public class LobbyScreen extends Screens implements Screen {
                 System.out.println("LobbyErstellen");
                 //Todo server muss wissen das die Lobby gestartet wurde!
 
-                game.setScreen(new GameScreen(game, skin));
+                game.setScreen(new GameScreen(game, skin,lobbyID));
 
             }
             @Override

@@ -1,5 +1,8 @@
-package de.main;
+package de.processes;
 
+
+import de.constants.Constants;
+import de.model.User;
 
 import java.io.*;
 import java.nio.ByteBuffer;

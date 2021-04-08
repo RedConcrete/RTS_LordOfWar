@@ -100,13 +100,14 @@ public class LoginScreen extends Screens implements Screen {
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("Login");
                 ArrayList<String> loginArray= new ArrayList<>();
+                loginArray.add(game.getSessionID());
                 loginArray.add(usernameTextField.getText());
                 loginArray.add(passwordTextField.getText());
 
                 loginScreenEvent.sendUserData(loginArray);
 
                 try {
-                    TimeUnit.SECONDS.sleep(1); // todo schauen ob delay immer ausreicht!
+                    TimeUnit.SECONDS.sleep(2); // todo schauen ob delay immer ausreicht!
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
