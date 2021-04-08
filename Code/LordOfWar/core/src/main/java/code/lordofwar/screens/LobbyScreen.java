@@ -21,9 +21,10 @@ public class LobbyScreen extends Screens implements Screen {
     private final Skin skin;
     private String[] playerNameArr;
     public String[] gameInfoArr;
+    private final String lobbyID;
 
-    public LobbyScreen(LOW aGame, Skin aSkin) {
-
+    public LobbyScreen(LOW aGame, Skin aSkin,String lobbyID) {
+        this.lobbyID=lobbyID;
         game = aGame;
         skin = aSkin;
         stage = new Stage(new ScreenViewport());
@@ -99,7 +100,7 @@ public class LobbyScreen extends Screens implements Screen {
 
                 //Todo server muss wissen das die Lobby gestartet wurde!
 
-                game.setScreen(new GameScreen(game, skin));
+                game.setScreen(new GameScreen(game, skin,lobbyID));
 
             }
             @Override

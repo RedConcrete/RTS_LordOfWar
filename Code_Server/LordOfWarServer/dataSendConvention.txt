@@ -1,3 +1,7 @@
+IDENTIFIER+SessionID + all other data (depending on request)
+example login
+IDENTIFIER+sessionID+username+password
+
 "id" + "//" + "data" + // + "data2" etc...
 z.B.:
 

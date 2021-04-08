@@ -24,19 +24,20 @@ import okhttp3.WebSocket;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import java.util.concurrent.TimeUnit;
+
 public class LobbyCreateScreen extends Screens implements Screen {
 
     private final Stage stage;
     private final LOW game;
     private final Skin skin;
-    LobbyCreateScreenEvent lobbyCreateScreenEvent;
+    private final LobbyCreateScreenEvent lobbyCreateScreenEvent;
 
     public LobbyCreateScreen(LOW aGame, Skin aSkin) {
-
         game = aGame;
         skin = aSkin;
         stage = new Stage(new ScreenViewport());
-        lobbyCreateScreenEvent = new LobbyCreateScreenEvent(game);
+        lobbyCreateScreenEvent=new LobbyCreateScreenEvent(game);
 
         createBackground(stage);
 
@@ -129,12 +130,22 @@ public class LobbyCreateScreen extends Screens implements Screen {
 
                 //Todo Abfrage entwickeln!!!
                 Lobby lobby = new Lobby(lobbyName.getText(), mapSelctBox.getSelected(), playerAmountSelectBox.getSelected(), gameModeSelectBox.getSelected());
-                ArrayList<String> lobbyArr = new ArrayList(Collections.singleton(lobby.getLobbyname() + lobby.getMap() + lobby.getPlayerAmount() + lobby.getGamemode()));
-                lobbyCreateScreenEvent.sendLobbyData(lobbyArr);
+//                ArrayList<String> lobbyArr = new ArrayList(Collections.singleton(lobby.getLobbyname() + lobby.getMap() + lobby.getPlayerAmount() + lobby.getGamemode()));
+//                lobbyCreateScreenEvent.sendLobbyData(lobbyArr);
 
-                if (false) { //LobbyCreateScreenEvent.isLobbyCreated()
-                    game.setScreen(new LobbyScreen(game, skin));
-                } else {
+
+                lobbyCreateScreenEvent.sendLobbyCreateRequest(lobby);
+                try {
+                    TimeUnit.SECONDS.sleep(2); // todo schauen ob delay immer ausreicht!
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                if(lobbyCreateScreenEvent.isCreated()){
+                    game.setScreen(new LobbyScreen(game, skin,lobbyCreateScreenEvent.getLobbyID()));
+                }
+                else{
+
                     Window w = new Window("", skin ,"border");
                     TextArea textArea = new TextArea("lobby konnte nicht erstellt werden!",skin);
                     w.add(textArea);
@@ -167,7 +178,12 @@ public class LobbyCreateScreen extends Screens implements Screen {
         backButton(stage, skin, game, windowLobbyCreate);
         packAndSetWindow(windowLobbyCreate, stage);
 
+
+
         stage.setDebugAll(false);
     }
 
+    public LobbyCreateScreenEvent getLobbyCreateScreenEvent() {
+        return lobbyCreateScreenEvent;
+    }
 }

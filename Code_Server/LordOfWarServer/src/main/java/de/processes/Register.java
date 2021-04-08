@@ -1,9 +1,12 @@
-package de.main;
+package de.processes;
+
+import de.communication.DataPacker;
+import de.model.User;
 
 import javax.transaction.Transactional;
 import javax.websocket.Session;
 
-import static de.main.MessageIdentifier.REGISTER_VALID;
+import static de.constants.MessageIdentifier.REGISTER_VALID;
 
 
 public class Register {
@@ -20,12 +23,12 @@ public class Register {
 
     @Transactional
     public void isRegisterValid(String[] strings, Session session) {
-        if (!DataManager.isFile(strings[1])) {//username doesnt exist
+        if (!DataManager.isFile(strings[2])) {//username doesnt exist
             Integer id = null;
             while (id == null) {
                 id = DataManager.getNextID();//try until
             }
-            User user = new User(strings[1], strings[2], 0, id, null);
+            User user = new User(strings[2], strings[3], 0, id, null);
             registerValid= DataManager.userToFile(user);//successful creation
         }
 
