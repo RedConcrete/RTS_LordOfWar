@@ -81,13 +81,10 @@ public class GameWebSocketListener extends WebSocketListener {
 
     @Override
     public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
-        //webSocket.send("This is a test message");
-        System.out.println("websocket to server is open!");
-        //webSocket.close(NORMAL_CLOSURE_STATUS, "the ws is Closed|")
 
-        if(constants.getCLOSEWEBSOCKET()){
-            webSocket.close(0,"Exit Game");
-        }
+        System.out.println("websocket to server is open!");
+        game.getCon().setWEBSOCKET_OPEN(true);
+
     }
 
     public void setWebSocket(WebSocket websocket){

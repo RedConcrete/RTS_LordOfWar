@@ -1,8 +1,10 @@
 package code.lordofwar.screens;
 
 import code.lordofwar.backend.Constants;
+import code.lordofwar.main.LOW;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -13,21 +15,36 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 
 public abstract class Screens extends Constants{
 
+
+
     public Screens()  {
-
-
     }
 
     protected void createBackground(Stage stage){
         Texture texture = new Texture("ui\\background.jpg");
         Image image = new Image(texture);
-        image.setSize(WORLD_WIDTH_PIXEL,WORLD_HEIGHT_PIXEL);
+        Graphics.DisplayMode currentMode = Gdx.graphics.getDisplayMode();
+        if(Gdx.graphics.isFullscreen()){
+            image.setSize(currentMode.width,currentMode.height);
+        }
+        else{
+            image.setSize(WORLD_WIDTH_PIXEL,WORLD_HEIGHT_PIXEL);
+        }
+
         stage.addActor(image);
     }
 
     protected void clearStage(){
         Gdx.graphics.getGL20().glClearColor( 0, 0, 0, 1 );
         Gdx.graphics.getGL20().glClear( GL20.GL_COLOR_BUFFER_BIT |  GL20.GL_DEPTH_BUFFER_BIT );
+        Graphics.DisplayMode currentMode = Gdx.graphics.getDisplayMode();
+        if(Gdx.graphics.isFullscreen()){
+            Gdx.graphics.getGL20().glViewport(0,0,currentMode.width,currentMode.height);
+        }
+        else{
+            Gdx.graphics.getGL20().glViewport(0,0,WORLD_WIDTH_PIXEL,WORLD_HEIGHT_PIXEL);
+        }
+
     }
 
     protected void fps(Stage stage, Skin skin){
@@ -52,7 +69,7 @@ public abstract class Screens extends Constants{
     @author Robin Hefner
      */
 
-    protected void backButton(Stage stage, Skin skin, Game game, Window window){
+    protected void backButton(Stage stage, Skin skin, LOW game, Window window){
         TextButton backButton = new TextButton("Back", skin);
         backButton.getLabel().setFontScale(3f);
 

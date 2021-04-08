@@ -1,6 +1,7 @@
 package code.lordofwar.backend.events;
 
 import code.lordofwar.backend.DataPacker;
+import code.lordofwar.backend.User;
 import code.lordofwar.main.LOW;
 import okhttp3.WebSocket;
 
@@ -33,6 +34,7 @@ public class LoginScreenEvent {
 
     public void sendUserData(ArrayList<String> arr) {
         webSocket.send(dataPacker.packData(LOGIN, dataPacker.stringCombiner(arr)));
+
     }
 
     public boolean isLoginAnswer() {

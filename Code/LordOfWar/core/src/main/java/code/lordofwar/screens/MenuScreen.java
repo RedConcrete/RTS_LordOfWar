@@ -1,14 +1,12 @@
 package code.lordofwar.screens;
 
 import code.lordofwar.backend.Constants;
-import com.badlogic.gdx.Game;
+import code.lordofwar.main.LOW;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -19,10 +17,10 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 public class MenuScreen extends Screens implements Screen {
 
     private final Stage stage;
-    private final Game game;
+    private final LOW game;
     private final Skin skin;
 
-    public MenuScreen(Game aGame, Skin aSkin) {
+    public MenuScreen(LOW aGame, Skin aSkin) {
         game = aGame;
         skin = aSkin;
         stage = new Stage(new ScreenViewport());
@@ -160,8 +158,6 @@ public class MenuScreen extends Screens implements Screen {
                 yesButton.addListener(new InputListener(){
                     @Override
                     public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-                        Constants constants = new Constants();
-                        constants.setCLOSEWEBSOCKET(true);
                         System.exit(0);
                     }
 

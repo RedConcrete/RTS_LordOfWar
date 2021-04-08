@@ -1,27 +1,42 @@
 package code.lordofwar.screens;
 
+import code.lordofwar.backend.DataPacker;
+import code.lordofwar.backend.Lobby;
+import code.lordofwar.backend.MessageIdentifier;
+import code.lordofwar.backend.Rumble;
 import code.lordofwar.backend.events.LobbyCreateScreenEvent;
+import code.lordofwar.backend.events.LobbyScreenEvent;
+import code.lordofwar.main.LOW;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.Select;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import okhttp3.WebSocket;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class LobbyCreateScreen extends Screens implements Screen {
 
     private final Stage stage;
-    private final Game game;
+    private final LOW game;
     private final Skin skin;
+    LobbyCreateScreenEvent lobbyCreateScreenEvent;
 
-    public LobbyCreateScreen(Game aGame, Skin aSkin) {
+    public LobbyCreateScreen(LOW aGame, Skin aSkin) {
 
         game = aGame;
         skin = aSkin;
         stage = new Stage(new ScreenViewport());
+        lobbyCreateScreenEvent = new LobbyCreateScreenEvent(game);
 
         createBackground(stage);
 
@@ -36,11 +51,14 @@ public class LobbyCreateScreen extends Screens implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.graphics.getGL20().glClearColor( 0, 0, 0, 1 );
-        //es muss alles übermalt werden anders können aneblich die actors nicht entfernt werden :|
-        Gdx.graphics.getGL20().glClear( GL20.GL_COLOR_BUFFER_BIT |  GL20.GL_DEPTH_BUFFER_BIT );
+        clearStage();
 
-        fps(stage,skin);
+        if (Rumble.getRumbleTimeLeft() > 0){
+            Rumble.tick(Gdx.graphics.getDeltaTime());
+            stage.getCamera().translate(Rumble.getPos());
+        }
+
+        fps(stage, skin);
 
         stage.act();
         stage.draw();
@@ -77,45 +95,77 @@ public class LobbyCreateScreen extends Screens implements Screen {
         windowLobbyCreate.defaults().pad(20f);
         windowLobbyCreate.setMovable(false);
 
-        TextButton lobbyCreateButton = new TextButton("Lobby erstellen",skin);
+        TextButton lobbyCreateButton = new TextButton("create Lobby", skin);
         lobbyCreateButton.getLabel().setFontScale(3f);
 
-        Label lobbyNameLabel = new Label("Lobby name",skin);
+        TextField lobbyName = new TextField("", skin);
+
+        Label lobbyNameLabel = new Label("Lobby name", skin);
         lobbyNameLabel.setFontScale(2f);
 
-        TextField lobbyName = new TextField("",skin);
+        Label lobbyPlayerAmountLabel = new Label("Player amount", skin);
+        lobbyPlayerAmountLabel.setFontScale(2f);
 
-        lobbyCreateButton.addListener(new InputListener(){
+        Label gameModeLabel = new Label("Gamemode", skin);
+        gameModeLabel.setFontScale(2f);
+
+        Label mapLabel = new Label("Map", skin);
+        mapLabel.setFontScale(2f);
+
+        SelectBox<Integer> playerAmountSelectBox = new SelectBox(skin);
+        playerAmountSelectBox.setItems(2, 4, 6);
+
+        SelectBox<String> gameModeSelectBox = new SelectBox(skin);
+        gameModeSelectBox.setItems("Normal", "Expert");
+
+        SelectBox<String> mapSelctBox = new SelectBox(skin);
+        //todo maps müsseten noch überabretet werden
+        mapSelctBox.setItems("map_1", "map_2");
+
+
+        lobbyCreateButton.addListener(new InputListener() {
             @Override
-            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("LobbyErstellen");
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+
                 //Todo Abfrage entwickeln!!!
+                Lobby lobby = new Lobby(lobbyName.getText(), mapSelctBox.getSelected(), playerAmountSelectBox.getSelected(), gameModeSelectBox.getSelected());
+                ArrayList<String> lobbyArr = new ArrayList(Collections.singleton(lobby.getLobbyname() + lobby.getMap() + lobby.getPlayerAmount() + lobby.getGamemode()));
+                lobbyCreateScreenEvent.sendLobbyData(lobbyArr);
 
-
-                if(LobbyCreateScreenEvent.isGameStart()){
+                if (false) { //LobbyCreateScreenEvent.isLobbyCreated()
                     game.setScreen(new LobbyScreen(game, skin));
-                }
-                else{
+                } else {
+                    Window w = new Window("", skin ,"border");
+                    TextArea textArea = new TextArea("lobby konnte nicht erstellt werden!",skin);
+                    w.add(textArea);
+                    stage.addActor(w);
 
+                    Rumble.rumble(1f, .2f);
                 }
             }
 
             @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });
 
+        windowLobbyCreate.add(lobbyNameLabel);
+        windowLobbyCreate.add(gameModeLabel).row();
 
-        windowLobbyCreate.add(lobbyNameLabel).row();
-        windowLobbyCreate.add(lobbyName).row();
+        windowLobbyCreate.add(lobbyName);
+        windowLobbyCreate.add(gameModeSelectBox).row();
 
+        windowLobbyCreate.add(lobbyPlayerAmountLabel);
+        windowLobbyCreate.add(mapLabel).row();
 
-        windowLobbyCreate.add(lobbyCreateButton).row();
-        backButton(stage,skin,game,windowLobbyCreate);
-        packAndSetWindow(windowLobbyCreate,stage);
+        windowLobbyCreate.add(playerAmountSelectBox);
+        windowLobbyCreate.add(mapSelctBox).row();
 
+        windowLobbyCreate.add(lobbyCreateButton);
 
+        backButton(stage, skin, game, windowLobbyCreate);
+        packAndSetWindow(windowLobbyCreate, stage);
 
         stage.setDebugAll(false);
     }

@@ -1,5 +1,6 @@
 package code.lordofwar.screens;
 
+import code.lordofwar.main.LOW;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -11,11 +12,11 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 public class LobbyBrowserScreen extends Screens implements Screen {
 
     private final Stage stage;
-    private final Game game;
+    private final LOW game;
     private final Skin skin;
 
 
-    public LobbyBrowserScreen(Game aGame, Skin aSkin) {
+    public LobbyBrowserScreen(LOW aGame, Skin aSkin) {
         game = aGame;
         skin = aSkin;
         stage = new Stage(new ScreenViewport());

@@ -2,6 +2,7 @@ package code.lordofwar.screens;
 
 import code.lordofwar.backend.Soldier;
 import code.lordofwar.backend.Villager;
+import code.lordofwar.main.LOW;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -33,7 +34,7 @@ import java.util.ArrayList;
 public class GameScreen extends Screens implements Screen {
 
     private final Stage stage;
-    private final Game game;
+    private final LOW game;
     private final Skin skin;
     private final Vector2 vectorSpeed;
     public Vector3 posCameraDesired;
@@ -51,7 +52,7 @@ public class GameScreen extends Screens implements Screen {
     TmxMapLoader loader;
 
 
-    public GameScreen(Game aGame, Skin aSkin) {
+    public GameScreen(LOW aGame, Skin aSkin) {
 
         game = aGame;
         skin = aSkin;

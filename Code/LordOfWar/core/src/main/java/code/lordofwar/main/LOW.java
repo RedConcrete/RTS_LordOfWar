@@ -1,6 +1,7 @@
 package code.lordofwar.main;
 
 import code.lordofwar.backend.CommunicationHandler;
+import code.lordofwar.backend.Constants;
 import code.lordofwar.backend.GameWebSocketListener;
 import code.lordofwar.screens.LoginScreen;
 import com.badlogic.gdx.Game;
@@ -28,15 +29,19 @@ public class LOW extends Game {
 	private Stage stage;
 	private Skin skin;
 	private WebSocket webSocket;
+	private Constants con;
+
+	public Constants getCon() {
+		return con;
+	}
 
 	public LOW() {
+		con = new Constants();
 		buildWebSocketConnection();
 	}
 
 	@Override
 	public void create() {
-
-
 
 		skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 
