@@ -6,6 +6,7 @@ import code.lordofwar.main.LOW;
 import okhttp3.WebSocket;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import static code.lordofwar.backend.MessageIdentifier.CREATE_LOBBY;
 import static code.lordofwar.backend.MessageIdentifier.GET_GAME_POINTS;
@@ -22,15 +23,21 @@ public class LobbyCreateScreenEvent {
         game = aGame;
         dataPacker = new DataPacker();
         webSocket = aGame.getWebSocket();
-        isCreated=false;
+        isCreated = false;
     }
 
     public void sendLobbyCreateRequest(Lobby lobby) {
-        ArrayList<String> arr = new ArrayList<>();
-        //todo alles richtig machen
-        arr.add(game.getSessionID());
 
-        webSocket.send(dataPacker.packData(CREATE_LOBBY,dataPacker.stringCombiner(arr)));
+        ArrayList<String> lobbyArr = new ArrayList();
+
+        lobbyArr.add(game.getSessionID());
+        lobbyArr.add(lobby.getLobbyname());
+        lobbyArr.add(lobby.getMap());
+        lobbyArr.add(String.valueOf(lobby.getPlayerAmount()));
+        lobbyArr.add(lobby.getGamemode());
+
+        System.out.println(lobbyArr);
+        webSocket.send(dataPacker.packData(CREATE_LOBBY,dataPacker.stringCombiner(lobbyArr)));
     }
 
     public String getLobbyID() {

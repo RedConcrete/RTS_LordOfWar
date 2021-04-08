@@ -37,7 +37,7 @@ public class LobbyCreateScreen extends Screens implements Screen {
         game = aGame;
         skin = aSkin;
         stage = new Stage(new ScreenViewport());
-        lobbyCreateScreenEvent=new LobbyCreateScreenEvent(game);
+        lobbyCreateScreenEvent = new LobbyCreateScreenEvent(game);
 
         createBackground(stage);
 
@@ -54,7 +54,7 @@ public class LobbyCreateScreen extends Screens implements Screen {
     public void render(float delta) {
         clearStage();
 
-        if (Rumble.getRumbleTimeLeft() > 0){
+        if (Rumble.getRumbleTimeLeft() > 0) {
             Rumble.tick(Gdx.graphics.getDeltaTime());
             stage.getCamera().translate(Rumble.getPos());
         }
@@ -129,30 +129,38 @@ public class LobbyCreateScreen extends Screens implements Screen {
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
 
                 //Todo Abfrage entwickeln!!!
-                Lobby lobby = new Lobby(lobbyName.getText(), mapSelctBox.getSelected(), playerAmountSelectBox.getSelected(), gameModeSelectBox.getSelected());
-//                ArrayList<String> lobbyArr = new ArrayList(Collections.singleton(lobby.getLobbyname() + lobby.getMap() + lobby.getPlayerAmount() + lobby.getGamemode()));
-//                lobbyCreateScreenEvent.sendLobbyData(lobbyArr);
 
+                if (lobbyName.getText().isEmpty()) {
 
-                lobbyCreateScreenEvent.sendLobbyCreateRequest(lobby);
-                try {
-                    TimeUnit.SECONDS.sleep(2); // todo schauen ob delay immer ausreicht!
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                if(lobbyCreateScreenEvent.isCreated()){
-                    game.setScreen(new LobbyScreen(game, skin,lobbyCreateScreenEvent.getLobbyID()));
-                }
-                else{
-
-                    Window w = new Window("", skin ,"border");
-                    TextArea textArea = new TextArea("lobby konnte nicht erstellt werden!",skin);
+                    Window w = new Window("", skin, "border");
+                    TextArea textArea = new TextArea("der Lobby wurde kein Name gegeben!", skin);
                     w.add(textArea);
                     stage.addActor(w);
 
                     Rumble.rumble(1f, .2f);
+                } else {
+                    Lobby lobby = new Lobby(lobbyName.getText(), mapSelctBox.getSelected(), playerAmountSelectBox.getSelected(), gameModeSelectBox.getSelected());
+                    lobbyCreateScreenEvent.sendLobbyCreateRequest(lobby);
+                    try {
+                        TimeUnit.SECONDS.sleep(2); // todo schauen ob delay immer ausreicht!
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (lobbyCreateScreenEvent.isCreated()) {
+                        game.setScreen(new LobbyScreen(game, skin, lobbyCreateScreenEvent.getLobbyID()));
+                    } else {
+
+                        Window w = new Window("", skin, "border");
+                        TextArea textArea = new TextArea("lobby konnte nicht erstellt werden!", skin);
+                        w.add(textArea);
+                        stage.addActor(w);
+
+                        Rumble.rumble(1f, .2f);
+                    }
                 }
+
+
             }
 
             @Override
@@ -177,7 +185,6 @@ public class LobbyCreateScreen extends Screens implements Screen {
 
         backButton(stage, skin, game, windowLobbyCreate);
         packAndSetWindow(windowLobbyCreate, stage);
-
 
 
         stage.setDebugAll(false);
