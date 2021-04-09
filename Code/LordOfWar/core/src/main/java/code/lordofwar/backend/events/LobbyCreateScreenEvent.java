@@ -26,15 +26,20 @@ public class LobbyCreateScreenEvent {
         isCreated = false;
     }
 
+    public LobbyCreateScreenEvent() {
+
+    }
+
+
     public void sendLobbyCreateRequest(Lobby lobby) {
 
         ArrayList<String> lobbyArr = new ArrayList();
-
-        lobbyArr.add(game.getSessionID());
-        lobbyArr.add(lobby.getLobbyname());
-        lobbyArr.add(lobby.getMap());
-        lobbyArr.add(String.valueOf(lobby.getPlayerAmount()));
-        lobbyArr.add(lobby.getGamemode());
+        //0
+        lobbyArr.add(game.getSessionID()); //1
+        lobbyArr.add(lobby.getLobbyname());//2
+        lobbyArr.add(lobby.getMap());//3
+        lobbyArr.add(String.valueOf(lobby.getPlayerAmount()));//4
+        lobbyArr.add(lobby.getGamemode());//5
 
         System.out.println(lobbyArr);
         webSocket.send(dataPacker.packData(CREATE_LOBBY,dataPacker.stringCombiner(lobbyArr)));

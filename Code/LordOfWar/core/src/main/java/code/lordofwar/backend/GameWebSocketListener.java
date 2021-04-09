@@ -24,7 +24,6 @@ public class GameWebSocketListener extends WebSocketListener {
 
     private WebSocket gameWebSocket = null;
 
-    private CommunicationHandler communicationHandler = null;
     Constants constants = new Constants();
 
     @Override
@@ -49,31 +48,38 @@ public class GameWebSocketListener extends WebSocketListener {
         checkDataDir(dataArray);
     }
 
-    private String[] depackData(String message){
+    private String[] depackData(String message) {
         System.out.println(message);
         return message.split(STRINGSEPERATOR);
     }
 
-    private void checkDataDir(String[] strings){
+    private void checkDataDir(String[] strings) {
         System.out.println(Arrays.toString(strings));
         for (MessageIdentifier messageIdentifier : MessageIdentifier.values()) {
-            if(strings[0].equals(messageIdentifier.toString())){
-                if(strings[0].equals(LOGIN_VALID.toString())){
-                    if(game.getScreen() instanceof LoginScreen){
+            if (strings[0].equals(messageIdentifier.toString())) {
+                if (strings[0].equals(LOGIN_VALID.toString())) {
+                    if (game.getScreen() instanceof LoginScreen) {
                         ((LoginScreen) game.getScreen()).getLoginScreenEvent().setLoginAnswer(strings);
                     }
-                }else if(strings[0].equals(REGISTER_VALID.toString())){
-                    if(game.getScreen() instanceof RegisterScreen){
+                } else if (strings[0].equals(REGISTER_VALID.toString())) {
+                    if (game.getScreen() instanceof RegisterScreen) {
                         ((RegisterScreen) game.getScreen()).getRegisterScreenEvent().setRegisterAnswer(strings);
                     }
-                }else if (strings[0].equals(GET_GAME_POINTS.toString())){
-                    if (game.getScreen() instanceof GameScreen){
+                } else if (strings[0].equals(GET_GAME_POINTS.toString())) {
+                    if (game.getScreen() instanceof GameScreen) {
                         ((GameScreen) game.getScreen()).getGameScreenEvent().updatePoints(strings);
                     }
-                }else if (strings[0].equals(CONNECTION.toString())){
+                } else if (strings[0].equals(CONNECTION.toString())) {
                     game.setSessionID(strings[1]);//set session id
-                }else if (strings[0].equals(CREATE_LOBBY.toString())){
-                    ((LobbyCreateScreen) game.getScreen()).getLobbyCreateScreenEvent().setLobbyID(strings);
+                } else if (strings[0].equals(CREATE_LOBBY.toString())) {
+                    if (game.getScreen() instanceof LobbyCreateScreen) {
+                        ((LobbyCreateScreen) game.getScreen()).getLobbyCreateScreenEvent().setLobbyID(strings);
+                    }
+                } else if (strings[0].equals(GET_LOBBYS.toString())) {
+                    //todo lobbys richtig übergeben
+                    if (game.getScreen() instanceof LobbyBrowserScreen) {
+                        ((LobbyBrowserScreen) game.getScreen()).getLobbyBrowserScreenEvent().setLobbyList(strings);
+                    }
                 }
             }
         }
@@ -93,15 +99,11 @@ public class GameWebSocketListener extends WebSocketListener {
 
     }
 
-    public void setWebSocket(WebSocket websocket){
+    public void setWebSocket(WebSocket websocket) {
         gameWebSocket = websocket;
     }
 
-    public void sendMessage(String message){
+    public void sendMessage(String message) {
         gameWebSocket.send(message);
-    }
-
-    public void setCommunicationHandler(CommunicationHandler communicationHandler) {
-        this.communicationHandler = communicationHandler;
     }
 }

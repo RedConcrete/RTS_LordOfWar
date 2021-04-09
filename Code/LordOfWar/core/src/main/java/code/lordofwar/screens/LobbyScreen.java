@@ -114,7 +114,6 @@ public class LobbyScreen extends Screens implements Screen {
 
         windowLobby.add(startButton);
 
-
         backButton(stage,skin,game,windowLobby);
         packAndSetWindow(windowLobby,stage);
 
