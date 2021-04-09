@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.ArrayList;
@@ -25,7 +26,6 @@ public class LoginScreen extends Screens implements Screen {
     private final Skin skin;
     LoginScreenEvent loginScreenEvent;
     Image img;
-
 
 
     public LoginScreen(LOW aGame, Skin aSkin) {
@@ -195,7 +195,6 @@ public class LoginScreen extends Screens implements Screen {
          * checks if the Websocket-connection is open and shows it with a red / green sword
          */
 
-
         Window window = new Window("", skin, "border");
         window.defaults().pad(10f);
         window.defaults().padLeft(40f);
@@ -206,13 +205,12 @@ public class LoginScreen extends Screens implements Screen {
         window.add(usernameTextField).row();
         window.add(password).row();
         window.add(passwordTextField).row();
+        window.add(img);
         window.add(loginButton).row();
         window.add(noAccountLabel).row();
         window.add(registerButton).row();
         window.add(exitButton).row();
         packAndSetWindow(window, stage);
-        stage.addActor(img);
-        stage.getActors().get(stage.getActors().indexOf(img,true)).setPosition(stage.getWidth() * 9 / 10,stage.getHeight() * 1 / 10);
         stage.setDebugAll(false);
     }
 

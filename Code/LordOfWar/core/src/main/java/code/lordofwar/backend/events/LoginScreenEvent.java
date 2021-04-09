@@ -22,7 +22,6 @@ public class LoginScreenEvent {
     boolean loginAnswer;
 
 
-
     public LoginScreenEvent(LOW aGame) {
         this.game = aGame;
         webSocket = aGame.getWebSocket();

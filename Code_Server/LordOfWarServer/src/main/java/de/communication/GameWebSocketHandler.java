@@ -64,49 +64,68 @@ public class GameWebSocketHandler {
         return message.split(STRINGSEPERATOR);
     }
 
-    private void checkDataDir(String[] strings) {
+    private void checkDataDir(String[] data) {
         //um... with multiple players connected this will only work for the last one to connect right?
         // bc the currentSessionCounter is the value used?
         //send session id on connect to identify? send username with every query and check if said username is currently logged in? idk
         //TODO change data processing (see dataSendConvention.txt)
         //TODO change all methods associated with data processing
         for (MessageIdentifier messageIdentifier : MessageIdentifier.values()) {
-            if (strings[0].equals(messageIdentifier.toString())) {
-                if (strings[0].equals(LOGIN.toString())) {
+            if (data[0].equals(messageIdentifier.toString())) {
+                if (data[0].equals(LOGIN.toString())) {
                     Login login = new Login();
-                    User newUser = login.isLoginValid(strings, sessions.get(strings[1]));
+                    User newUser = login.isLoginValid(data, sessions.get(data[1]));
                     loginUser(newUser);
-                } else if (strings[0].equals(REGISTER.toString())) {
+                } else if (data[0].equals(REGISTER.toString())) {
                     Register register = new Register();
-                    register.isRegisterValid(strings, sessions.get(strings[1]));
-                } else if (strings[0].equals(GET_GAME_POINTS.toString())) {
-                    ServerLobby serverLobby=findLobby(strings);
-                    if (serverLobby!=null){
-                        sessions.get(strings[1]).getAsyncRemote().sendObject(dataPacker.packData(GET_GAME_POINTS, String.valueOf(serverLobby.getGame().getPoints(strings[1]))));
+                    register.isRegisterValid(data, sessions.get(data[1]));
+                } else if (data[0].equals(GET_GAME_POINTS.toString())) {
+                    ServerLobby serverLobby = findLobby(data);
+                    if (serverLobby != null) {
+                        sessions.get(data[1]).getAsyncRemote().sendObject(dataPacker.packData(GET_GAME_POINTS, String.valueOf(serverLobby.getGame().getPoints(data[1]))));
                     }
-                } else if (strings[0].equals(CREATE_LOBBY.toString())) {
-                    createLobby(strings);
+                } else if (data[0].equals(CREATE_LOBBY.toString())) {
+                    createLobby(data);
+
+                } else if (data[0].equals(GET_LOBBYS.toString())) {
+                    sendLobbysToClient(data[1]);
                 }
             }
         }
     }
 
-    private void createLobby(String[] args) {
-        //TODO where to put this?
-        if (userSessions.containsKey(args[1])) {//user is logged in
-            if (!lobbys.containsKey(args[2])) {//lobby doesnt exist
-                ServerLobby newLobby = new ServerLobby(new User[]{userSessions.get(args[1])});
-                lobbys.put(args[2], newLobby);
-                ArrayList<String> data=new ArrayList<>();
-                data.add("true");
-                data.add(args[2]);
-                sessions.get(args[1]).getAsyncRemote().sendObject(dataPacker.packData(CREATE_LOBBY, dataPacker.stringCombiner(data)));
-            }
+    private void sendLobbysToClient(String userID) {
+        ArrayList<String> arr = new ArrayList<>();
+        for (Map.Entry <String, ServerLobby> entry: lobbys.entrySet() ){
+            arr.add(entry.getKey());
+            arr.add(entry.getValue().getLobbyMap());
+            arr.add(entry.getValue().getGamemode());
+            arr.add(String.valueOf(entry.getValue().getPlayerAmount()));
         }
-        sessions.get(args[1]).getAsyncRemote().sendObject(dataPacker.packData(CREATE_LOBBY, "false"));
+
+        sessions.get(userID).getAsyncRemote().sendObject(dataPacker.packData(GET_LOBBYS, dataPacker.stringCombiner(arr)));
+        System.out.println(arr.toString());
     }
 
-    private ServerLobby findLobby(String[] args){
+    private void createLobby(String[] data) {
+        //TODO where to put this?
+        if (userSessions.containsKey(data[1])) { //user is logged in
+            if (!lobbys.containsKey(data[2])) { //lobby doesnt exist
+                User[] users = new User[Integer.parseInt(data[4])];
+                users[0] = userSessions.get(data[1]);
+                ServerLobby newLobby = new ServerLobby(users, data[2], data[3], users.length, data[5]);
+                lobbys.put(data[2], newLobby);
+
+                ArrayList<String> dataList = new ArrayList<>();
+                dataList.add("true");
+                dataList.add(data[2]);
+                sessions.get(data[1]).getAsyncRemote().sendObject(dataPacker.packData(CREATE_LOBBY, dataPacker.stringCombiner(dataList)));
+            }
+        }
+        sessions.get(data[1]).getAsyncRemote().sendObject(dataPacker.packData(CREATE_LOBBY, "false"));
+    }
+
+    private ServerLobby findLobby(String[] args) {
         return lobbys.getOrDefault(args[2], null);
     }
 

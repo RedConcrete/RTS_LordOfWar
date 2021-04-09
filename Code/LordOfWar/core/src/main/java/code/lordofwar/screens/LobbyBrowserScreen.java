@@ -1,5 +1,8 @@
 package code.lordofwar.screens;
 
+import code.lordofwar.backend.Lobby;
+import code.lordofwar.backend.events.LobbyBrowserScreenEvent;
+import code.lordofwar.backend.events.LobbyCreateScreenEvent;
 import code.lordofwar.main.LOW;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -7,29 +10,35 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import org.w3c.dom.Text;
+
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 public class LobbyBrowserScreen extends Screens implements Screen {
 
     private final Stage stage;
     private final LOW game;
     private final Skin skin;
-
+    private LobbyBrowserScreenEvent lobbyBrowserScreenEvent;
 
     public LobbyBrowserScreen(LOW aGame, Skin aSkin) {
         game = aGame;
         skin = aSkin;
         stage = new Stage(new ScreenViewport());
+        lobbyBrowserScreenEvent = new LobbyBrowserScreenEvent(game);
 
         createBackground(stage);
-
-        setupUI();
 
     }
 
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
+        setupUI();
+
     }
 
     @Override
@@ -66,50 +75,34 @@ public class LobbyBrowserScreen extends Screens implements Screen {
 
     private void setupUI() {
 
+        lobbyBrowserScreenEvent.sendRequestGetLobbys();
+
+        try {
+            TimeUnit.SECONDS.sleep(2); // todo schauen ob delay immer ausreicht!
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         Window windowLobbyBrowser = new Window("", skin, "border");
         windowLobbyBrowser.defaults().pad(20f);
 
-        backButton(stage,skin,game,windowLobbyBrowser);
+        String[] strings = lobbyBrowserScreenEvent.getLobbyList();
 
-        /*
-        Array<Label> labelArray = new Array<>();
-        labelArray.add(new Label("Test2",skin));
-
-        Table table = new Table();
-
-        final ScrollPane scroll = new ScrollPane(table, skin);
-        //Todo Scrollpane funkt noch nicht ganz nach sehen wie es funkt
-
-        scroll.setScrollingDisabled(true,false);
-        scroll.setScrollBarPositions(false,true);
-        table.pad(50f).defaults().space(4);
-
-        for (int i = 1; i < 10; i++) {
-            table.row();
-            //Todo Lobby wird mit infos vom Server gefüllt
-            Label label=new Label(i  + " 'Lobbyname' + 'Map' + '??' + 'CurrentConectedPlayers/AmountOfPlayers'  ", skin);
-            //Todo buttons müssen in ein Array
-            TextButton textButton = new TextButton("Beitreten",skin);
-
-            label.setFontScale(2f);
-            textButton.getLabel().setFontScale(2f);
-            table.add(label).padRight(50f);
-            table.add(textButton);
+        for (int i = 4; i < strings.length - 4; i += 4) {
+            TextButton textButton = new TextButton("join",skin);
+            Label l = new Label(strings[i - 3] +"  "+ strings[i - 2] +"  "+ strings[i - 1] +"  "+ strings[i] ,skin);
+            l.setFontScale(2f);
+            windowLobbyBrowser.add(l);
+            windowLobbyBrowser.add(textButton).row();
         }
 
-        windowLobbyBrowser.add(scroll).row();
-        windowLobbyBrowser.add(backButton).row();
-        
-         */
-        windowLobbyBrowser.pack();
-
-
-        windowLobbyBrowser.setPosition(stage.getWidth() / 2f - windowLobbyBrowser.getWidth() / 2f,
-                stage.getHeight() / 2f - windowLobbyBrowser.getHeight() / 2f);
-        windowLobbyBrowser.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
+        backButton(stage,skin,game,windowLobbyBrowser);
+        packAndSetWindow(windowLobbyBrowser,stage);
         stage.addActor(windowLobbyBrowser);
+        stage.setDebugAll(false);
+    }
 
-
-        stage.setDebugAll(true);
+    public LobbyBrowserScreenEvent getLobbyBrowserScreenEvent() {
+        return lobbyBrowserScreenEvent;
     }
 }
