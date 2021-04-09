@@ -1,6 +1,5 @@
 package code.lordofwar.main;
 
-import code.lordofwar.backend.CommunicationHandler;
 import code.lordofwar.backend.Constants;
 import code.lordofwar.backend.GameWebSocketListener;
 import code.lordofwar.screens.LoginScreen;
@@ -80,11 +79,7 @@ public class LOW extends Game {
 
 		GameWebSocketListener gameWebSocketListener = new GameWebSocketListener(this);
 		webSocket = client.newWebSocket(request,gameWebSocketListener);
-		CommunicationHandler cHandler = new CommunicationHandler();
-
-		gameWebSocketListener.setCommunicationHandler(cHandler);
 		gameWebSocketListener.setWebSocket(webSocket);
-		cHandler.setGameWebSocketListener(gameWebSocketListener);
 	}
 
 	public Constants getCon() {
