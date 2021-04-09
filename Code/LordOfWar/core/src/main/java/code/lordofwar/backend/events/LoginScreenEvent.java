@@ -1,7 +1,6 @@
 package code.lordofwar.backend.events;
 
 import code.lordofwar.backend.DataPacker;
-import code.lordofwar.backend.User;
 import code.lordofwar.main.LOW;
 import okhttp3.WebSocket;
 
