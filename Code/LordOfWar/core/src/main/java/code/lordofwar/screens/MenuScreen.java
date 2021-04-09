@@ -8,8 +8,6 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -161,8 +159,6 @@ public class MenuScreen extends Screens implements Screen {
                 yesButton.addListener(new InputListener(){
                     @Override
                     public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-                        Constants constants = new Constants();
-                        constants.setCLOSEWEBSOCKET(true);
                         System.exit(0);
                     }
 

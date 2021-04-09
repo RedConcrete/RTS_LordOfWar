@@ -1,16 +1,22 @@
 package code.lordofwar.lwjgl3;
 
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
-import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import code.lordofwar.main.LOW;
-import org.lwjgl.system.CallbackI;
+import jdk.internal.org.jline.utils.Display;
+
+import static code.lordofwar.backend.Constants.WORLD_HEIGHT_PIXEL;
+import static code.lordofwar.backend.Constants.WORLD_WIDTH_PIXEL;
+
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
+
+
+
+
 	public static void main(String[] args) {
 		createApplication();
 	}
@@ -22,7 +28,7 @@ public class Lwjgl3Launcher {
 	private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
 		Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
 		configuration.setTitle("LordOfWar");
-		configuration.setWindowedMode(1920, 1080);
+		configuration.setWindowedMode(WORLD_WIDTH_PIXEL,WORLD_HEIGHT_PIXEL);
 		configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
 		return configuration;
 	}

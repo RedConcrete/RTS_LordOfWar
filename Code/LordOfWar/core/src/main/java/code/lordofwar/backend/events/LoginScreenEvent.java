@@ -33,6 +33,7 @@ public class LoginScreenEvent {
 
     public void sendUserData(ArrayList<String> arr) {
         webSocket.send(dataPacker.packData(LOGIN, dataPacker.stringCombiner(arr)));
+
     }
 
     public boolean isLoginAnswer() {
