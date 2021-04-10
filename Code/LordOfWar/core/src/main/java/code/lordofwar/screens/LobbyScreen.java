@@ -1,5 +1,6 @@
 package code.lordofwar.screens;
 
+import code.lordofwar.backend.events.LobbyScreenEvent;
 import code.lordofwar.main.LOW;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -22,6 +23,7 @@ public class LobbyScreen extends Screens implements Screen {
     private String[] playerNameArr;
     public String[] gameInfoArr;
     private final String lobbyID;
+    private LobbyScreenEvent lobbyScreenEvent;
 
     public LobbyScreen(LOW aGame, Skin aSkin,String lobbyID) {
         this.lobbyID=lobbyID;
@@ -30,6 +32,7 @@ public class LobbyScreen extends Screens implements Screen {
         stage = new Stage(new ScreenViewport());
         playerNameArr = new String[]{"Username"};
         gameInfoArr = new String[]{"map \n" + "gamemode\n" + "...\n"};
+        lobbyScreenEvent=new LobbyScreenEvent(game);
 
         createBackground(stage);
 
@@ -120,4 +123,26 @@ public class LobbyScreen extends Screens implements Screen {
         stage.setDebugAll(false);
     }
 
+    @Override
+    protected void backButton(Stage stage, Skin skin, LOW game, Window window) {
+        TextButton backButton = new TextButton("Back", skin);
+        backButton.getLabel().setFontScale(3f);
+
+        backButton.addListener(new InputListener(){
+            @Override
+            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+                lobbyScreenEvent.sendLeaveLobbyNotice(LobbyScreen.this.lobbyID);
+                game.setScreen(new MenuScreen(game, skin));
+                stage.dispose();
+
+            }
+
+            @Override
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+        });
+
+        window.add(backButton).row();
+    }
 }

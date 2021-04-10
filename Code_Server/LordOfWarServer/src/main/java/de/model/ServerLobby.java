@@ -69,7 +69,7 @@ public class ServerLobby {
                         lowest = entry.getValue();
                     }
                 }
-                admin = newAdmin;
+                admin = newAdmin;//if no users admin=null
             }
             return true;
         }
