@@ -33,7 +33,7 @@ public class LobbyCreateScreenEvent {
 
     public void sendLobbyCreateRequest(Lobby lobby) {
 
-        ArrayList<String> lobbyArr = new ArrayList();
+        ArrayList<String> lobbyArr = new ArrayList<>();
         //0
         lobbyArr.add(game.getSessionID()); //1
         lobbyArr.add(lobby.getLobbyname());//2

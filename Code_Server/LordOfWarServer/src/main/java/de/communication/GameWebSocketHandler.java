@@ -89,6 +89,8 @@ public class GameWebSocketHandler {
 
                 } else if (data[0].equals(GET_LOBBYS.toString())) {
                     sendLobbysToClient(data[1]);
+                }else if (data[0].equals(JOIN_LOBBY.toString())){
+                    joinLobby(data);
                 }
             }
         }
@@ -96,15 +98,38 @@ public class GameWebSocketHandler {
 
     private void sendLobbysToClient(String userID) {
         ArrayList<String> arr = new ArrayList<>();
-        for (Map.Entry <String, ServerLobby> entry: lobbys.entrySet() ){
-            arr.add(entry.getKey());
-            arr.add(entry.getValue().getLobbyMap());
-            arr.add(entry.getValue().getGamemode());
-            arr.add(String.valueOf(entry.getValue().getPlayerAmount()));
+        for (Map.Entry<String, ServerLobby> entry : lobbys.entrySet()) {
+            if (entry.getValue().getGame() == null) {//not ingame
+                arr.add(entry.getKey());
+                arr.add(entry.getValue().getLobbyMap());
+                arr.add(entry.getValue().getGamemode());
+                arr.add(String.valueOf(entry.getValue().getPlayerAmount()));
+            }
         }
 
         sessions.get(userID).getAsyncRemote().sendObject(dataPacker.packData(GET_LOBBYS, dataPacker.stringCombiner(arr)));
         System.out.println(arr.toString());
+    }
+
+    private void joinLobby(String[] data) {
+        boolean joined = false;
+        ServerLobby lobby = findLobby(data);
+        if (lobby != null) {
+            if (lobby.getGame() == null) {
+                joined = lobby.joinLobby(userSessions.get(data[1]));
+                if (joined) {
+                    ArrayList<String> lobbyDataToSend = new ArrayList<>();
+                    lobbyDataToSend.add("true");
+                    lobbyDataToSend.add(lobby.getLobbyName());
+                    sessions.get(data[1]).getAsyncRemote().sendObject(dataPacker.packData(JOIN_LOBBY, dataPacker.stringCombiner(lobbyDataToSend)));
+                    System.out.println(joined);
+                }
+            }
+        }
+        if (!joined) {
+            sessions.get(data[1]).getAsyncRemote().sendObject(dataPacker.packData(JOIN_LOBBY, "false"));
+        }
+        //TODO send joined success back
     }
 
     private void createLobby(String[] data) {
