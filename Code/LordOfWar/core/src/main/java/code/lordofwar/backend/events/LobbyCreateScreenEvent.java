@@ -26,11 +26,6 @@ public class LobbyCreateScreenEvent {
         isCreated = false;
     }
 
-    public LobbyCreateScreenEvent() {
-
-    }
-
-
     public void sendLobbyCreateRequest(Lobby lobby) {
 
         ArrayList<String> lobbyArr = new ArrayList<>();

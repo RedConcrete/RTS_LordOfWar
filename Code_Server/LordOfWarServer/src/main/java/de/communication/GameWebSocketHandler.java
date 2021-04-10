@@ -91,6 +91,8 @@ public class GameWebSocketHandler {
                     sendLobbysToClient(data[1]);
                 }else if (data[0].equals(JOIN_LOBBY.toString())){
                     joinLobby(data);
+                }else if (data[0].equals(LEAVE_LOBBY.toString())){
+                    leaveLobby(data);
                 }
             }
         }
@@ -109,6 +111,18 @@ public class GameWebSocketHandler {
 
         sessions.get(userID).getAsyncRemote().sendObject(dataPacker.packData(GET_LOBBYS, dataPacker.stringCombiner(arr)));
         System.out.println(arr.toString());
+    }
+
+    private void leaveLobby(String[] data){
+        ServerLobby lobby=findLobby(data);
+        if (lobby!=null){
+            boolean leave= lobby.leaveLobby(userSessions.get(data[1]));
+        if (leave){
+            if (lobby.getAdmin()==null){
+                lobbys.remove(lobby.getLobbyName());
+            }
+        }
+        }
     }
 
     private void joinLobby(String[] data) {
