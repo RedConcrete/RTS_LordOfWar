@@ -80,6 +80,10 @@ public class GameWebSocketListener extends WebSocketListener {
                     if (game.getScreen() instanceof LobbyBrowserScreen) {
                         ((LobbyBrowserScreen) game.getScreen()).getLobbyBrowserScreenEvent().setLobbyList(strings);
                     }
+                }else if (strings[0].equals(JOIN_LOBBY.toString())){
+                    if (game.getScreen() instanceof LobbyBrowserScreen){
+                        ((LobbyBrowserScreen) game.getScreen()).getLobbyBrowserScreenEvent().setJoined(strings);
+                    }
                 }
             }
         }

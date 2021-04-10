@@ -9,6 +9,7 @@ public enum MessageIdentifier {
     REGISTER_VALID,
     GET_GAME_POINTS,//request to get current number of points (ingame) included data: UserID
     CREATE_LOBBY,
-    GET_LOBBYS
+    GET_LOBBYS,
+    JOIN_LOBBY
     ;
 }

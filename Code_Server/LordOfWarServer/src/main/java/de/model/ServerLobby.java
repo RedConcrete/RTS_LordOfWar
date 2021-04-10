@@ -1,14 +1,14 @@
 package de.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 //for keeping data about a lobby
 public class ServerLobby {
 
     private ArrayList<User> players;//players in the lobby (adaptive since max players can be switched)
-    private HashMap<User,Integer> joinOrder;//lowest number is admin
+    private HashMap<User, Integer> joinOrder;//lowest number is admin
 
     private String lobbyName;
     private String lobbyMap;
@@ -17,18 +17,22 @@ public class ServerLobby {
 
     private ServerGame game;
     private int joinCounter;
+    private User admin;
 
     //TODO gamesettings
     //todo das server lobby objekt muss wie folgt erstellt werden (name der lobby , lobby map, player amount, gamemode, etc..)
     public ServerLobby(User[] players, String lobbyName, String lobbyMap, int playerAmount, String gamemode) {
-        joinCounter =0;
-        this.players=new ArrayList<>();
-        this.joinOrder=new HashMap<>();
+        joinCounter = 0;
+        this.players = new ArrayList<>();
+        this.joinOrder = new HashMap<>();
 
         for (int i = 0; i < players.length; i++) {//garantee order
-            if(players[i] != null){
+            if (players[i] != null) {
+                if (joinOrder.isEmpty()) {
+                    admin = players[i];
+                }
                 this.players.add(players[i]);
-                joinOrder.put(players[i],joinCounter);
+                joinOrder.put(players[i], joinCounter);
                 joinCounter++;
             }
         }
@@ -38,6 +42,39 @@ public class ServerLobby {
         this.lobbyMap = lobbyMap;
         this.playerAmount = playerAmount;
         this.gamemode = gamemode;
+    }
+
+    public boolean joinLobby(User user) {
+        if (players.size() < playerAmount) {//free spots open
+            if (!joinOrder.containsKey(user)) {
+                players.add(user);
+                joinOrder.put(user, joinCounter);
+                joinCounter++;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean leaveLobby(User user) {
+        if (players.contains(user)) {
+            players.remove(user);
+            joinOrder.remove(user);
+            if (admin == user) {
+                User newAdmin = null;
+                int lowest = Integer.MAX_VALUE;
+                for (Map.Entry<User, Integer> entry : joinOrder.entrySet()) {
+                    if (entry.getValue() < lowest) {
+                        newAdmin = entry.getKey();
+                        lowest = entry.getValue();
+                    }
+                }
+                admin = newAdmin;
+            }
+            return true;
+        }
+
+        return false;
     }
 
     public ServerGame getGame() {
@@ -104,6 +141,9 @@ public class ServerLobby {
         this.joinCounter = joinCounter;
     }
 
+    public User getAdmin() {
+        return admin;
+    }
     //TODO add methods for
     // -create (constructor or static create?)
     // -get
