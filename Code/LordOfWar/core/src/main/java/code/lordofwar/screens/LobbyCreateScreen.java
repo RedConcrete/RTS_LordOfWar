@@ -1,28 +1,18 @@
 package code.lordofwar.screens;
 
-import code.lordofwar.backend.DataPacker;
+
 import code.lordofwar.backend.Lobby;
-import code.lordofwar.backend.MessageIdentifier;
 import code.lordofwar.backend.Rumble;
 import code.lordofwar.backend.events.LobbyCreateScreenEvent;
-import code.lordofwar.backend.events.LobbyScreenEvent;
 import code.lordofwar.main.LOW;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.utils.Select;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import okhttp3.WebSocket;
 
-import java.util.ArrayList;
-import java.util.Collections;
 
 import java.util.concurrent.TimeUnit;
 
@@ -96,7 +86,7 @@ public class LobbyCreateScreen extends Screens implements Screen {
         windowLobbyCreate.defaults().pad(20f);
         windowLobbyCreate.setMovable(false);
 
-        TextButton lobbyCreateButton = new TextButton("create Lobby", skin);
+        TextButton lobbyCreateButton = new TextButton("Create Lobby", skin);
         lobbyCreateButton.getLabel().setFontScale(3f);
 
         TextField lobbyName = new TextField("", skin);

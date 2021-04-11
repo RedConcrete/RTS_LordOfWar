@@ -50,7 +50,9 @@ public class GameScreen extends Screens implements Screen {
     int startingVillager = 5;
     TmxMapLoader loader;
     private float pointTimerCounter;
+    private  Label yourScoreLabel;
     private Label scoreLabel;
+    private Label spacerLabel;
     private GameScreenEvent gameScreenEvent;
     public GameScreen(LOW aGame, Skin aSkin,String lobbyID) {
         pointTimerCounter=10;
@@ -193,6 +195,8 @@ public class GameScreen extends Screens implements Screen {
         gameWindow2.setMovable(false);
 //        gameWindow3.setMovable(false);
 
+
+
         exitGameButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
@@ -206,36 +210,24 @@ public class GameScreen extends Screens implements Screen {
             }
         });
 
-
-        TextButton backButton = new TextButton("Villager", skin);
-        backButton.getLabel().setFontScale(3f);
-
-        backButton.addListener(new InputListener() {
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-
-                Villager villager = new Villager(new Sprite(atlas.findRegion("Character_Green_B")), collisionUnitLayer);
-                villagerArrayList.add(villager);
-                villager.setVelocity(vectorSpeed);
-                villager.setPosition(10, 10);
-            }
-
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
-        });
-
-        gameWindow1.add(backButton).row();
+        yourScoreLabel= new Label(" Your Score ",skin);
+        yourScoreLabel.setFontScale(2.5f);
         scoreLabel=new Label("",skin);
+        scoreLabel.setFontScale(2.5f);
+        spacerLabel=new Label("",skin);
+        spacerLabel.setFontScale(1.5f);
+        gameWindow1.add(spacerLabel).row();
+        gameWindow1.add(yourScoreLabel).row();
+        gameWindow1.add(spacerLabel).row();
         gameWindow1.add(scoreLabel).row();
 
+
         gameWindow1.setPosition(0, stage.getHeight());
-        gameWindow1.setSize(stage.getWidth() * 1 / 10, stage.getHeight() * 3 / 10);
+        gameWindow1.setSize(stage.getWidth() * 1 / 10, stage.getHeight() * 3 / 25);
 
         gameWindow2.add(exitGameButton);
         gameWindow2.setPosition(stage.getWidth(), stage.getHeight());
-        gameWindow2.setSize(exitGameButton.getWidth() * 3, exitGameButton.getHeight() * 3);
+        gameWindow2.setSize(exitGameButton.getWidth() , exitGameButton.getHeight() * 3);
 //
 //        gameWindow3.setPosition(stage.getWidth() * 2/10,0);
 //        gameWindow3.setSize(stage.getWidth()* 2/10,stage.getHeight() * 2/6);
