@@ -18,10 +18,11 @@ public class Sounds {
     public Sounds (){
         value = -30f;
         load();
+        play(sound);
     }
 
     public void load(){
-        //sound = new File(assets/music/Ireland.wav);
+        sound = new File("assets/music/Ireland.wav");
 
     }
 
