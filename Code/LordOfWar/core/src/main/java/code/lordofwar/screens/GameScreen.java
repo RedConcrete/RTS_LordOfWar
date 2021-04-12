@@ -49,7 +49,7 @@ public class GameScreen extends Screens implements Screen {
     TmxMapLoader loader;
     private float pointTimerCounter;
     private Label scoreLabel;
-    private GameScreenEvent gameScreenEvent;
+    private final GameScreenEvent gameScreenEvent;
     public GameScreen(LOW aGame, Skin aSkin,String lobbyID) {
         pointTimerCounter=10;
         game = aGame;
@@ -177,24 +177,72 @@ public class GameScreen extends Screens implements Screen {
          }
          */
 
-        Window gameWindow1 = new Window("", skin);
-        Window gameWindow2 = new Window("", skin);
-//      Window gameWindow3 = new Window("right corner bottom",skin);
-        TextButton villagerButton = new TextButton("Villager", skin);
-        TextButton exitGameButton = new TextButton("Exit",skin);
-        exitGameButton.getLabel().setFontScale(3f);
-        ProgressBar progressBar = new ProgressBar(1,100000,10,false,skin);
-        progressBar.setColor(Color.GOLD);
-
+        Window gameWindow1 = new Window("left corner top", skin);
+        Window gameWindow2 = new Window("test", skin);
+        Window windowExit = new Window("Exit?",skin, "border");
         gameWindow1.setMovable(false);
         gameWindow2.setMovable(false);
-//      gameWindow3.setMovable(false);
 
-        exitGameButton.addListener(new InputListener() {
+
+        windowExit.setMovable(false);
+        windowExit.defaults().pad(20f);
+
+        TextButton exitGameButton = new TextButton("Exit",skin);
+        exitGameButton.setSize(exitGameButton.getWidth() * 5, exitGameButton.getHeight() * 5);
+        exitGameButton.setPosition(stage.getWidth(), stage.getHeight());
+        exitGameButton.getLabel().setFontScale(3f);
+        exitGameButton.getLabel().setFontScale(3f);
+
+        exitGameButton.addListener(new InputListener(){
             @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                game.setScreen(new MenuScreen(game, skin));
-                stage.dispose();
+            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+
+                windowExit.setVisible(true);
+
+                TextButton yesButton = new TextButton("Yes", skin);
+                yesButton.getLabel().setFontScale(2f);
+
+                yesButton.addListener(new InputListener() {
+                    @Override
+                    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                        game.setScreen(new MenuScreen(game, skin));
+                        stage.dispose();
+                    }
+
+                    @Override
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                        return true;
+                    }
+                });
+
+
+                TextButton noButton = new TextButton("No", skin);
+                noButton.getLabel().setFontScale(2f);
+
+                noButton.addListener(new InputListener() {
+                    @Override
+                    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                        windowExit.setVisible(false);
+                    }
+
+                    @Override
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                        return true;
+                    }
+                });
+
+                Label exitLabel = new Label("Do you realy want to Exit?",skin);
+                exitLabel.setFontScale(3f);
+
+
+                windowExit.add(exitLabel).colspan(2).row();
+                windowExit.add(yesButton);
+                windowExit.add(noButton);
+                windowExit.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
+                windowExit.pack();
+
+                stage.addActor(windowExit);
+
             }
 
             @Override
@@ -203,42 +251,26 @@ public class GameScreen extends Screens implements Screen {
             }
         });
 
-        villagerButton.getLabel().setFontScale(3f);
 
-        villagerButton.addListener(new InputListener() {
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-
-                Villager villager = new Villager(new Sprite(atlas.findRegion("Character_Green_B")), collisionUnitLayer);
-                villagerArrayList.add(villager);
-                villager.setVelocity(vectorSpeed);
-                villager.setPosition(10, 10);
-            }
-
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
-        });
-
-        gameWindow1.add(villagerButton).row();
+        Label yourScoreLabel = new Label(" Your Score ", skin);
+        yourScoreLabel.setFontScale(2.5f);
         scoreLabel = new Label("",skin);
+        scoreLabel.setFontScale(2.5f);
+        Label spacerLabel = new Label("", skin);
+        spacerLabel.setFontScale(1.5f);
+        gameWindow1.add(spacerLabel).row();
+        gameWindow1.add(yourScoreLabel).row();
+        gameWindow1.add(spacerLabel).row();
         gameWindow1.add(scoreLabel).row();
 
         gameWindow1.setPosition(0, stage.getHeight());
-        gameWindow1.setSize(stage.getWidth() * 1 / 10, stage.getHeight() * 3 / 10);
+        gameWindow1.setSize(stage.getWidth() * 1 / 10, stage.getHeight() * 3 / 25);
 
-        gameWindow2.add(progressBar).padRight(20f);
-        gameWindow2.add(exitGameButton).padRight(20f);
-
+        gameWindow2.add(exitGameButton);
         gameWindow2.setPosition(stage.getWidth() - gameWindow2.getWidth(),stage.getHeight() - gameWindow2.getHeight());
-
-//      gameWindow3.setPosition(stage.getWidth() * 2/10,0);
-//      gameWindow3.setSize(stage.getWidth()* 2/10,stage.getHeight() * 2/6);
 
         stage.addActor(gameWindow1);
         stage.addActor(gameWindow2);
-//      stage.addActor(gameWindow3);
 
         stage.setDebugAll(false);
     }
@@ -271,7 +303,7 @@ public class GameScreen extends Screens implements Screen {
     private void processCameraMovement(float xClicked, float yClicked) {
 
         //oben links
-        if (xClicked <= camera.viewportWidth * 3 / 16  && yClicked <= camera.viewportHeight * 2 / 9) {
+        if (xClicked <= camera.viewportWidth * 3 / 16 && yClicked <= camera.viewportHeight * 2 / 9) {
             posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
             posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
             camera.update();
@@ -306,7 +338,7 @@ public class GameScreen extends Screens implements Screen {
             camera.update();
         }
 
-        //mitte oben,
+        //mitte oben
         else if (xClicked >= camera.viewportWidth * 3 / 16 && xClicked <= camera.viewportWidth * 13 / 16 && yClicked <= camera.viewportHeight * 2 / 9) {
             posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
             camera.update();
@@ -320,7 +352,6 @@ public class GameScreen extends Screens implements Screen {
         }
 
     }
-
 
     public static void DrawDebugLine(Vector2 start, Vector2 end, int lineWidth, Color color, Matrix4 projectionMatrix) {
         Gdx.gl.glLineWidth(lineWidth);
