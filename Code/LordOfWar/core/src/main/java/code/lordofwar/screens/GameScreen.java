@@ -50,10 +50,8 @@ public class GameScreen extends Screens implements Screen {
     int startingVillager = 5;
     TmxMapLoader loader;
     private float pointTimerCounter;
-    private  Label yourScoreLabel;
     private Label scoreLabel;
-    private Label spacerLabel;
-    private GameScreenEvent gameScreenEvent;
+    private final GameScreenEvent gameScreenEvent;
     public GameScreen(LOW aGame, Skin aSkin,String lobbyID) {
         pointTimerCounter=10;
         game = aGame;
@@ -185,56 +183,82 @@ public class GameScreen extends Screens implements Screen {
 
         Window gameWindow1 = new Window("left corner top", skin);
         Window gameWindow2 = new Window("test", skin);
-//      Window gameWindow3 = new Window("right corner bottom",skin);
+        Window windowExit = new Window("Exit?",skin, "border");
+        windowExit.setMovable(false);
+        windowExit.defaults().pad(20f);
 
         Button exitGameButton = new TextButton("Exit",skin);
-        exitGameButton.setSize(exitGameButton.getWidth() * 2, exitGameButton.getHeight() * 2);
+        exitGameButton.setSize(exitGameButton.getWidth() * 5, exitGameButton.getHeight() * 5);
         exitGameButton.setPosition(stage.getWidth(), stage.getHeight());
 
-        gameWindow1.setMovable(false);
-        gameWindow2.setMovable(false);
-//        gameWindow3.setMovable(false);
 
 
-
-        exitGameButton.addListener(new InputListener() {
+        exitGameButton.addListener(new InputListener(){
             @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                game.setScreen(new MenuScreen(game, skin));
-                stage.dispose();
-            }
+            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
 
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true;
+                windowExit.setVisible(true);
+
+                TextButton yesButton = new TextButton("Yes", skin);
+                yesButton.getLabel().setFontScale(2f);
+
+                yesButton.addListener(new InputListener() {
+                    @Override
+                    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                        game.setScreen(new MenuScreen(game, skin));
+                        stage.dispose();
+                    }
+
+                    @Override
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                        return true;
+                    }
+                });
+
+
+                TextButton noButton = new TextButton("No", skin);
+                noButton.getLabel().setFontScale(2f);
+
+                noButton.addListener(new InputListener() {
+                    @Override
+                    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                        windowExit.setVisible(false);
+                    }
+
+                    @Override
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                        return true;
+                    }
+                });
+
             }
         });
 
-        yourScoreLabel= new Label(" Your Score ",skin);
+
+        Label yourScoreLabel = new Label(" Your Score ", skin);
         yourScoreLabel.setFontScale(2.5f);
         scoreLabel=new Label("",skin);
         scoreLabel.setFontScale(2.5f);
-        spacerLabel=new Label("",skin);
+        Label spacerLabel = new Label("", skin);
         spacerLabel.setFontScale(1.5f);
         gameWindow1.add(spacerLabel).row();
         gameWindow1.add(yourScoreLabel).row();
         gameWindow1.add(spacerLabel).row();
         gameWindow1.add(scoreLabel).row();
 
-
+        gameWindow1.setMovable(false);
+        gameWindow2.setMovable(false);
         gameWindow1.setPosition(0, stage.getHeight());
         gameWindow1.setSize(stage.getWidth() * 1 / 10, stage.getHeight() * 3 / 25);
 
         gameWindow2.add(exitGameButton);
         gameWindow2.setPosition(stage.getWidth(), stage.getHeight());
-        gameWindow2.setSize(exitGameButton.getWidth() , exitGameButton.getHeight() * 3);
-//
-//        gameWindow3.setPosition(stage.getWidth() * 2/10,0);
-//        gameWindow3.setSize(stage.getWidth()* 2/10,stage.getHeight() * 2/6);
+        gameWindow2.setSize(stage.getWidth() *1/25, stage.getHeight()*1/15);
+
 
         stage.addActor(gameWindow1);
         stage.addActor(gameWindow2);
-//        stage.addActor(gameWindow3);
+
 
         stage.setDebugAll(false);
     }
