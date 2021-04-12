@@ -191,9 +191,10 @@ public class MenuScreen extends Screens implements Screen {
 
 
 
-                windowExit.add(exitLabel).row();
+                windowExit.add(exitLabel).colspan(2).row();
                 windowExit.add(yesButton);
                 windowExit.add(noButton);
+                windowExit.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
                 windowExit.pack();
 
                 stage.addActor(windowExit);
