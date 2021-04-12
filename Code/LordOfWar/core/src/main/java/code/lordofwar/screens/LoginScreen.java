@@ -26,6 +26,7 @@ public class LoginScreen extends Screens implements Screen {
     private final Skin skin;
     LoginScreenEvent loginScreenEvent;
     Image img;
+    Image img2;
 
 
     public LoginScreen(LOW aGame, Skin aSkin) {
@@ -35,8 +36,8 @@ public class LoginScreen extends Screens implements Screen {
         loginScreenEvent = new LoginScreenEvent(game);
 
         img = new Image(new Texture("ui/sword_1.png"));
-        img.setHeight(img.getPrefHeight() * 3f);
-        img.setWidth(img.getPrefWidth() * 3f);
+
+        img2 = new Image(new Texture("ui/sword_1.png"));
 
         fps(stage, skin);
         createBackground(stage);
@@ -58,8 +59,10 @@ public class LoginScreen extends Screens implements Screen {
 
         if (game.getCon().getWEBSOCKET_OPEN()) {
             img.setColor(Color.GREEN);
+            img2.setColor(Color.GREEN);
         } else {
             img.setColor(Color.RED);
+            img2.setColor(Color.RED);
         }
 
         if (Rumble.getRumbleTimeLeft() > 0){
@@ -201,15 +204,16 @@ public class LoginScreen extends Screens implements Screen {
         window.defaults().padRight(40f);
         window.setMovable(false);
 
-        window.add(name).row();
-        window.add(usernameTextField).row();
-        window.add(password).row();
-        window.add(passwordTextField).row();
+        window.add(name).colspan(3).row();
+        window.add(usernameTextField).colspan(3).row();
+        window.add(password).colspan(3).row();
+        window.add(passwordTextField).colspan(3).row();
         window.add(img);
-        window.add(loginButton).row();
-        window.add(noAccountLabel).row();
-        window.add(registerButton).row();
-        window.add(exitButton).row();
+        window.add(loginButton);
+        window.add(img2).row();
+        window.add(noAccountLabel).colspan(3).row();
+        window.add(registerButton).colspan(3).row();
+        window.add(exitButton).colspan(3).row();
         packAndSetWindow(window, stage);
         stage.setDebugAll(false);
     }

@@ -1,11 +1,8 @@
 package code.lordofwar.lwjgl3;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import code.lordofwar.main.LOW;
-import jdk.internal.org.jline.utils.Display;
 
 import static code.lordofwar.backend.Constants.WORLD_HEIGHT_PIXEL;
 import static code.lordofwar.backend.Constants.WORLD_WIDTH_PIXEL;

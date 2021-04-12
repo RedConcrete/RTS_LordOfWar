@@ -147,9 +147,6 @@ public class Soldier extends Sprite {
 
     }
 
-
-
-
     public Vector2 getVelocity() {
         return velocity;
     }
