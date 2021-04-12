@@ -231,7 +231,25 @@ public class GameScreen extends Screens implements Screen {
                     }
                 });
 
+                Label exitLabel = new Label("Do you realy want to Exit?",skin);
+                exitLabel.setFontScale(3f);
+
+
+
+                windowExit.add(exitLabel).row();
+                windowExit.add(yesButton);
+                windowExit.add(noButton);
+                windowExit.pack();
+
+                stage.addActor(windowExit);
+
             }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+
         });
 
 
