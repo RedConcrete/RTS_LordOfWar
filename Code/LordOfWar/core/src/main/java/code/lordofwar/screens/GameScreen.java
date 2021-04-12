@@ -3,9 +3,7 @@ package code.lordofwar.screens;
 import code.lordofwar.backend.Soldier;
 import code.lordofwar.backend.Villager;
 import code.lordofwar.backend.events.GameScreenEvent;
-import code.lordofwar.backend.events.RegisterScreenEvent;
 import code.lordofwar.main.LOW;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -92,7 +90,7 @@ public class GameScreen extends Screens implements Screen {
         }
 
         soldier = new Soldier(new Sprite(atlas.findRegion("Character_Green_B")), (TiledMapTileLayer) map.getLayers().get(0));
-        soldier.setPosition(soldier.getCollisionLayer().getTileWidth(), 2 * soldier.getCollisionLayer().getTileHeight());
+        soldier.setPosition(soldier.getCollisionLayer().getTileWidth(), 2* soldier.getCollisionLayer().getTileHeight());
         Vector2 vector2 = new Vector2();
         //vector2.x = 120;
         vector2.y = -200;
@@ -101,8 +99,7 @@ public class GameScreen extends Screens implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.graphics.getGL20().glClearColor(0, 0, 0, 1);
-        Gdx.graphics.getGL20().glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+        clearStage();
 
         fps(stage,skin);
 
@@ -125,7 +122,7 @@ public class GameScreen extends Screens implements Screen {
 
         renderer.getBatch().end();
 
-
+        // todo schau wo die maus ist und dann reagiere also x und y abfragen und dann camera moven falls passend
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
             mouseOnEdgeofCamera();
         }
@@ -166,7 +163,6 @@ public class GameScreen extends Screens implements Screen {
 
     private void setupUI(){
 
-
         //Todo https://www.youtube.com/watch?v=qik60F5I6J4&list=PLXY8okVWvwZ0qmqSBhOtqYRjzWtUCWylb <---------
 
         //Todo später inGame um tasten zu belegen!!
@@ -181,17 +177,18 @@ public class GameScreen extends Screens implements Screen {
          }
          */
 
-        Window gameWindow1 = new Window("left corner top", skin);
-        Window gameWindow2 = new Window("test", skin);
+        Window gameWindow1 = new Window("", skin);
+        Window gameWindow2 = new Window("", skin);
 //      Window gameWindow3 = new Window("right corner bottom",skin);
-
-        Button exitGameButton = new TextButton("Exit",skin);
-        exitGameButton.setSize(exitGameButton.getWidth() * 2, exitGameButton.getHeight() * 2);
-        exitGameButton.setPosition(stage.getWidth(), stage.getHeight());
+        TextButton villagerButton = new TextButton("Villager", skin);
+        TextButton exitGameButton = new TextButton("Exit",skin);
+        exitGameButton.getLabel().setFontScale(3f);
+        ProgressBar progressBar = new ProgressBar(1,100000,10,false,skin);
+        progressBar.setColor(Color.GOLD);
 
         gameWindow1.setMovable(false);
         gameWindow2.setMovable(false);
-//        gameWindow3.setMovable(false);
+//      gameWindow3.setMovable(false);
 
         exitGameButton.addListener(new InputListener() {
             @Override
@@ -206,11 +203,9 @@ public class GameScreen extends Screens implements Screen {
             }
         });
 
+        villagerButton.getLabel().setFontScale(3f);
 
-        TextButton backButton = new TextButton("Villager", skin);
-        backButton.getLabel().setFontScale(3f);
-
-        backButton.addListener(new InputListener() {
+        villagerButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
 
@@ -226,23 +221,24 @@ public class GameScreen extends Screens implements Screen {
             }
         });
 
-        gameWindow1.add(backButton).row();
-        scoreLabel=new Label("",skin);
+        gameWindow1.add(villagerButton).row();
+        scoreLabel = new Label("",skin);
         gameWindow1.add(scoreLabel).row();
 
         gameWindow1.setPosition(0, stage.getHeight());
         gameWindow1.setSize(stage.getWidth() * 1 / 10, stage.getHeight() * 3 / 10);
 
-        gameWindow2.add(exitGameButton);
-        gameWindow2.setPosition(stage.getWidth(), stage.getHeight());
-        gameWindow2.setSize(exitGameButton.getWidth() * 3, exitGameButton.getHeight() * 3);
-//
-//        gameWindow3.setPosition(stage.getWidth() * 2/10,0);
-//        gameWindow3.setSize(stage.getWidth()* 2/10,stage.getHeight() * 2/6);
+        gameWindow2.add(progressBar).padRight(20f);
+        gameWindow2.add(exitGameButton).padRight(20f);
+
+        gameWindow2.setPosition(stage.getWidth() - gameWindow2.getWidth(),stage.getHeight() - gameWindow2.getHeight());
+
+//      gameWindow3.setPosition(stage.getWidth() * 2/10,0);
+//      gameWindow3.setSize(stage.getWidth()* 2/10,stage.getHeight() * 2/6);
 
         stage.addActor(gameWindow1);
         stage.addActor(gameWindow2);
-//        stage.addActor(gameWindow3);
+//      stage.addActor(gameWindow3);
 
         stage.setDebugAll(false);
     }
@@ -275,7 +271,7 @@ public class GameScreen extends Screens implements Screen {
     private void processCameraMovement(float xClicked, float yClicked) {
 
         //oben links
-        if (xClicked <= camera.viewportWidth * 3 / 16 && yClicked <= camera.viewportHeight * 2 / 9) {
+        if (xClicked <= camera.viewportWidth * 3 / 16  && yClicked <= camera.viewportHeight * 2 / 9) {
             posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
             posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
             camera.update();
@@ -310,7 +306,7 @@ public class GameScreen extends Screens implements Screen {
             camera.update();
         }
 
-        //mitte oben
+        //mitte oben,
         else if (xClicked >= camera.viewportWidth * 3 / 16 && xClicked <= camera.viewportWidth * 13 / 16 && yClicked <= camera.viewportHeight * 2 / 9) {
             posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
             camera.update();
@@ -324,7 +320,6 @@ public class GameScreen extends Screens implements Screen {
         }
 
     }
-
 
 
     public static void DrawDebugLine(Vector2 start, Vector2 end, int lineWidth, Color color, Matrix4 projectionMatrix) {

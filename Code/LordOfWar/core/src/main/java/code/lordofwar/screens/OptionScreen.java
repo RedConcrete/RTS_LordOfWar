@@ -2,16 +2,12 @@ package code.lordofwar.screens;
 
 
 import code.lordofwar.main.LOW;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import jdk.internal.org.jline.utils.Display;
-import org.jetbrains.annotations.Contract;
 
 
 public class OptionScreen extends Screens implements Screen {

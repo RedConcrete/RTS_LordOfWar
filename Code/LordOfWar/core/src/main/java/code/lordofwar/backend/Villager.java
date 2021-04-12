@@ -35,15 +35,16 @@ public class Villager extends Sprite {
     private void endOfMapCollision(){
         if(getX() <= 0 ){
             setPosition(1 ,getY());
-        }else if(getX() >= collisionLayer.getWidth()*64-64){
-            setPosition(getX()-1 ,getY());
+        }else if(getX() >= collisionLayer.getWidth()*64-100){
+            setPosition(getX()-10 ,getY());
         }
 
         if(getY() <= 0 ){
             setPosition(getX() ,1);
         }else if (getY() >= collisionLayer.getHeight()*64-100){
-            setPosition(getX() ,getY()-1);
+            setPosition(getX() ,getY()-10);
         }
+
     }
 
 

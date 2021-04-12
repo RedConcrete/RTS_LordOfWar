@@ -2,7 +2,6 @@ package code.lordofwar.screens;
 
 import code.lordofwar.backend.Constants;
 import code.lordofwar.main.LOW;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.graphics.GL20;
@@ -38,6 +37,7 @@ public abstract class Screens extends Constants{
         Gdx.graphics.getGL20().glClearColor( 0, 0, 0, 1 );
         Gdx.graphics.getGL20().glClear( GL20.GL_COLOR_BUFFER_BIT |  GL20.GL_DEPTH_BUFFER_BIT );
         Graphics.DisplayMode currentMode = Gdx.graphics.getDisplayMode();
+
         if(Gdx.graphics.isFullscreen()){
             Gdx.graphics.getGL20().glViewport(0,0,currentMode.width,currentMode.height);
         }
