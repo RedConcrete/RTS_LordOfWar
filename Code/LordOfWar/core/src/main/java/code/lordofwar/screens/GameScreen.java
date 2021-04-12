@@ -187,9 +187,10 @@ public class GameScreen extends Screens implements Screen {
         windowExit.setMovable(false);
         windowExit.defaults().pad(20f);
 
-        Button exitGameButton = new TextButton("Exit",skin);
+        TextButton exitGameButton = new TextButton("Exit",skin);
         exitGameButton.setSize(exitGameButton.getWidth() * 5, exitGameButton.getHeight() * 5);
         exitGameButton.setPosition(stage.getWidth(), stage.getHeight());
+        exitGameButton.getLabel().setFontScale(3f);
 
 
 
@@ -236,7 +237,7 @@ public class GameScreen extends Screens implements Screen {
 
 
 
-                windowExit.add(exitLabel).row();
+                windowExit.add(exitLabel).colspan(2).row();
                 windowExit.add(yesButton);
                 windowExit.add(noButton);
                 windowExit.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
@@ -270,9 +271,9 @@ public class GameScreen extends Screens implements Screen {
         gameWindow1.setPosition(0, stage.getHeight());
         gameWindow1.setSize(stage.getWidth() * 1 / 10, stage.getHeight() * 3 / 25);
 
-        gameWindow2.add(exitGameButton);
         gameWindow2.setPosition(stage.getWidth(), stage.getHeight());
-        gameWindow2.setSize(stage.getWidth() *1/25, stage.getHeight()*1/15);
+        gameWindow2.add(exitGameButton);
+        gameWindow2.setSize(stage.getWidth() *1/16, stage.getHeight()*1/9);
 
 
         stage.addActor(gameWindow1);
