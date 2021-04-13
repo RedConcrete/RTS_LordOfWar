@@ -5,6 +5,7 @@ import code.lordofwar.main.LOW;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static code.lordofwar.backend.MessageIdentifier.GET_LOBBYS;
 import static code.lordofwar.backend.MessageIdentifier.JOIN_LOBBY;
@@ -19,7 +20,7 @@ public class LobbyBrowserScreenEvent {
     public LobbyBrowserScreenEvent(LOW game) {
         this.game = game;
         dP = new DataPacker();
-        lobbyList = null;
+        lobbyList = new String[0];
         joined=null;
     }
 
@@ -46,7 +47,7 @@ public class LobbyBrowserScreenEvent {
 
     public void setLobbyList(String[] lobbyList) {
         this.lobbyList = lobbyList;
-        System.out.println(lobbyList);
+        System.out.println(Arrays.toString(lobbyList));
     }
 
     public String[] getLobbyList() {

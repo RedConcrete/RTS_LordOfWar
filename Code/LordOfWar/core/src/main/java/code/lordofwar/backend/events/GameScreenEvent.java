@@ -7,6 +7,7 @@ import okhttp3.WebSocket;
 import java.util.ArrayList;
 
 import static code.lordofwar.backend.MessageIdentifier.GET_GAME_POINTS;
+import static code.lordofwar.backend.MessageIdentifier.LEAVE_LOBBY;
 
 public class GameScreenEvent {
 
@@ -40,5 +41,11 @@ public class GameScreenEvent {
         if (Integer.parseInt(arr[1]) >= 0) {
             this.points = Integer.parseInt(arr[1]);
         }
+    }
+    public void sendLeaveGameNotice(){
+        ArrayList<String> leaveData=new ArrayList<>();
+        leaveData.add(game.getSessionID());
+        leaveData.add(lobbyID);
+        webSocket.send(dataPacker.packData(LEAVE_LOBBY,dataPacker.stringCombiner(leaveData)));
     }
 }

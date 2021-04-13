@@ -207,6 +207,10 @@ public class GameScreen extends Screens implements Screen {
 
         TextButton addGoldButton = new TextButton("AddGold", skin);
         TextButton tackGoldButton = new TextButton("TackGold", skin);
+        TextButton noButton = new TextButton("No", skin);
+        TextButton yesButton = new TextButton("Yes", skin);
+        Label exitLabel = new Label("Do you realy want to Exit?", skin);
+        exitLabel.setFontScale(3f);
 
         Label yourScoreLabel = new Label(" Your Score ", skin);
         yourScoreLabel.setFontScale(2.5f);
@@ -223,8 +227,6 @@ public class GameScreen extends Screens implements Screen {
 
         exitGameButton.setSize(exitGameButton.getWidth() * 5, exitGameButton.getHeight() * 5);
         exitGameButton.setPosition(stage.getWidth(), stage.getHeight());
-        exitGameButton.getLabel().setFontScale(3f);
-        exitGameButton.getLabel().setFontScale(3f);
 
         addGoldButton.addListener(new InputListener() {
             @Override
@@ -256,12 +258,13 @@ public class GameScreen extends Screens implements Screen {
 
                 windowExit.setVisible(true);
 
-                TextButton yesButton = new TextButton("Yes", skin);
+
                 yesButton.getLabel().setFontScale(2f);
 
                 yesButton.addListener(new InputListener() {
                     @Override
                     public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                        GameScreen.this.getGameScreenEvent().sendLeaveGameNotice();
                         game.setScreen(new MenuScreen(game, skin));
                         stage.dispose();
                     }
@@ -273,7 +276,7 @@ public class GameScreen extends Screens implements Screen {
                 });
 
 
-                TextButton noButton = new TextButton("No", skin);
+
                 noButton.getLabel().setFontScale(2f);
 
                 noButton.addListener(new InputListener() {
@@ -287,20 +290,9 @@ public class GameScreen extends Screens implements Screen {
                         return true;
                     }
                 });
-
-                scoreLabel = new Label("", skin);
-                Label exitLabel = new Label("Do you realy want to Exit?", skin);
-                exitLabel.setFontScale(3f);
-
-
-                windowExit.add(exitLabel).colspan(2).row();
-                windowExit.add(yesButton);
-                windowExit.add(noButton);
                 windowExit.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
                 windowExit.pack();
-
                 stage.addActor(windowExit);
-
             }
 
             @Override
@@ -308,6 +300,12 @@ public class GameScreen extends Screens implements Screen {
                 return true;
             }
         });
+        windowExit.add(exitLabel).colspan(2).row();
+        windowExit.add(yesButton);
+        windowExit.add(noButton);
+
+
+
 
         scoreLabel = new Label("", skin);
         scoreLabel.setFontScale(2.5f);
