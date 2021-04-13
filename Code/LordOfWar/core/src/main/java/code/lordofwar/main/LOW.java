@@ -25,7 +25,6 @@ import static code.lordofwar.backend.Constants.WORLD_WIDTH_PIXEL;
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms.
 */
 
-
 public class LOW extends Game {
 	private Stage stage;
 	private Skin skin;
@@ -49,11 +48,11 @@ public class LOW extends Game {
 
 		 //TODO progressbar machen !! und Assetloader
 
-
-
 		this.setScreen(new LoginScreen(this, skin));
+
 		//BackgroundMusic.music("assets/music/ireland.wav");
 		new Sounds();
+
 	}
 
 	@Override

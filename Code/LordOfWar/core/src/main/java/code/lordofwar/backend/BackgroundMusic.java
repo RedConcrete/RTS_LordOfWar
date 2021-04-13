@@ -1,7 +1,5 @@
 package code.lordofwar.backend;
 
-
-
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -21,6 +19,7 @@ public class BackgroundMusic {
             public void run() {
                 while (true) {
                     try {
+
                         Clip clip = AudioSystem.getClip();
                         AudioInputStream inputStream = AudioSystem.getAudioInputStream(new File(trackName));
                         clip.open(inputStream);

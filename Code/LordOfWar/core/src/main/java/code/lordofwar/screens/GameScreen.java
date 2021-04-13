@@ -1,5 +1,6 @@
 package code.lordofwar.screens;
 
+import code.lordofwar.backend.Castle;
 import code.lordofwar.backend.Soldier;
 import code.lordofwar.backend.Villager;
 import code.lordofwar.backend.events.GameScreenEvent;
@@ -10,6 +11,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -22,9 +24,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
 import java.util.ArrayList;
 
@@ -46,6 +47,9 @@ public class GameScreen extends Screens implements Screen {
     private final ArrayList<Soldier> soldierArrayList;
     private ArrayList<Object> entityArrayList;
     private final Sprite villiagerSprite;
+    private Castle castle;
+    private Image castleImage;
+    private Label entityName;
 
     private final TmxMapLoader loader;
     private Label scoreLabel;
@@ -57,14 +61,18 @@ public class GameScreen extends Screens implements Screen {
 
     public GameScreen(LOW aGame, Skin aSkin, String lobbyID) {
         super(aGame,aSkin);
+        entityName = new Label("", skin);
+        castleImage = new Image(new Sprite(new Texture("maps/RTS_CASTEL_TILES.png")));
+        castleImage.setVisible(false);
         pointTimerCounter = 10;
         gameScreenEvent = new GameScreenEvent(game, lobbyID);
         posCameraDesired = new Vector3();
-        isCameraDebug = true;
+        isCameraDebug = false;
         vectorSpeed = new Vector2();
         posCameraDesired = new Vector3();
         villagerArrayList = new ArrayList<>();
         soldierArrayList = new ArrayList<>();
+        castle = new Castle();
 
         TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("maps/RTS_UNITS_TILES.txt"));
         villiagerSprite = new Sprite(atlas.findRegion("Character_Green_B"));
@@ -94,12 +102,6 @@ public class GameScreen extends Screens implements Screen {
             villager.setVelocity(new Vector2(vectorSpeed));
         }
 
-//        soldier = new Soldier(new Sprite(atlas.findRegion("Character_Green")), (TiledMapTileLayer) map.getLayers().get(0));
-//        soldierArrayList.add(soldier);
-//        soldier.setPosition(soldier.getCollisionLayer().getTileWidth(), 2 * soldier.getCollisionLayer().getTileHeight());
-//        Vector2 vector2 = new Vector2();
-//        vector2.y = -200;
-//        soldier.setVelocity(vector2);
     }
 
     @Override
@@ -119,21 +121,29 @@ public class GameScreen extends Screens implements Screen {
             pointTimerCounter = 0;
         }
 
-        //debugRenderer.set(ShapeRenderer.ShapeType.Line);
-
         scoreLabel.setText(gameScreenEvent.getPoints());
         for (Villager v : villagerArrayList) {
             if (v.isSelected()) {
-                v.setAlpha(.5f);
+                v.setColor(Color.GREEN);
                 v.draw(renderer.getBatch());
             } else {
-                v.setAlpha(1);
+                v.setColor(Color.RED);
                 v.draw(renderer.getBatch());
             }
             v.draw(renderer.getBatch());
 
+            if(v.isSelected()){
+                entityName.setText("Villager");
+                castleImage.setVisible(false);
+            }
         }
+
         renderer.getBatch().end();
+
+        if(castle.isSelected()){
+            entityName.setText("Castle");
+            castleImage.setVisible(true);
+        }
 
         // todo schau wo die maus ist und dann reagiere also x und y abfragen und dann camera moven falls passend
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
@@ -191,11 +201,14 @@ public class GameScreen extends Screens implements Screen {
          }
          */
 
-        Window gameWindow1 = new Window("", skin);
-        gameWindow1.setMovable(false);
+        Window scoreAndVilliagerWindow = new Window("", skin);
+        scoreAndVilliagerWindow.setMovable(false);
 
-        Window gameWindow2 = new Window("", skin);
-        gameWindow2.setMovable(false);
+        Window goldAndExitWindow = new Window("", skin);
+        goldAndExitWindow.setMovable(false);
+
+        Window entityWindow = new Window("",skin);
+        entityWindow.setMovable(false);
 
         Window windowExit = new Window("Exit?", skin, "border");
         windowExit.setMovable(false);
@@ -220,7 +233,17 @@ public class GameScreen extends Screens implements Screen {
 
         Label goldLabel = new Label("0", skin);
         goldLabel.setText(goldAmount);
-        Image image = new Image(new Sprite(new Texture("ui/gold_treasure_icons_16x16/gold.png")));
+
+        Image goldImage = new Image(new Sprite(new Texture("ui/gold_treasure_icons_16x16/gold.png")));
+
+        scoreAndVilliagerWindow.setMovable(false);
+        goldAndExitWindow.setMovable(false);
+
+        windowExit.setMovable(false);
+        windowExit.defaults().pad(20f);
+
+        exitGameButton.setSize(exitGameButton.getWidth() * 5, exitGameButton.getHeight() * 5);
+        exitGameButton.setPosition(stage.getWidth(), stage.getHeight());
 
         addGoldButton.addListener(new InputListener() {
             @Override
@@ -301,23 +324,30 @@ public class GameScreen extends Screens implements Screen {
         windowExit.add(yesButton);
         windowExit.add(noButton);
 
-        gameWindow1.add(yourScoreLabel).padBottom(20f).padTop(20f).colspan(2).row();
-        gameWindow1.add(scoreLabel).colspan(2).row();
-        gameWindow1.add(addGoldButton);
-        gameWindow1.add(tackGoldButton);
-        gameWindow1.setPosition(0, stage.getHeight());
-        gameWindow1.setSize(stage.getWidth() * 1 / 10, stage.getHeight() * 3 / 25);
+        scoreAndVilliagerWindow.add(yourScoreLabel).padBottom(20f).padTop(30f).colspan(2).row();
+        scoreAndVilliagerWindow.add(scoreLabel).colspan(2).row();
+        scoreAndVilliagerWindow.add(addGoldButton);
+        scoreAndVilliagerWindow.add(tackGoldButton);
+        scoreAndVilliagerWindow.setPosition(0, stage.getHeight());
+        scoreAndVilliagerWindow.setSize(stage.getWidth() * 1 / 10, stage.getHeight() * 3 / 25);
 
-        gameWindow2.add(goldLabel).padRight(20f).padLeft(20f);
-        gameWindow2.add(image).padRight(20f).padLeft(20f);
-        gameWindow2.add(exitGameButton);
-        gameWindow2.setPosition(stage.getWidth(), stage.getHeight());
+        goldAndExitWindow.add(goldLabel).padRight(20f).padLeft(20f).padTop(30f);
+        goldAndExitWindow.add(goldImage).padRight(20f).padLeft(20f).padTop(30f);
+        goldAndExitWindow.add(exitGameButton).padTop(30f);
+        goldAndExitWindow.setPosition(stage.getWidth(), stage.getHeight());
 
-        packWindow(gameWindow1, stage);
-        packWindow(gameWindow2, stage);
+        entityWindow.add(entityName).row();
+        entityWindow.add(castleImage);
+        entityWindow.setPosition(stage.getWidth() / 2,0);
 
-        stage.addActor(gameWindow1);
-        stage.addActor(gameWindow2);
+        packWindow(scoreAndVilliagerWindow, stage);
+        packWindow(goldAndExitWindow, stage);
+        packWindow(entityWindow, stage);
+
+        stage.addActor(entityWindow);
+        stage.addActor(scoreAndVilliagerWindow);
+        stage.addActor(goldAndExitWindow);
+
         stage.setDebugAll(false);
     }
 
@@ -418,7 +448,7 @@ public class GameScreen extends Screens implements Screen {
         Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
         camera.unproject(mousePos);
 
-        float x = mousePos.x, y = mousePos.y;
+        int x = (int) mousePos.x, y = (int) mousePos.y;
 
         for (Villager villager : villagerArrayList) {
 
@@ -427,6 +457,16 @@ public class GameScreen extends Screens implements Screen {
                     villager.setSelected(!villager.isSelected());
                 }
             }
+
+        }
+
+        try {
+            if(collisionUnitLayer.getCell(x / collisionUnitLayer.getTileWidth(), y / collisionUnitLayer.getTileHeight())
+                    .getTile().getProperties().containsKey("isCastel")){
+                castle.setSelected(!castle.isSelected());
+            }
+        } catch (Exception e) {
+
         }
     }
 }
