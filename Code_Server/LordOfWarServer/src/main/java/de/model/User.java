@@ -59,7 +59,7 @@ public class User {
         if (this.score>score) {
             this.score -= score;
         }else {
-            this.score=0;//no minus score
+            this.score=0;
         }
     }
 

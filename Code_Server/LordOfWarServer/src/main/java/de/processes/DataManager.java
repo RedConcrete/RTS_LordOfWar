@@ -72,13 +72,7 @@ public class DataManager {
 
         String helper = currentDirFile.getAbsolutePath();
         try {
-            String currentDir = helper.substring(0, helper.length() - currentDirFile.getCanonicalPath().length()); //this line may need a try-catch block
-            System.out.println(userIDPath.toFile().toURI());
-            System.out.println(currentDir);
-            System.out.println(currentDirFile);
-            System.out.println(System.getProperty("user.dir"));
-            //System.out.println(this.getClass().getClassLoader().getResource("resources"));
-
+            String currentDir = helper.substring(0, helper.length() - currentDirFile.getCanonicalPath().length());
         } catch (IOException e) {
             e.printStackTrace();
         }

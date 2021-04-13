@@ -1,5 +1,6 @@
 package code.lordofwar.backend;
 
+import javax.print.attribute.standard.Media;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
@@ -27,7 +28,8 @@ public class Sounds {
     }
 
     public void play(File sound){
-        try {
+
+        /*try {
             clip = AudioSystem.getClip();
             clip.open(AudioSystem.getAudioInputStream(sound));
             FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
@@ -37,6 +39,8 @@ public class Sounds {
         }catch (Exception e){
             e.printStackTrace();
         }
+
+         */
 
     }
 

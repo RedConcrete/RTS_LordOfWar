@@ -31,8 +31,7 @@ public class GameWebSocketHandler {
 
     @OnOpen
     public void onOpen(Session session) {
-        System.out.println("Websocket is Open!");
-        System.out.println(session);
+
         sessions.put(session.getId(), session);
         session.getAsyncRemote().sendObject(dataPacker.packData(CONNECTION, session.getId()));
         //todo hier wird der player der sich verbinden will als neuer player geaddet (er ist noch nicht eingelogt!! Player --> user)
@@ -41,20 +40,18 @@ public class GameWebSocketHandler {
 
     @OnClose
     public void onClose() {
-        System.out.println("the websocket-connection is now closed!");
+
     }
 
     @OnError
     public void onError(Throwable throwable) {
-        System.out.println("An error occured when building connection from client.");
-        //throwable.getStackTrace();
-        //sessionArrayList.remove(session);
+
 
     }
 
     @OnMessage
     public void onMessage(String message) {
-        //System.out.println(message);
+
         String[] dataArray = depackData(message);
         checkDataDir(dataArray);
 
@@ -101,7 +98,7 @@ public class GameWebSocketHandler {
     private void sendLobbysToClient(String userID) {
         ArrayList<String> arr = new ArrayList<>();
         for (Map.Entry<String, ServerLobby> entry : lobbys.entrySet()) {
-            if (entry.getValue().getGame() == null) {//not ingame
+            if (entry.getValue().getGame() == null) {
                 arr.add(entry.getKey());
                 arr.add(entry.getValue().getLobbyMap());
                 arr.add(entry.getValue().getGamemode());
@@ -148,8 +145,8 @@ public class GameWebSocketHandler {
 
     private void createLobby(String[] data) {
         //TODO where to put this?
-        if (userSessions.containsKey(data[1])) { //user is logged in
-            if (!lobbys.containsKey(data[2])) { //lobby doesnt exist
+        if (userSessions.containsKey(data[1])) {
+            if (!lobbys.containsKey(data[2])) {
                 User[] users = new User[Integer.parseInt(data[4])];
                 users[0] = userSessions.get(data[1]);
                 ServerLobby newLobby = new ServerLobby(users, data[2], data[3], users.length, data[5]);
@@ -185,15 +182,6 @@ public class GameWebSocketHandler {
 
 
     private void broadcast(String message) {
-        System.out.println(message);
-        /*
-        sessions.values().forEach(s -> {
-            s.getAsyncRemote().sendObject(message, result ->  {
-                if (result.getException() != null) {
-                    System.out.println("Unable to send message: " + result.getException());
-                }
-            });
-        });
-        */
+
     }
 }

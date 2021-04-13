@@ -53,7 +53,7 @@ public abstract class Screens extends Constants {
 
     protected void fps(Stage stage, Skin skin) {
         if (game.getCon().getFPS()) {
-            //Todo fps muss richtig ausgegeben werden (überschreibt sich selbst)
+
             if (fps == null) {
                 fps = new Label("fps: " + Gdx.graphics.getFramesPerSecond(), skin);
                 fps.setFontScale(2f);
@@ -66,9 +66,7 @@ public abstract class Screens extends Constants {
                 System.out.println(fps.getStage());
                 fps.setText("fps: " + Gdx.graphics.getFramesPerSecond());
             }
-            //stage.getBatch().begin();
-            //Gdx.graphics.setTitle(" LordOfWar fps: "+Gdx.graphics.getFramesPerSecond());
-            //stage.getBatch().end();
+
         } else {
             if (fps != null) {
                 fps.setText("");
@@ -76,7 +74,7 @@ public abstract class Screens extends Constants {
         }
     }
 
-    /*
+    /**
     Creates an backButton and adds an InputListener to it. If Button pressed Game will return to MenuScreen.
     @author Robin Hefner
      */
@@ -104,7 +102,7 @@ public abstract class Screens extends Constants {
 
     }
 
-    /*
+    /**
     Packs the passed Window and sets its position.
     @author Robin Hefner
      */

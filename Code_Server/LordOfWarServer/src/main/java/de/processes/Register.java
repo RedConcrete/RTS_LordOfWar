@@ -23,13 +23,13 @@ public class Register {
 
     @Transactional
     public void isRegisterValid(String[] strings, Session session) {
-        if (!DataManager.isFile(strings[2])) {//username doesnt exist
+        if (!DataManager.isFile(strings[2])) {
             Integer id = null;
             while (id == null) {
-                id = DataManager.getNextID();//try until
+                id = DataManager.getNextID();
             }
             User user = new User(strings[2], strings[3], 0, id, null);
-            registerValid= DataManager.userToFile(user);//successful creation
+            registerValid= DataManager.userToFile(user);
         }
 
 

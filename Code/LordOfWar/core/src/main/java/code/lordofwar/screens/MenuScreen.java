@@ -5,13 +5,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class MenuScreen extends Screens implements Screen {
 
@@ -72,13 +70,13 @@ public class MenuScreen extends Screens implements Screen {
         lordOfWarLabel.setWidth(Gdx.graphics.getWidth());
         stage.addActor(lordOfWarLabel);
 
-        TextButton lobbyCreateButton = new TextButton("Lobby erstellen", skin);
+        TextButton lobbyCreateButton = new TextButton("Create Lobby", skin);
         lobbyCreateButton.getLabel().setFontScale(3f);
 
-        TextButton lobbyJoinButton = new TextButton("Lobby beitreten", skin);
+        TextButton lobbyJoinButton = new TextButton("Join Lobby", skin);
         lobbyJoinButton.getLabel().setFontScale(3f);
 
-        TextButton optionButton = new TextButton("Optionen", skin);
+        TextButton optionButton = new TextButton("Options", skin);
         optionButton.getLabel().setFontScale(3f);
 
         TextButton exitButton = new TextButton("Exit", skin);
@@ -96,7 +94,6 @@ public class MenuScreen extends Screens implements Screen {
         lobbyJoinButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("Lobby beitreten");
                 game.setScreen(new LobbyBrowserScreen(game, skin));
                 //Todo server muss daten von erstellten lobbys senden!
 
@@ -111,7 +108,6 @@ public class MenuScreen extends Screens implements Screen {
         lobbyCreateButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("LobbyErstellen");
                 game.setScreen(new LobbyCreateScreen(game, skin));
             }
 
@@ -124,7 +120,6 @@ public class MenuScreen extends Screens implements Screen {
         optionButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("OptionsScreen");
                 game.setScreen(new OptionScreen(game, skin));
 
             }
@@ -139,10 +134,13 @@ public class MenuScreen extends Screens implements Screen {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
 
-
-                System.out.println("ExitWindow");
                 windowMenu.setVisible(false);
                 windowExit.setVisible(true);
+
+
+                Label exitLabel = new Label("Do you realy want to Exit?", skin);
+                exitLabel.setFontScale(3f);
+
 
                 TextButton yesButton = new TextButton("Yes", skin);
                 yesButton.getLabel().setFontScale(2f);
@@ -175,11 +173,6 @@ public class MenuScreen extends Screens implements Screen {
                         return true;
                     }
                 });
-
-
-                Label exitLabel = new Label("Do you realy want to Exit?", skin);
-                exitLabel.setFontScale(3f);
-
 
                 windowExit.add(exitLabel).colspan(2).row();
                 windowExit.add(yesButton);
