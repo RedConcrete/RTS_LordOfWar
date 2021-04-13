@@ -9,10 +9,15 @@ public class Constants {
     public static final float CAMERASPEED = 500f;
     public static final String STRINGSEPERATOR = "///";
 
-    public Boolean WEBSOCKET_OPEN = false;
-    public Boolean FPS = false; //Todo an und ausschaltbar in Optionen
-    public Boolean MUSIC = true;
+    public Boolean WEBSOCKET_OPEN;
+    public Boolean FPS; //Todo an und ausschaltbar in Optionen
+    public Boolean MUSIC;
 
+    public Constants(){
+        WEBSOCKET_OPEN = false;
+        FPS = false; //Todo an und ausschaltbar in Optionen
+        MUSIC = true;
+    }
 
     public Boolean getMUSIC() {
         return MUSIC;

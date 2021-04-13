@@ -33,9 +33,6 @@ public class GameScreen extends Screens implements Screen {
 
     private static final ShapeRenderer debugRenderer = new ShapeRenderer();
 
-    private final Stage stage;
-    private final LOW game;
-    private final Skin skin;
     private final Vector2 vectorSpeed;
     private final TiledMapTileLayer collisionUnitLayer;
     private final OrthographicCamera camera;
@@ -60,12 +57,9 @@ public class GameScreen extends Screens implements Screen {
     private float pointTimerCounter;
 
     public GameScreen(LOW aGame, Skin aSkin, String lobbyID) {
-
+        super(aGame,aSkin);
         pointTimerCounter = 10;
-        game = aGame;
         gameScreenEvent = new GameScreenEvent(game, lobbyID);
-        skin = aSkin;
-        stage = new Stage(new ScreenViewport());
         posCameraDesired = new Vector3();
         isCameraDebug = true;
         vectorSpeed = new Vector2();
