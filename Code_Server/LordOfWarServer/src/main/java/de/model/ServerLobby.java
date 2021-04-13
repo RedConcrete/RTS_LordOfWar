@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-//for keeping data about a lobby
+
 public class ServerLobby {
 
-    private ArrayList<User> players;//players in the lobby (adaptive since max players can be switched)
-    private HashMap<User, Integer> joinOrder;//lowest number is admin
+    private ArrayList<User> players;
+    private HashMap<User, Integer> joinOrder;
 
     private String lobbyName;
     private String lobbyMap;
@@ -26,7 +26,7 @@ public class ServerLobby {
         this.players = new ArrayList<>();
         this.joinOrder = new HashMap<>();
 
-        for (int i = 0; i < players.length; i++) {//garantee order
+        for (int i = 0; i < players.length; i++) {
             if (players[i] != null) {
                 if (joinOrder.isEmpty()) {
                     admin = players[i];
@@ -45,7 +45,7 @@ public class ServerLobby {
     }
 
     public boolean joinLobby(User user) {
-        if (players.size() < playerAmount) {//free spots open
+        if (players.size() < playerAmount) {
             if (!joinOrder.containsKey(user)) {
                 players.add(user);
                 joinOrder.put(user, joinCounter);
@@ -69,7 +69,7 @@ public class ServerLobby {
                         lowest = entry.getValue();
                     }
                 }
-                admin = newAdmin;//if no users admin=null
+                admin = newAdmin;
             }
             return true;
         }

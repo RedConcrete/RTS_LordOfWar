@@ -52,7 +52,7 @@ public class LOW extends Game {
 
 
 		this.setScreen(new LoginScreen(this, skin));
-		//BackgroundMusic.music("assets/music/Ireland.wav");
+		//BackgroundMusic.music("assets/music/ireland.wav");
 		new Sounds();
 	}
 

@@ -70,13 +70,13 @@ public class GameWebSocketListener extends WebSocketListener {
                         ((GameScreen) game.getScreen()).getGameScreenEvent().updatePoints(strings);
                     }
                 } else if (strings[0].equals(CONNECTION.toString())) {
-                    game.setSessionID(strings[1]);//set session id
+                    game.setSessionID(strings[1]);
                 } else if (strings[0].equals(CREATE_LOBBY.toString())) {
                     if (game.getScreen() instanceof LobbyCreateScreen) {
                         ((LobbyCreateScreen) game.getScreen()).getLobbyCreateScreenEvent().setLobbyID(strings);
                     }
                 } else if (strings[0].equals(GET_LOBBYS.toString())) {
-                    //todo lobbys richtig übergeben
+
                     if (game.getScreen() instanceof LobbyBrowserScreen) {
                         ((LobbyBrowserScreen) game.getScreen()).getLobbyBrowserScreenEvent().setLobbyList(strings);
                     }
@@ -98,7 +98,6 @@ public class GameWebSocketListener extends WebSocketListener {
     @Override
     public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
 
-        System.out.println("websocket to server is open!");
         game.getCon().setWEBSOCKET_OPEN(true);
 
     }

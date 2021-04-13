@@ -39,20 +39,19 @@ public class GameScreen extends Screens implements Screen {
     private final boolean isCameraDebug;
 
     private Vector3 posCameraDesired;
-    private TiledMap map;
+    private final TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
     private Soldier soldier;
-    private TextureAtlas atlas;
-    private ArrayList<Villager> villagerArrayList;
-    private ArrayList<Soldier> soldierArrayList;
+    private final ArrayList<Villager> villagerArrayList;
+    private final ArrayList<Soldier> soldierArrayList;
     private ArrayList<Object> entityArrayList;
-    private Sprite villiagerSprite;
+    private final Sprite villiagerSprite;
 
-    private TmxMapLoader loader;
+    private final TmxMapLoader loader;
     private Label scoreLabel;
-    private GameScreenEvent gameScreenEvent;
+    private final GameScreenEvent gameScreenEvent;
 
-    private int startingVillager = 5;
+    private final int startingVillager = 5;
     private int goldAmount = 100;
     private float pointTimerCounter;
 
@@ -67,7 +66,7 @@ public class GameScreen extends Screens implements Screen {
         villagerArrayList = new ArrayList<>();
         soldierArrayList = new ArrayList<>();
 
-        atlas = new TextureAtlas(Gdx.files.internal("maps/RTS_UNITS_TILES.txt"));
+        TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("maps/RTS_UNITS_TILES.txt"));
         villiagerSprite = new Sprite(atlas.findRegion("Character_Green_B"));
 
         loader = new TmxMapLoader();
@@ -193,8 +192,14 @@ public class GameScreen extends Screens implements Screen {
          */
 
         Window gameWindow1 = new Window("", skin);
+        gameWindow1.setMovable(false);
+
         Window gameWindow2 = new Window("", skin);
+        gameWindow2.setMovable(false);
+
         Window windowExit = new Window("Exit?", skin, "border");
+        windowExit.setMovable(false);
+        windowExit.defaults().pad(20f);
 
         TextButton exitGameButton = new TextButton("Exit", skin);
         exitGameButton.getLabel().setFontScale(3f);
@@ -203,24 +208,19 @@ public class GameScreen extends Screens implements Screen {
         TextButton tackGoldButton = new TextButton("TackGold", skin);
         TextButton noButton = new TextButton("No", skin);
         TextButton yesButton = new TextButton("Yes", skin);
+
         Label exitLabel = new Label("Do you realy want to Exit?", skin);
         exitLabel.setFontScale(3f);
 
         Label yourScoreLabel = new Label(" Your Score ", skin);
         yourScoreLabel.setFontScale(2.5f);
 
+        scoreLabel = new Label("", skin);
+        scoreLabel.setFontScale(2.5f);
+
         Label goldLabel = new Label("0", skin);
         goldLabel.setText(goldAmount);
         Image image = new Image(new Sprite(new Texture("ui/gold_treasure_icons_16x16/gold.png")));
-
-        gameWindow1.setMovable(false);
-        gameWindow2.setMovable(false);
-
-        windowExit.setMovable(false);
-        windowExit.defaults().pad(20f);
-
-        exitGameButton.setSize(exitGameButton.getWidth() * 5, exitGameButton.getHeight() * 5);
-        exitGameButton.setPosition(stage.getWidth(), stage.getHeight());
 
         addGoldButton.addListener(new InputListener() {
             @Override
@@ -246,6 +246,10 @@ public class GameScreen extends Screens implements Screen {
             }
         });
 
+
+        exitGameButton.setSize(exitGameButton.getWidth() * 5, exitGameButton.getHeight() * 5);
+        exitGameButton.setPosition(stage.getWidth(), stage.getHeight());
+
         exitGameButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
@@ -268,8 +272,6 @@ public class GameScreen extends Screens implements Screen {
                         return true;
                     }
                 });
-
-
 
                 noButton.getLabel().setFontScale(2f);
 
@@ -294,17 +296,10 @@ public class GameScreen extends Screens implements Screen {
                 return true;
             }
         });
+
         windowExit.add(exitLabel).colspan(2).row();
         windowExit.add(yesButton);
         windowExit.add(noButton);
-
-
-
-
-        scoreLabel = new Label("", skin);
-        scoreLabel.setFontScale(2.5f);
-        Label spacerLabel = new Label("", skin);
-        spacerLabel.setFontScale(1.5f);
 
         gameWindow1.add(yourScoreLabel).padBottom(20f).padTop(20f).colspan(2).row();
         gameWindow1.add(scoreLabel).colspan(2).row();
@@ -323,7 +318,6 @@ public class GameScreen extends Screens implements Screen {
 
         stage.addActor(gameWindow1);
         stage.addActor(gameWindow2);
-
         stage.setDebugAll(false);
     }
 

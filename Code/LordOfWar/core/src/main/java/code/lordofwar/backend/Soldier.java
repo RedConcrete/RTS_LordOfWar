@@ -25,8 +25,6 @@ public class Soldier extends Sprite {
         super.draw(batch);
     }
 
-
-
     private void update(float deltaTime) {
         endOfMapCollision();
         objectCollision(deltaTime);

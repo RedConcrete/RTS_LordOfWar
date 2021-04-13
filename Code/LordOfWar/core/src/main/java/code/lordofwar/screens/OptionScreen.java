@@ -7,7 +7,7 @@ import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+
 
 
 public class OptionScreen extends Screens implements Screen {
@@ -103,7 +103,6 @@ public class OptionScreen extends Screens implements Screen {
             @Override
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
 
-                //Todo Abfrage entwickeln!!!
                 if(!game.getCon().getFPS()){
                     fpsButton.setText("FPS ON");
                     game.getCon().setFPS(true);
@@ -157,6 +156,6 @@ public class OptionScreen extends Screens implements Screen {
         backButton(stage,skin,game,windowOptionen);
         packAndSetWindow(windowOptionen,stage);
 
-        stage.setDebugAll(true);
+        stage.setDebugAll(false);
     }
 }

@@ -5,7 +5,6 @@ import de.model.User;
 
 import javax.websocket.Session;
 
-import java.util.ArrayList;
 
 import static de.constants.MessageIdentifier.LOGIN_VALID;
 
@@ -23,7 +22,7 @@ public class Login{
 
     public User isLoginValid(String[] strings, Session session) {
         User validUser=null;
-        if (DataManager.isFile(strings[2])) {//username exists
+        if (DataManager.isFile(strings[2])) {
 
             User user = DataManager.fileToUser(DataManager.usernameToPath(strings[2]).toFile());
             if (user!=null){
