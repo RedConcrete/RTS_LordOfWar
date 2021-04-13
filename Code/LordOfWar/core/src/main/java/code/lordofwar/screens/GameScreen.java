@@ -1,5 +1,6 @@
 package code.lordofwar.screens;
 
+import code.lordofwar.backend.Castle;
 import code.lordofwar.backend.Soldier;
 import code.lordofwar.backend.Villager;
 import code.lordofwar.backend.events.GameScreenEvent;
@@ -22,9 +23,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.ArrayList;
 
@@ -47,6 +46,7 @@ public class GameScreen extends Screens implements Screen {
     private ArrayList<Soldier> soldierArrayList;
     private ArrayList<Object> entityArrayList;
     private Sprite villiagerSprite;
+    private Castle castle;
 
     private TmxMapLoader loader;
     private Label scoreLabel;
@@ -61,11 +61,12 @@ public class GameScreen extends Screens implements Screen {
         pointTimerCounter = 10;
         gameScreenEvent = new GameScreenEvent(game, lobbyID);
         posCameraDesired = new Vector3();
-        isCameraDebug = true;
+        isCameraDebug = false;
         vectorSpeed = new Vector2();
         posCameraDesired = new Vector3();
         villagerArrayList = new ArrayList<>();
         soldierArrayList = new ArrayList<>();
+        castle = new Castle();
 
         atlas = new TextureAtlas(Gdx.files.internal("maps/RTS_UNITS_TILES.txt"));
         villiagerSprite = new Sprite(atlas.findRegion("Character_Green_B"));
@@ -125,15 +126,16 @@ public class GameScreen extends Screens implements Screen {
         scoreLabel.setText(gameScreenEvent.getPoints());
         for (Villager v : villagerArrayList) {
             if (v.isSelected()) {
-                v.setAlpha(.5f);
+                v.setColor(Color.GREEN);
                 v.draw(renderer.getBatch());
             } else {
-                v.setAlpha(1);
+                v.setColor(Color.RED);
                 v.draw(renderer.getBatch());
             }
             v.draw(renderer.getBatch());
 
         }
+
         renderer.getBatch().end();
 
         // todo schau wo die maus ist und dann reagiere also x und y abfragen und dann camera moven falls passend
@@ -298,9 +300,6 @@ public class GameScreen extends Screens implements Screen {
         windowExit.add(yesButton);
         windowExit.add(noButton);
 
-
-
-
         scoreLabel = new Label("", skin);
         scoreLabel.setFontScale(2.5f);
         Label spacerLabel = new Label("", skin);
@@ -424,7 +423,7 @@ public class GameScreen extends Screens implements Screen {
         Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
         camera.unproject(mousePos);
 
-        float x = mousePos.x, y = mousePos.y;
+        int x = (int) mousePos.x, y = (int) mousePos.y;
 
         for (Villager villager : villagerArrayList) {
 
@@ -433,6 +432,12 @@ public class GameScreen extends Screens implements Screen {
                     villager.setSelected(!villager.isSelected());
                 }
             }
+
+        }
+
+        if(collisionUnitLayer.getCell(x / collisionUnitLayer.getTileWidth(), y / collisionUnitLayer.getTileHeight())
+                .getTile().getProperties().containsKey("isCastel")){
+            castle.setSelected(!castle.isSelected());
         }
     }
 }
