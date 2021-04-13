@@ -98,10 +98,14 @@ public abstract class Screens extends Constants{
      */
     protected void packAndSetWindow(Window window, Stage stage){
         window.pack();
-
         window.setPosition(stage.getWidth() / 2f - window.getWidth() / 2f,
                 stage.getHeight() / 2f - window.getHeight() / 2f);
         window.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(.25f)));
+        stage.addActor(window);
+    }
+
+    protected void packWindow(Window window, Stage stage){
+        window.pack();
         stage.addActor(window);
     }
 

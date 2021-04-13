@@ -8,8 +8,8 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Villager extends Sprite {
 
+    private boolean selected;
     private Vector2 velocity = new Vector2();
-
     private float speed = 60 * 2;
 
     private TiledMapTileLayer collisionLayer;
@@ -24,8 +24,6 @@ public class Villager extends Sprite {
         update(Gdx.graphics.getDeltaTime());
         super.draw(batch);
     }
-
-
 
     private void update(float deltaTime) {
         endOfMapCollision();
@@ -49,6 +47,7 @@ public class Villager extends Sprite {
 
 
     private void objectCollision(float deltaTime){
+
         //Todo https://youtu.be/DOpqkaX9844 Fix Colloison
 
         if (velocity.x > speed && velocity.y > speed) {
@@ -108,6 +107,7 @@ public class Villager extends Sprite {
         // moving in y
         setY(getY() + velocity.y * deltaTime);
 
+
         if (velocity.y < 0) {
 
             //bottom left
@@ -149,8 +149,6 @@ public class Villager extends Sprite {
     }
 
 
-
-
     public Vector2 getVelocity() {
         return velocity;
     }
@@ -173,5 +171,13 @@ public class Villager extends Sprite {
 
     public void setCollisionLayer(TiledMapTileLayer collisionLayer) {
         this.collisionLayer = collisionLayer;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public boolean isSelected() {
+        return selected;
     }
 }
