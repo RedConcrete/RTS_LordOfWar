@@ -10,11 +10,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Scaling;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -121,10 +118,19 @@ public class LoginScreen extends Screens implements Screen {
         TextButton exitButton = new TextButton("Exit", skin);
         exitButton.getLabel().setFontScale(3f);
 
+        Window windowLogin = new Window("", skin, "border");
+        windowLogin.defaults().pad(10f);
+        windowLogin.defaults().padLeft(40f);
+        windowLogin.defaults().padRight(40f);
+        windowLogin.setMovable(false);
+
+        Window errorWindow = new Window("", skin, "border");
+        errorWindow.setMovable(false);
+        errorWindow.defaults().pad(20f);
+
         loginButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("Login");
                 ArrayList<String> loginArray= new ArrayList<>();
                 loginArray.add(game.getSessionID());
                 loginArray.add(usernameTextField.getText());
@@ -141,12 +147,40 @@ public class LoginScreen extends Screens implements Screen {
                 if (loginScreenEvent.isLoginAnswer()) {
 
                     game.setScreen(new MenuScreen(game, skin));
-                    //removet alle actors von der stage
                     stage.dispose();
 
                 } else {
                     Rumble.rumble(1f, .2f);
-                    //todo zeige fehler an!!! in cooler Arte und Weise
+
+                    TextButton okButton = new TextButton("OK",skin);
+
+                    errorWindow.setVisible(true);
+                    windowLogin.setVisible(false);
+
+                    Label errorLabel = new Label("Failed to login. Try again",skin);
+                    errorLabel.setFontScale(3f);
+
+
+                    okButton.addListener(new InputListener(){
+
+                        @Override
+                        public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                            errorWindow.setVisible(false);
+                            windowLogin.setVisible(true);
+                        }
+                        @Override
+                        public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                            return true;
+                        }
+                    });
+
+                    errorWindow.add(errorLabel).row();
+                    errorWindow.add(okButton).row();
+                    errorWindow.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
+                    errorWindow.pack();
+
+                    stage.addActor(errorWindow);
+
                 }
             }
 
@@ -167,7 +201,6 @@ public class LoginScreen extends Screens implements Screen {
         registerButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("Register");
                 game.setScreen(new RegisterScreen(game, skin));
                 stage.dispose();
             }
@@ -193,24 +226,17 @@ public class LoginScreen extends Screens implements Screen {
         /**
          * checks if the Websocket-connection is open and shows it with a red / green sword
          */
-
-        Window window = new Window("", skin, "border");
-        window.defaults().pad(10f);
-        window.defaults().padLeft(40f);
-        window.defaults().padRight(40f);
-        window.setMovable(false);
-
-        window.add(name).colspan(3).row();
-        window.add(usernameTextField).colspan(3).row();
-        window.add(password).colspan(3).row();
-        window.add(passwordTextField).colspan(3).row();
-        window.add(img);
-        window.add(loginButton);
-        window.add(img2).row();
-        window.add(noAccountLabel).colspan(3).row();
-        window.add(registerButton).colspan(3).row();
-        window.add(exitButton).colspan(3).row();
-        packAndSetWindow(window, stage);
+        windowLogin.add(name).colspan(3).row();
+        windowLogin.add(usernameTextField).colspan(3).row();
+        windowLogin.add(password).colspan(3).row();
+        windowLogin.add(passwordTextField).colspan(3).row();
+        windowLogin.add(img);
+        windowLogin.add(loginButton);
+        windowLogin.add(img2).row();
+        windowLogin.add(noAccountLabel).colspan(3).row();
+        windowLogin.add(registerButton).colspan(3).row();
+        windowLogin.add(exitButton).colspan(3).row();
+        packAndSetWindow(windowLogin, stage);
         stage.setDebugAll(false);
     }
 

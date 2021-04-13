@@ -4,10 +4,13 @@ import com.badlogic.gdx.math.Vector3;
 import java.util.Random;
 
 /**
- * got this code from this page
+ * Rumble makes a short shake of the camera if an error appears.
+ * Source:
  * https://gamedev.stackexchange.com/questions/163662/how-to-make-shake-effect-on-camera-in-libgdx
  * https://carelesslabs.wordpress.com/2017/08/14/making-a-libgdx-roguelike-survival-game-part-9-screen-shake-inventory-gamedev/
+ * @author Franz Klose
  */
+
 public class Rumble {
     private static float time = 0;
     private static float currentTime = 0;

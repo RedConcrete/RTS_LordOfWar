@@ -83,6 +83,8 @@ public class LobbyCreateScreen extends Screens implements Screen {
         windowLobbyCreate.defaults().pad(20f);
         windowLobbyCreate.setMovable(false);
 
+
+
         TextButton lobbyCreateButton = new TextButton("Create Lobby", skin);
         lobbyCreateButton.getLabel().setFontScale(3f);
 
@@ -99,6 +101,8 @@ public class LobbyCreateScreen extends Screens implements Screen {
 
         Label mapLabel = new Label("Map", skin);
         mapLabel.setFontScale(2f);
+
+
 
         SelectBox<Integer> playerAmountSelectBox = new SelectBox(skin);
         playerAmountSelectBox.setItems(2, 4, 6);
@@ -119,12 +123,14 @@ public class LobbyCreateScreen extends Screens implements Screen {
 
                 if (lobbyName.getText().isEmpty()) {
 
-                    Window w = new Window("", skin, "border");
-                    TextArea textArea = new TextArea("der Lobby wurde kein Name gegeben!", skin);
-                    w.add(textArea);
-                    stage.addActor(w);
-
                     Rumble.rumble(1f, .2f);
+
+                    printErrorWindow(windowLobbyCreate,"Lobbys has no Name");
+
+
+
+
+
                 } else {
                     Lobby lobby = new Lobby(lobbyName.getText(), mapSelctBox.getSelected(), playerAmountSelectBox.getSelected(), gameModeSelectBox.getSelected());
                     lobbyCreateScreenEvent.sendLobbyCreateRequest(lobby);
@@ -138,12 +144,9 @@ public class LobbyCreateScreen extends Screens implements Screen {
                         game.setScreen(new LobbyScreen(game, skin, lobbyCreateScreenEvent.getLobbyID()));
                     } else {
 
-                        Window w = new Window("", skin, "border");
-                        TextArea textArea = new TextArea("lobby konnte nicht erstellt werden!", skin);
-                        w.add(textArea);
-                        stage.addActor(w);
-
                         Rumble.rumble(1f, .2f);
+
+                        printErrorWindow(windowLobbyCreate,"Can´t create Lobby");
                     }
                 }
 
@@ -175,6 +178,42 @@ public class LobbyCreateScreen extends Screens implements Screen {
 
 
         stage.setDebugAll(false);
+    }
+
+    private void printErrorWindow(Window windowLobbyCreate, String text){
+
+        Window errorWindow = new Window("", skin, "border");
+        errorWindow.setMovable(false);
+        errorWindow.defaults().pad(20f);
+
+        TextButton okButton = new TextButton("OK",skin);
+
+        errorWindow.setVisible(true);
+        windowLobbyCreate.setVisible(false);
+
+        Label errorLabel = new Label(text,skin);
+        errorLabel.setFontScale(3f);
+
+        okButton.addListener(new InputListener(){
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                errorWindow.setVisible(false);
+                windowLobbyCreate.setVisible(true);
+            }
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+        });
+
+        errorWindow.add(errorLabel).row();
+        errorWindow.add(okButton).row();
+        errorWindow.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
+        errorWindow.pack();
+
+        stage.addActor(errorWindow);
+
     }
 
     public LobbyCreateScreenEvent getLobbyCreateScreenEvent() {

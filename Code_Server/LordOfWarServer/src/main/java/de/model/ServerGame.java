@@ -3,11 +3,11 @@ package de.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-//For keeping data about a running game
+
 public class ServerGame {
-    private final User[] players;//static array
+    private final User[] players;
     private HashMap<String,User> sessionIDMap;
-    private HashMap<User, Integer> pointMap;//how many points the players earned
+    private HashMap<User, Integer> pointMap;
 
     public ServerGame(ArrayList<User> players) {
         this.players = new User[players.size()];

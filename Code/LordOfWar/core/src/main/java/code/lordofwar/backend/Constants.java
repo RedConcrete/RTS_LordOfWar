@@ -1,6 +1,6 @@
 package code.lordofwar.backend;
 
-import com.badlogic.gdx.Graphics;
+
 
 public class Constants {
 
@@ -10,12 +10,12 @@ public class Constants {
     public static final String STRINGSEPERATOR = "///";
 
     public Boolean WEBSOCKET_OPEN;
-    public Boolean FPS; //Todo an und ausschaltbar in Optionen
+    public Boolean FPS;
     public Boolean MUSIC;
 
     public Constants(){
         WEBSOCKET_OPEN = false;
-        FPS = false; //Todo an und ausschaltbar in Optionen
+        FPS = false;
         MUSIC = true;
     }
 
@@ -38,6 +38,7 @@ public class Constants {
     public Boolean getWEBSOCKET_OPEN() {
         return WEBSOCKET_OPEN;
     }
+
     public void setWEBSOCKET_OPEN(Boolean WEBSOCKET_OPEN) {
         this.WEBSOCKET_OPEN = WEBSOCKET_OPEN;
     }

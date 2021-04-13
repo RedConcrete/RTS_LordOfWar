@@ -7,12 +7,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+
 
 import java.util.concurrent.TimeUnit;
 
@@ -76,14 +75,21 @@ public class LobbyBrowserScreen extends Screens implements Screen {
 
         lobbyBrowserScreenEvent.sendRequestGetLobbys();
 
+        Window windowLobbyBrowser = new Window("", skin, "border");
+        windowLobbyBrowser.defaults().pad(20f);
+
+        Window errorWindow = new Window("", skin, "border");
+        errorWindow.setMovable(false);
+        errorWindow.defaults().pad(20f);
+
+        TextButton okButton = new TextButton("OK",skin);
+
+
         try {
-            TimeUnit.SECONDS.sleep(2); // todo schauen ob delay immer ausreicht!
+            TimeUnit.SECONDS.sleep(2); // TODO mit Thread realisieren
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-        Window windowLobbyBrowser = new Window("", skin, "border");
-        windowLobbyBrowser.defaults().pad(20f);
 
         String[] strings = lobbyBrowserScreenEvent.getLobbyList();
         for (int i = 4; i < strings.length; i += 4) {
@@ -95,7 +101,7 @@ public class LobbyBrowserScreen extends Screens implements Screen {
                 public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                     lobbyBrowserScreenEvent.sendRequestJoinLobby(textButton.getName());
                     try {
-                        TimeUnit.SECONDS.sleep(2); // todo schauen ob delay immer ausreicht!
+                        TimeUnit.SECONDS.sleep(2); // TODO mit Thread realisieren
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -103,12 +109,38 @@ public class LobbyBrowserScreen extends Screens implements Screen {
                     if (lobbyBrowserScreenEvent.getJoined() != null) {
 
                         game.setScreen(new LobbyScreen(game, skin, lobbyBrowserScreenEvent.getJoined()));//TODO does this work?
-                        //removet alle actors von der stage
                         stage.dispose();
 
                     } else {
                         Rumble.rumble(1f, .2f);
-                        //todo zeige fehler an
+
+                        errorWindow.setVisible(true);
+                        windowLobbyBrowser.setVisible(false);
+
+                        Label errorLabel = new Label("Can´t join lobby",skin);
+                        errorLabel.setFontScale(3f);
+
+
+                        okButton.addListener(new InputListener(){
+
+                            @Override
+                            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                                errorWindow.setVisible(false);
+                                windowLobbyBrowser.setVisible(true);
+                            }
+                            @Override
+                            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                                return true;
+                            }
+                        });
+
+                        errorWindow.add(errorLabel);
+                        errorWindow.add(okButton);
+                        errorWindow.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
+                        errorWindow.pack();
+
+                        stage.addActor(errorWindow);
+
                     }
                 }
 

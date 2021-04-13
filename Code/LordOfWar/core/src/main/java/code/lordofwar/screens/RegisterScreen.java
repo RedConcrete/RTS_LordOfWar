@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 
-/*
+/**
 The class Register Screen allows the User to create a Account, that he can use the Login the next time.
 @author Robin Hefner
  */
@@ -44,6 +44,15 @@ public class RegisterScreen extends Screens implements Screen {
         passwordLabel.setFontScale(4f);
         passwordLabel.setWidth(Gdx.graphics.getWidth());
 
+        Window registerWindow = new Window("", skin, "border");
+        registerWindow.defaults().pad(10f);
+        registerWindow.defaults().padLeft(40f);
+        registerWindow.defaults().padRight(40f);
+        registerWindow.setMovable(false);
+
+        Window errorWindow = new Window("", skin, "border");
+        errorWindow.setMovable(false);
+        errorWindow.defaults().pad(20f);
 
         TextField passwordTextField = new TextField("Password", skin);
         passwordTextField.setPasswordCharacter('*');
@@ -55,7 +64,6 @@ public class RegisterScreen extends Screens implements Screen {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
 
-                System.out.println("Register");
                 //TODO Get rid of code copying
                 ArrayList<String> registerArray = new ArrayList<>();
                 registerArray.add(game.getSessionID());
@@ -78,7 +86,34 @@ public class RegisterScreen extends Screens implements Screen {
                     stage.dispose();
 
                 } else {
-                    //TODO FEHLER ANZEIGEN
+                    TextButton okButton = new TextButton("OK",skin);
+
+                    errorWindow.setVisible(true);
+                    registerWindow.setVisible(false);
+
+                    Label errorLabel = new Label("Failed to login. Try again",skin);
+                    errorLabel.setFontScale(3f);
+
+
+                    okButton.addListener(new InputListener(){
+
+                        @Override
+                        public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                            errorWindow.setVisible(false);
+                            registerWindow.setVisible(true);
+                        }
+                        @Override
+                        public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                            return true;
+                        }
+                    });
+
+                    errorWindow.add(errorLabel).row();
+                    errorWindow.add(okButton).row();
+                    errorWindow.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
+                    errorWindow.pack();
+
+                    stage.addActor(errorWindow);
                 }
             }
 
@@ -97,7 +132,6 @@ public class RegisterScreen extends Screens implements Screen {
 
                 game.setScreen(new LoginScreen(game, skin));
                 stage.dispose();
-
             }
 
             @Override
@@ -106,12 +140,6 @@ public class RegisterScreen extends Screens implements Screen {
             }
         });
 
-
-        Window registerWindow = new Window("", skin, "border");
-        registerWindow.defaults().pad(10f);
-        registerWindow.defaults().padLeft(40f);
-        registerWindow.defaults().padRight(40f);
-        registerWindow.setMovable(false);
         registerWindow.add(usernameLabel).row();
         registerWindow.add(usernameTextField).row();
         registerWindow.add(passwordLabel).row();

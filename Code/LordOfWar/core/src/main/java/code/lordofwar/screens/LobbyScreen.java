@@ -2,7 +2,6 @@ package code.lordofwar.screens;
 
 import code.lordofwar.backend.events.LobbyScreenEvent;
 import code.lordofwar.main.LOW;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -13,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class LobbyScreen extends Screens implements Screen {
 
