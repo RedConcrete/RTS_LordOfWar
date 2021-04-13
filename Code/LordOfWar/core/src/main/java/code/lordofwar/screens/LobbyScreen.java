@@ -17,19 +17,16 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class LobbyScreen extends Screens implements Screen {
 
-    private final Stage stage;
-    private final LOW game;
-    private final Skin skin;
+
     private String[] playerNameArr;
     public String[] gameInfoArr;
     private final String lobbyID;
     private LobbyScreenEvent lobbyScreenEvent;
 
     public LobbyScreen(LOW aGame, Skin aSkin,String lobbyID) {
+        super(aGame,aSkin);
         this.lobbyID=lobbyID;
-        game = aGame;
-        skin = aSkin;
-        stage = new Stage(new ScreenViewport());
+
         playerNameArr = new String[]{"Username"};
         gameInfoArr = new String[]{"map \n" + "gamemode\n" + "...\n"};
         lobbyScreenEvent=new LobbyScreenEvent(game);

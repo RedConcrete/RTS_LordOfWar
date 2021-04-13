@@ -1,8 +1,6 @@
 package code.lordofwar.screens;
 
-import code.lordofwar.backend.Constants;
 import code.lordofwar.main.LOW;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -17,17 +15,10 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class MenuScreen extends Screens implements Screen {
 
-    private final Stage stage;
-    private final LOW game;
-    private final Skin skin;
 
     public MenuScreen(LOW aGame, Skin aSkin) {
-        game = aGame;
-        skin = aSkin;
-        stage = new Stage(new ScreenViewport());
+        super(aGame, aSkin);
 
-
-        fps(stage,skin);
         createBackground(stage);
 
         setupUI();
@@ -44,7 +35,7 @@ public class MenuScreen extends Screens implements Screen {
 
         clearStage();
 
-        fps(stage,skin);
+        fps(stage, skin);
 
         stage.act();
         stage.draw();
@@ -72,39 +63,39 @@ public class MenuScreen extends Screens implements Screen {
         stage.dispose();
     }
 
-    private void setupUI(){
+    private void setupUI() {
 
         Label lordOfWarLabel = new Label("Lord of War", skin);
         lordOfWarLabel.setAlignment(Align.center);
         lordOfWarLabel.setFontScale(6f);
-        lordOfWarLabel.setY(Gdx.graphics.getHeight()*18f/20f);
+        lordOfWarLabel.setY(Gdx.graphics.getHeight() * 18f / 20f);
         lordOfWarLabel.setWidth(Gdx.graphics.getWidth());
         stage.addActor(lordOfWarLabel);
 
-        TextButton lobbyCreateButton = new TextButton("Lobby erstellen",skin);
+        TextButton lobbyCreateButton = new TextButton("Lobby erstellen", skin);
         lobbyCreateButton.getLabel().setFontScale(3f);
 
-        TextButton lobbyJoinButton = new TextButton("Lobby beitreten",skin);
+        TextButton lobbyJoinButton = new TextButton("Lobby beitreten", skin);
         lobbyJoinButton.getLabel().setFontScale(3f);
 
-        TextButton optionButton = new TextButton("Optionen",skin);
+        TextButton optionButton = new TextButton("Optionen", skin);
         optionButton.getLabel().setFontScale(3f);
 
-        TextButton exitButton = new TextButton("Exit",skin);
+        TextButton exitButton = new TextButton("Exit", skin);
         exitButton.getLabel().setFontScale(3f);
 
         Window windowMenu = new Window("", skin, "border");
         windowMenu.setMovable(false);
         windowMenu.defaults().pad(20f);
 
-        Window windowExit = new Window("Exit?",skin, "border");
+        Window windowExit = new Window("Exit?", skin, "border");
         windowExit.setMovable(false);
         windowExit.defaults().pad(20f);
 
 
-        lobbyJoinButton.addListener(new InputListener(){
+        lobbyJoinButton.addListener(new InputListener() {
             @Override
-            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("Lobby beitreten");
                 game.setScreen(new LobbyBrowserScreen(game, skin));
                 //Todo server muss daten von erstellten lobbys senden!
@@ -112,83 +103,82 @@ public class MenuScreen extends Screens implements Screen {
             }
 
             @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });
 
-        lobbyCreateButton.addListener(new InputListener(){
+        lobbyCreateButton.addListener(new InputListener() {
             @Override
-            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("LobbyErstellen");
                 game.setScreen(new LobbyCreateScreen(game, skin));
             }
 
             @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });
 
-        optionButton.addListener(new InputListener(){
+        optionButton.addListener(new InputListener() {
             @Override
-            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("OptionsScreen");
                 game.setScreen(new OptionScreen(game, skin));
 
             }
 
             @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });
 
-        exitButton.addListener(new InputListener(){
+        exitButton.addListener(new InputListener() {
             @Override
-            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
 
 
                 System.out.println("ExitWindow");
                 windowMenu.setVisible(false);
                 windowExit.setVisible(true);
 
-                TextButton yesButton = new TextButton("Yes",skin);
+                TextButton yesButton = new TextButton("Yes", skin);
                 yesButton.getLabel().setFontScale(2f);
 
-                yesButton.addListener(new InputListener(){
+                yesButton.addListener(new InputListener() {
                     @Override
-                    public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+                    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                         System.exit(0);
                     }
 
                     @Override
-                    public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                         return true;
                     }
                 });
 
 
-                TextButton noButton = new TextButton("No",skin);
+                TextButton noButton = new TextButton("No", skin);
                 noButton.getLabel().setFontScale(2f);
 
-                noButton.addListener(new InputListener(){
+                noButton.addListener(new InputListener() {
                     @Override
-                    public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+                    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                         windowMenu.setVisible(true);
                         windowExit.setVisible(false);
                     }
 
                     @Override
-                    public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                         return true;
                     }
                 });
 
 
-                Label exitLabel = new Label("Do you realy want to Exit?",skin);
+                Label exitLabel = new Label("Do you realy want to Exit?", skin);
                 exitLabel.setFontScale(3f);
-
 
 
                 windowExit.add(exitLabel).colspan(2).row();
@@ -202,7 +192,7 @@ public class MenuScreen extends Screens implements Screen {
             }
 
             @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });
@@ -214,7 +204,7 @@ public class MenuScreen extends Screens implements Screen {
         windowMenu.add(exitButton).row();
         windowMenu.pack();
 
-        packAndSetWindow(windowMenu,stage);
+        packAndSetWindow(windowMenu, stage);
         stage.addActor(windowMenu);
 
         stage.setDebugAll(false);
