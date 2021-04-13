@@ -18,15 +18,12 @@ import java.util.concurrent.TimeUnit;
 
 public class LobbyCreateScreen extends Screens implements Screen {
 
-    private final Stage stage;
-    private final LOW game;
-    private final Skin skin;
+
     private final LobbyCreateScreenEvent lobbyCreateScreenEvent;
 
     public LobbyCreateScreen(LOW aGame, Skin aSkin) {
-        game = aGame;
-        skin = aSkin;
-        stage = new Stage(new ScreenViewport());
+       super(aGame,aSkin);
+
         lobbyCreateScreenEvent = new LobbyCreateScreenEvent(game);
 
         createBackground(stage);

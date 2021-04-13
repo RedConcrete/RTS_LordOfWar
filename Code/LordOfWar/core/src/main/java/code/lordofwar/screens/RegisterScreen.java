@@ -7,10 +7,8 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -22,16 +20,10 @@ The class Register Screen allows the User to create a Account, that he can use t
  */
 public class RegisterScreen extends Screens implements Screen {
 
-    private final Stage stage;
-    private final LOW game;
-    private final Skin skin;
     private final RegisterScreenEvent registerScreenEvent;
 
     public RegisterScreen(LOW aGame, Skin aSkin) {
-
-        game = aGame;
-        skin = aSkin;
-        stage = new Stage(new ScreenViewport());
+        super(aGame, aSkin);
         registerScreenEvent = new RegisterScreenEvent(game);
         createBackground(stage);
         setupUI();

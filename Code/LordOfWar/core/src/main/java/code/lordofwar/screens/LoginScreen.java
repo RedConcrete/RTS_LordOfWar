@@ -21,18 +21,14 @@ import java.util.concurrent.TimeUnit;
 
 public class LoginScreen extends Screens implements Screen {
 
-    private final Stage stage;
-    private final LOW game;
-    private final Skin skin;
+
     LoginScreenEvent loginScreenEvent;
     Image img;
     Image img2;
 
 
     public LoginScreen(LOW aGame, Skin aSkin) {
-        game = aGame;
-        skin = aSkin;
-        stage = new Stage(new ScreenViewport());
+        super(aGame, aSkin);
         loginScreenEvent = new LoginScreenEvent(game);
 
         img = new Image(new Texture("ui/sword_1.png"));

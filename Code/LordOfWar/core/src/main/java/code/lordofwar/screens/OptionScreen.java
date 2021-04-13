@@ -12,14 +12,9 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class OptionScreen extends Screens implements Screen {
 
-    private final Stage stage;
-    private final LOW game;
-    private final Skin skin;
 
     public OptionScreen(LOW aGame, Skin aSkin) {
-        game = aGame;
-        skin = aSkin;
-        stage = new Stage(new ScreenViewport());
+       super(aGame,aSkin);
 
         createBackground(stage);
 
@@ -109,13 +104,13 @@ public class OptionScreen extends Screens implements Screen {
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
 
                 //Todo Abfrage entwickeln!!!
-                if(!getFPS()){
+                if(!game.getCon().getFPS()){
                     fpsButton.setText("FPS ON");
-                    setFPS(true);
+                    game.getCon().setFPS(true);
                 }
                 else {
                     fpsButton.setText("FPS OFF");
-                    setFPS(false);
+                    game.getCon().setFPS(false);
                 }
             }
 
