@@ -11,12 +11,16 @@ public class Villager extends Sprite {
     private boolean selected;
     private Vector2 velocity = new Vector2();
     private float speed = 60 * 2;
+    private int hp;
+
+
 
     private TiledMapTileLayer collisionLayer;
 
     public Villager(Sprite sprite, TiledMapTileLayer collisionLayer) {
         super(sprite);
         this.collisionLayer = collisionLayer;
+        hp = 50;
     }
 
     @Override
@@ -179,5 +183,13 @@ public class Villager extends Sprite {
 
     public boolean isSelected() {
         return selected;
+    }
+
+    public int getHp() {
+        return hp;
+    }
+
+    public void setHp(int hp) {
+        this.hp = hp;
     }
 }

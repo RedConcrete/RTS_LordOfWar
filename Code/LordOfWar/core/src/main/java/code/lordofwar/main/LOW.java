@@ -7,6 +7,7 @@ import code.lordofwar.backend.Sounds;
 import code.lordofwar.screens.LoginScreen;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -15,6 +16,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.WebSocket;
 
+import java.awt.*;
 import java.util.concurrent.TimeUnit;
 
 import static code.lordofwar.backend.Constants.WORLD_HEIGHT_PIXEL;
@@ -41,7 +43,8 @@ public class LOW extends Game {
 	@Override
 	public void create() {
 
-		skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
+		skin = new Skin(Gdx.files.internal("ui/skin/uiskin.json"));
+		skin.getFont("default").getData().setScale(2f);
 
 		FitViewport fitViewport = new FitViewport(WORLD_WIDTH_PIXEL, WORLD_HEIGHT_PIXEL);
 		stage = new Stage(fitViewport);

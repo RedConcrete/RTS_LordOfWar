@@ -20,6 +20,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -50,6 +51,9 @@ public class GameScreen extends Screens implements Screen {
     private Castle castle;
     private Image castleImage;
     private Label entityName;
+    private TextureAtlas uiAtlas = new TextureAtlas(Gdx.files.internal("ui/skin/uiskin.atlas"));
+    private TextureAtlas unitAtlas = new TextureAtlas(Gdx.files.internal("maps/RTS_UNITS_TILES.txt"));
+    private boolean isPressed;
 
     private final TmxMapLoader loader;
     private Label scoreLabel;
@@ -61,6 +65,7 @@ public class GameScreen extends Screens implements Screen {
 
     public GameScreen(LOW aGame, Skin aSkin, String lobbyID) {
         super(aGame,aSkin);
+        isPressed = false;
         entityName = new Label("", skin);
         castleImage = new Image(new Sprite(new Texture("maps/RTS_CASTEL_TILES.png")));
         castleImage.setVisible(false);
@@ -74,8 +79,8 @@ public class GameScreen extends Screens implements Screen {
         soldierArrayList = new ArrayList<>();
         castle = new Castle();
 
-        TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("maps/RTS_UNITS_TILES.txt"));
-        villiagerSprite = new Sprite(atlas.findRegion("Character_Green_B"));
+
+        villiagerSprite = new Sprite(unitAtlas.findRegion("Character_Green_B"));
 
         loader = new TmxMapLoader();
         map = loader.load("maps/map_1.tmx");
@@ -113,7 +118,10 @@ public class GameScreen extends Screens implements Screen {
         renderer.setView(camera);
         renderer.render();
 
+        debugRenderer.setAutoShapeType(true);
+
         renderer.getBatch().begin();
+        debugRenderer.begin();
 
         pointTimerCounter += delta;
         if (pointTimerCounter > 1) {//1 second update
@@ -124,10 +132,10 @@ public class GameScreen extends Screens implements Screen {
         scoreLabel.setText(gameScreenEvent.getPoints());
         for (Villager v : villagerArrayList) {
             if (v.isSelected()) {
-                v.setColor(Color.GREEN);
+
                 v.draw(renderer.getBatch());
             } else {
-                v.setColor(Color.RED);
+
                 v.draw(renderer.getBatch());
             }
             v.draw(renderer.getBatch());
@@ -135,10 +143,17 @@ public class GameScreen extends Screens implements Screen {
             if(v.isSelected()){
                 entityName.setText("Villager");
                 castleImage.setVisible(false);
+                Sprite s = new Sprite(uiAtlas.findRegion("button-normal"));
+                s.setColor(Color.RED);
+                s.setSize(v.getHp(),10);
+                s.setPosition(v.getX() + 5,v.getY() + 60);
+                s.draw(renderer.getBatch());
             }
+
         }
 
         renderer.getBatch().end();
+        debugRenderer.end();
 
         if(castle.isSelected()){
             entityName.setText("Castle");
@@ -147,10 +162,18 @@ public class GameScreen extends Screens implements Screen {
 
         // todo schau wo die maus ist und dann reagiere also x und y abfragen und dann camera moven falls passend
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-            getClickedOnEntity();
-            mouseOnEdgeofCamera();
+            if(!isPressed){
+                getClickedOnEntity();
+                isPressed = true;
+            }
+            else {
+                if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
+                    isPressed = false;
+                }
+            }
         }
 
+        mouseOnEdgeofCamera();
         stage.act();
         stage.draw();
     }

@@ -22,15 +22,16 @@ public class LoginScreen extends Screens implements Screen {
     LoginScreenEvent loginScreenEvent;
     Image img;
     Image img2;
+    String swordTexturePath = "ui/swords/sword_1.png";
 
 
     public LoginScreen(LOW aGame, Skin aSkin) {
         super(aGame, aSkin);
         loginScreenEvent = new LoginScreenEvent(game);
 
-        img = new Image(new Texture("ui/sword_1.png"));
+        img = new Image(new Texture(swordTexturePath));
 
-        img2 = new Image(new Texture("ui/sword_1.png"));
+        img2 = new Image(new Texture(swordTexturePath));
 
         fps(stage, skin);
         createBackground(stage);
