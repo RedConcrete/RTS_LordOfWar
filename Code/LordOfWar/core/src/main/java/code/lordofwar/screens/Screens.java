@@ -13,11 +13,16 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import java.util.Random;
+
 public abstract class Screens extends Constants {
     protected final Stage stage;
     protected final LOW game;
     protected final Skin skin;
     private Label fps;
+
+    int upperBound = 4;
+    int lowerBound = 1;
 
     public Screens(LOW aGame, Skin aSkin) {
         game = aGame;
@@ -26,8 +31,23 @@ public abstract class Screens extends Constants {
     }
 
     protected void createBackground(Stage stage) {
-        Texture texture = new Texture("ui\\background.jpg");
-        Image image = new Image(texture);
+
+        int number = lowerBound + (int)(Math.random() * ((upperBound - lowerBound) + 1));
+        Texture backgroundTexture = new Texture("ui/background/background.jpg");;
+        if(number == 1){
+            backgroundTexture = new Texture("ui/background/background.jpg");
+        }
+        else if(number == 2){
+            backgroundTexture = new Texture("ui/background/background_2.jpg");
+        }
+        else if(number == 3){
+            backgroundTexture = new Texture("ui/background/background_3.jpg");
+        }
+        else if(number == 4){
+            backgroundTexture = new Texture("ui/background/background_4.jpg");
+        }
+
+        Image image = new Image(backgroundTexture);
         Graphics.DisplayMode currentMode = Gdx.graphics.getDisplayMode();
         if (Gdx.graphics.isFullscreen()) {
             image.setSize(currentMode.width, currentMode.height);
