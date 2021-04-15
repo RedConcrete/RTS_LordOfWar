@@ -13,11 +13,9 @@ public class Register {
 
 
     private boolean registerValid;
-    DataPacker dataPacker;
 
 
     public Register() {
-        dataPacker = new DataPacker();
         registerValid = false;
     }
 
@@ -34,7 +32,7 @@ public class Register {
 
 
         if (registerValid) {
-            session.getAsyncRemote().sendObject(dataPacker.packData(REGISTER_VALID, "true"));
+            session.getAsyncRemote().sendObject(DataPacker.packData(REGISTER_VALID, "true"));
         } else {
 
         }
