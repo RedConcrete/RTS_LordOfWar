@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 
-import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 public class LobbyScreen extends Screens implements Screen {
 
@@ -45,7 +45,13 @@ public class LobbyScreen extends Screens implements Screen {
 
     @Override
     public void render(float delta) {
-        if (!lobbyScreenEvent.isRecievedData()){//later data requests (map etc) also go here
+        if (lobbyScreenEvent.isStartedGame()) {
+            String[] gameData = lobbyScreenEvent.getGameData();
+            //[1]=lobbyname[2]=gamemode[3]=map
+            game.setScreen(new GameScreen(game, skin, gameData[1]));//todo insert data here via lobbyScreenEvent.getData
+        }
+
+        if (!lobbyScreenEvent.isRecievedData()) {//later data requests (map etc) also go here
             lobbyScreenEvent.sendPlayerRequest(lobbyID);//possible to move this to the end of setupUi()?
         }
 
@@ -60,7 +66,6 @@ public class LobbyScreen extends Screens implements Screen {
         }// for (int i = 0; i < playerNameArr.length; i++) {
         //     playerNameArr[i]=playerNameArr[i]+"\n";//TODO formatting properly
         //  }
-
 
         stage.act();
         stage.draw();
@@ -109,11 +114,8 @@ public class LobbyScreen extends Screens implements Screen {
         startButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-
                 //Todo server muss wissen das die Lobby gestartet wurde!
-
-                game.setScreen(new GameScreen(game, skin, lobbyID));
-
+                lobbyScreenEvent.sendGameStartRequest(lobbyID);
             }
 
             @Override
