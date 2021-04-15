@@ -6,22 +6,18 @@ import code.lordofwar.main.LOW;
 import okhttp3.WebSocket;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import static code.lordofwar.backend.MessageIdentifier.CREATE_LOBBY;
-import static code.lordofwar.backend.MessageIdentifier.GET_GAME_POINTS;
 
 public class LobbyCreateScreenEvent {
 
     WebSocket webSocket;
-    DataPacker dataPacker;
     LOW game;
     private String lobbyID;
     private boolean isCreated;
 
     public LobbyCreateScreenEvent(LOW aGame) {
         game = aGame;
-        dataPacker = new DataPacker();
         webSocket = aGame.getWebSocket();
         isCreated = false;
     }
@@ -37,7 +33,7 @@ public class LobbyCreateScreenEvent {
         lobbyArr.add(lobby.getGamemode());//5
 
         System.out.println(lobbyArr);
-        webSocket.send(dataPacker.packData(CREATE_LOBBY,dataPacker.stringCombiner(lobbyArr)));
+        webSocket.send(DataPacker.packData(CREATE_LOBBY, DataPacker.stringCombiner(lobbyArr)));
     }
 
     public String getLobbyID() {

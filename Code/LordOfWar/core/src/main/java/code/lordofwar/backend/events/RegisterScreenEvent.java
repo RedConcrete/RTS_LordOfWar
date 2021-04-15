@@ -10,7 +10,6 @@ import static code.lordofwar.backend.MessageIdentifier.REGISTER;
 
 public class RegisterScreenEvent {
     WebSocket webSocket;
-    DataPacker dataPacker = new DataPacker();
     LOW game;
 
     boolean registerAnswer;
@@ -27,7 +26,7 @@ public class RegisterScreenEvent {
  */
 
     public void sendUserData(ArrayList<String> arr) {
-        webSocket.send(dataPacker.packData(REGISTER, dataPacker.stringCombiner(arr)));
+        webSocket.send(DataPacker.packData(REGISTER, DataPacker.stringCombiner(arr)));
     }
 
     public boolean isRegisterAnswer() {

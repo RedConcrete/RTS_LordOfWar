@@ -16,7 +16,6 @@ import static code.lordofwar.backend.MessageIdentifier.LOGIN;
 public class LoginScreenEvent {
 
     WebSocket webSocket;
-    DataPacker dataPacker = new DataPacker();
     LOW game;
 
     boolean loginAnswer;
@@ -31,7 +30,7 @@ public class LoginScreenEvent {
     //todo methode schreiben zum senden der Login daten
 
     public void sendUserData(ArrayList<String> arr) {
-        webSocket.send(dataPacker.packData(LOGIN, dataPacker.stringCombiner(arr)));
+        webSocket.send(DataPacker.packData(LOGIN, DataPacker.stringCombiner(arr)));
 
     }
 

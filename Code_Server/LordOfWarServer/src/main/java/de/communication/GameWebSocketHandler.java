@@ -11,6 +11,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,13 +28,12 @@ public class GameWebSocketHandler {
     Map<String, User> userSessions = new ConcurrentHashMap<>();
     Map<String, ServerLobby> lobbys = new ConcurrentHashMap<>();
 
-    private DataPacker dataPacker = new DataPacker();
 
     @OnOpen
     public void onOpen(Session session) {
 
         sessions.put(session.getId(), session);
-        session.getAsyncRemote().sendObject(dataPacker.packData(CONNECTION, session.getId()));
+        session.getAsyncRemote().sendObject(DataPacker.packData(CONNECTION, session.getId()));
         //todo hier wird der player der sich verbinden will als neuer player geaddet (er ist noch nicht eingelogt!! Player --> user)
 
     }
@@ -79,17 +79,19 @@ public class GameWebSocketHandler {
                 } else if (data[0].equals(GET_GAME_POINTS.toString())) {
                     ServerLobby serverLobby = findLobby(data);
                     if (serverLobby != null) {
-                        sessions.get(data[1]).getAsyncRemote().sendObject(dataPacker.packData(GET_GAME_POINTS, String.valueOf(serverLobby.getGame().getPoints(data[1]))));
+                        sessions.get(data[1]).getAsyncRemote().sendObject(DataPacker.packData(GET_GAME_POINTS, String.valueOf(serverLobby.getGame().getPoints(data[1]))));
                     }
                 } else if (data[0].equals(CREATE_LOBBY.toString())) {
                     createLobby(data);
 
                 } else if (data[0].equals(GET_LOBBYS.toString())) {
                     sendLobbysToClient(data[1]);
-                }else if (data[0].equals(JOIN_LOBBY.toString())){
+                } else if (data[0].equals(JOIN_LOBBY.toString())) {
                     joinLobby(data);
-                }else if (data[0].equals(LEAVE_LOBBY.toString())){
+                } else if (data[0].equals(LEAVE_LOBBY.toString())) {
                     leaveLobby(data);
+                } else if (data[0].equals(LOBBY_PLAYERS.toString())) {
+                    sendPlayerListUpdate(data);
                 }
             }
         }
@@ -105,20 +107,36 @@ public class GameWebSocketHandler {
                 arr.add(String.valueOf(entry.getValue().getPlayerAmount()));
             }
         }
-
-        sessions.get(userID).getAsyncRemote().sendObject(dataPacker.packData(GET_LOBBYS, dataPacker.stringCombiner(arr)));
+        sessions.get(userID).getAsyncRemote().sendObject(DataPacker.packData(GET_LOBBYS, DataPacker.stringCombiner(arr)));
         System.out.println(arr.toString());
     }
 
-    private void leaveLobby(String[] data){
-        ServerLobby lobby=findLobby(data);
-        if (lobby!=null){
-            boolean leave= lobby.leaveLobby(userSessions.get(data[1]));
-        if (leave){
-            if (lobby.getAdmin()==null){
-                lobbys.remove(lobby.getLobbyName());
+    private void leaveLobby(String[] data) {
+        ServerLobby lobby = findLobby(data);
+        if (lobby != null) {
+            boolean leave = lobby.leaveLobby(userSessions.get(data[1]));
+            if (leave) {
+                sendPlayerChangeUpdate(lobby);
+                if (lobby.getAdmin() == null) {
+                    lobbys.remove(lobby.getLobbyName());
+                }
             }
         }
+    }
+
+    public void sendPlayerListUpdate(String[] data) {//this should get triggered once the game is over (incase anyone left during the game); maybe public later
+        ServerLobby lobby = lobbys.get(data[2]);
+        if (lobby.getGame() == null) {
+            sessions.get(data[1]).getAsyncRemote().sendObject(DataPacker.packData(LOBBY_PLAYERS, DataPacker.stringCombiner(lobby.getPlayerNames())));
+            System.out.println(lobby.getPlayerNames());
+        }
+    }
+
+    public void sendPlayerChangeUpdate(ServerLobby lobby) {
+        if (lobby.getGame() == null) {
+            for (User user : lobby.getPlayers()) {
+                user.getuSession().getAsyncRemote().sendObject(DataPacker.packData(LOBBY_PLAYERS, DataPacker.stringCombiner(lobby.getPlayerNames())));
+            }
         }
     }
 
@@ -129,16 +147,16 @@ public class GameWebSocketHandler {
             if (lobby.getGame() == null) {
                 joined = lobby.joinLobby(userSessions.get(data[1]));
                 if (joined) {
+                    sendPlayerChangeUpdate(lobby);
                     ArrayList<String> lobbyDataToSend = new ArrayList<>();
                     lobbyDataToSend.add("true");
                     lobbyDataToSend.add(lobby.getLobbyName());
-                    sessions.get(data[1]).getAsyncRemote().sendObject(dataPacker.packData(JOIN_LOBBY, dataPacker.stringCombiner(lobbyDataToSend)));
-                    System.out.println(joined);
+                    sessions.get(data[1]).getAsyncRemote().sendObject(DataPacker.packData(JOIN_LOBBY, DataPacker.stringCombiner(lobbyDataToSend)));
                 }
             }
         }
         if (!joined) {
-            sessions.get(data[1]).getAsyncRemote().sendObject(dataPacker.packData(JOIN_LOBBY, "false"));
+            sessions.get(data[1]).getAsyncRemote().sendObject(DataPacker.packData(JOIN_LOBBY, "false"));
         }
         //TODO send joined success back
     }
@@ -155,10 +173,10 @@ public class GameWebSocketHandler {
                 ArrayList<String> dataList = new ArrayList<>();
                 dataList.add("true");
                 dataList.add(data[2]);
-                sessions.get(data[1]).getAsyncRemote().sendObject(dataPacker.packData(CREATE_LOBBY, dataPacker.stringCombiner(dataList)));
+                sessions.get(data[1]).getAsyncRemote().sendObject(DataPacker.packData(CREATE_LOBBY, DataPacker.stringCombiner(dataList)));
             }
         }
-        sessions.get(data[1]).getAsyncRemote().sendObject(dataPacker.packData(CREATE_LOBBY, "false"));
+        sessions.get(data[1]).getAsyncRemote().sendObject(DataPacker.packData(CREATE_LOBBY, "false"));
     }
 
     private ServerLobby findLobby(String[] args) {

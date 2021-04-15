@@ -1,13 +1,19 @@
 package de.model;
 
+import de.communication.DataPacker;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import static de.constants.MessageIdentifier.JOIN_LOBBY;
+import static de.constants.MessageIdentifier.LOBBY_PLAYERS;
 
 
 public class ServerLobby {
 
     private ArrayList<User> players;
+    private ArrayList<String> playerNames;
     private HashMap<User, Integer> joinOrder;
 
     private String lobbyName;
@@ -24,6 +30,7 @@ public class ServerLobby {
     public ServerLobby(User[] players, String lobbyName, String lobbyMap, int playerAmount, String gamemode) {
         joinCounter = 0;
         this.players = new ArrayList<>();
+        this.playerNames = new ArrayList<>();
         this.joinOrder = new HashMap<>();
 
         for (int i = 0; i < players.length; i++) {
@@ -32,6 +39,7 @@ public class ServerLobby {
                     admin = players[i];
                 }
                 this.players.add(players[i]);
+                this.playerNames.add(players[i].getUsername());
                 joinOrder.put(players[i], joinCounter);
                 joinCounter++;
             }
@@ -48,6 +56,7 @@ public class ServerLobby {
         if (players.size() < playerAmount) {
             if (!joinOrder.containsKey(user)) {
                 players.add(user);
+                playerNames.add(user.getUsername());
                 joinOrder.put(user, joinCounter);
                 joinCounter++;
                 return true;
@@ -59,6 +68,7 @@ public class ServerLobby {
     public boolean leaveLobby(User user) {
         if (players.contains(user)) {
             players.remove(user);
+            playerNames.remove(user.getUsername());
             joinOrder.remove(user);
             if (admin == user) {
                 User newAdmin = null;
@@ -83,6 +93,10 @@ public class ServerLobby {
 
     public ArrayList<User> getPlayers() {
         return players;
+    }
+
+    public ArrayList<String> getPlayerNames() {
+        return playerNames;
     }
 
     public void setPlayers(ArrayList<User> players) {

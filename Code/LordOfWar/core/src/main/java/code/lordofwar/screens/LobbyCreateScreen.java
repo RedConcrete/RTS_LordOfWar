@@ -142,6 +142,7 @@ public class LobbyCreateScreen extends Screens implements Screen {
 
                     if (lobbyCreateScreenEvent.isCreated()) {
                         game.setScreen(new LobbyScreen(game, skin, lobbyCreateScreenEvent.getLobbyID()));
+
                     } else {
 
                         Rumble.rumble(1f, .2f);

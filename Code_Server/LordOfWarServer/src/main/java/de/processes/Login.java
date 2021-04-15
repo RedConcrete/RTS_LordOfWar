@@ -12,10 +12,8 @@ import static de.constants.MessageIdentifier.LOGIN_VALID;
 public class Login{
 
     private boolean loginValid;
-    DataPacker dataPacker;
 
     public Login() {
-        dataPacker = new DataPacker();
         loginValid=false;
     }
 
@@ -36,7 +34,7 @@ public class Login{
 
 
         if(loginValid){
-            session.getAsyncRemote().sendObject(dataPacker.packData(LOGIN_VALID,"true"));
+            session.getAsyncRemote().sendObject(DataPacker.packData(LOGIN_VALID,"true"));
 
         }
         else{
