@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -54,6 +55,8 @@ public class GameScreen extends Screens implements Screen {
     private TextureAtlas uiAtlas = new TextureAtlas(Gdx.files.internal("ui/skin/uiskin.atlas"));
     private TextureAtlas unitAtlas = new TextureAtlas(Gdx.files.internal("maps/RTS_UNITS_TILES.txt"));
     private boolean isPressed;
+    private Label villagerLabel;
+
 
     private final TmxMapLoader loader;
     private Label scoreLabel;
@@ -78,6 +81,7 @@ public class GameScreen extends Screens implements Screen {
         villagerArrayList = new ArrayList<>();
         soldierArrayList = new ArrayList<>();
         castle = new Castle();
+        villagerLabel = new Label("", skin);
 
 
         villiagerSprite = new Sprite(unitAtlas.findRegion("Character_Green_B"));
@@ -130,6 +134,9 @@ public class GameScreen extends Screens implements Screen {
         }
 
         scoreLabel.setText(gameScreenEvent.getPoints());
+        villagerLabel.setText(castle.getVillager());
+
+
         for (Villager v : villagerArrayList) {
             if (v.isSelected()) {
 
@@ -224,11 +231,15 @@ public class GameScreen extends Screens implements Screen {
          }
          */
 
-        Window scoreAndVilliagerWindow = new Window("", skin);
-        scoreAndVilliagerWindow.setMovable(false);
+        Window resourceBarWindow = new Window("", skin);
+        resourceBarWindow.setMovable(false);
 
-        Window goldAndExitWindow = new Window("", skin);
-        goldAndExitWindow.setMovable(false);
+        Window resourceWindow = new Window("",skin);
+        resourceWindow.setMovable(false);
+        resourceWindow.setSize(stage.getWidth(),stage.getHeight());
+
+        Window exitWindow = new Window("", skin);
+        exitWindow.setMovable(false);
 
         Window entityWindow = new Window("",skin);
         entityWindow.setMovable(false);
@@ -242,25 +253,31 @@ public class GameScreen extends Screens implements Screen {
 
         TextButton addGoldButton = new TextButton("AddGold", skin);
         TextButton tackGoldButton = new TextButton("TackGold", skin);
+
         TextButton noButton = new TextButton("No", skin);
         TextButton yesButton = new TextButton("Yes", skin);
 
         Label exitLabel = new Label("Do you realy want to Exit?", skin);
         exitLabel.setFontScale(3f);
 
-        Label yourScoreLabel = new Label(" Your Score ", skin);
-        yourScoreLabel.setFontScale(2.5f);
+        Label scoreTextLabel = new Label(" Your Score:", skin);
+
 
         scoreLabel = new Label("", skin);
-        scoreLabel.setFontScale(2.5f);
+
+
+        Label villagerTextLabel = new Label("Villager :",skin);
 
         Label goldLabel = new Label("0", skin);
         goldLabel.setText(goldAmount);
 
         Image goldImage = new Image(new Sprite(new Texture("ui/gold_treasure_icons_16x16/gold.png")));
 
-        scoreAndVilliagerWindow.setMovable(false);
-        goldAndExitWindow.setMovable(false);
+        Image villagerImage = new Image(new Sprite(unitAtlas.findRegion("Character_Green_B")));
+
+        resourceBarWindow.setMovable(false);
+
+        exitWindow.setMovable(false);
 
         windowExit.setMovable(false);
         windowExit.defaults().pad(20f);
@@ -347,29 +364,29 @@ public class GameScreen extends Screens implements Screen {
         windowExit.add(yesButton);
         windowExit.add(noButton);
 
-        scoreAndVilliagerWindow.add(yourScoreLabel).padBottom(20f).padTop(30f).colspan(2).row();
-        scoreAndVilliagerWindow.add(scoreLabel).colspan(2).row();
-        scoreAndVilliagerWindow.add(addGoldButton);
-        scoreAndVilliagerWindow.add(tackGoldButton);
-        scoreAndVilliagerWindow.setPosition(0, stage.getHeight());
-        scoreAndVilliagerWindow.setSize(stage.getWidth() * 1 / 10, stage.getHeight() * 3 / 25);
+        resourceBarWindow.add(scoreTextLabel).padTop(30f).padBottom(10f).padLeft(10f).padRight(10f);
+        resourceBarWindow.add(scoreLabel).padTop(30f).padBottom(10f).padRight(10f);
+        resourceBarWindow.add(goldImage).padTop(30f).padBottom(10f).padLeft(10f).padRight(10f);
+        resourceBarWindow.add(goldLabel).padTop(30f).padBottom(10f).padRight(10f);
+        resourceBarWindow.add(villagerImage).padTop(30f).padBottom(10f).padLeft(10f).padRight(10f);
+        resourceBarWindow.add(villagerLabel).padTop(30f).padBottom(10f).padRight(10f);
 
-        goldAndExitWindow.add(goldLabel).padRight(20f).padLeft(20f).padTop(30f);
-        goldAndExitWindow.add(goldImage).padRight(20f).padLeft(20f).padTop(30f);
-        goldAndExitWindow.add(exitGameButton).padTop(30f);
-        goldAndExitWindow.setPosition(stage.getWidth(), stage.getHeight());
+        resourceBarWindow.setPosition(0, stage.getHeight());
+
+        exitWindow.add(exitGameButton).padTop(30f);
+        exitWindow.setPosition(stage.getWidth(), stage.getHeight());
 
         entityWindow.add(entityName).row();
         entityWindow.add(castleImage);
-        entityWindow.setPosition(stage.getWidth() / 2,0);
+        entityWindow.setPosition(0,0);
 
-        packWindow(scoreAndVilliagerWindow, stage);
-        packWindow(goldAndExitWindow, stage);
+        packWindow(resourceBarWindow, stage);
+        packWindow(exitWindow, stage);
         packWindow(entityWindow, stage);
 
         stage.addActor(entityWindow);
-        stage.addActor(scoreAndVilliagerWindow);
-        stage.addActor(goldAndExitWindow);
+        stage.addActor(resourceBarWindow);
+        stage.addActor(exitWindow);
 
         stage.setDebugAll(false);
     }
@@ -386,7 +403,6 @@ public class GameScreen extends Screens implements Screen {
         processCameraMovement(xClicked, yClicked);
         camera.position.lerp(posCameraDesired, 0.1f);
 
-
         if (isCameraDebug) {
             DrawDebugLine(new Vector2(camera.position.x, camera.position.y)
                     , new Vector2(posCameraDesired.x, posCameraDesired.y)
@@ -396,7 +412,6 @@ public class GameScreen extends Screens implements Screen {
 
     /**
      * The Method processCameraMovement moves the Camera in the direction the mouse is pointing at.
-     *
      * @author Robin Hefner
      */
     private void processCameraMovement(float xClicked, float yClicked) {
@@ -480,7 +495,6 @@ public class GameScreen extends Screens implements Screen {
                     villager.setSelected(!villager.isSelected());
                 }
             }
-
         }
 
         try {
