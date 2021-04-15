@@ -73,8 +73,8 @@ public class OptionScreen extends Screens implements Screen {
         TextButton fpsButton = new TextButton("FPS OFF", skin);
         fpsButton.getLabel().setFontScale(3f);
 
-        TextButton fullscreenButton = new TextButton("fullscreen", skin);
-        fpsButton.getLabel().setFontScale(3f);
+        TextButton fullscreenButton = new TextButton("Fullscreen ON", skin);
+        fullscreenButton.getLabel().setFontScale(3f);
 
         musikButton.addListener(new InputListener(){
             @Override
@@ -131,11 +131,13 @@ public class OptionScreen extends Screens implements Screen {
                     stage.getViewport().setScreenWidth(currentMode.width);
                     stage.getViewport().setScreenHeight(currentMode.height);
                     System.out.println(fullscreenButton.getX() + STRINGSEPERATOR + fullscreenButton.getY());
+                    fullscreenButton.setText("Fullscreen OFF");
                 }
                 else {
                     Gdx.graphics.setWindowedMode(WORLD_WIDTH_PIXEL,WORLD_HEIGHT_PIXEL);
                     stage.getViewport().setScreenWidth(WORLD_WIDTH_PIXEL);
                     stage.getViewport().setScreenHeight(WORLD_HEIGHT_PIXEL);
+                    fullscreenButton.setText("Fullscreen ON");
                 }
 
             }
