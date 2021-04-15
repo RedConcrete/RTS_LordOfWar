@@ -2,6 +2,7 @@ package de.communication;
 
 
 import de.constants.MessageIdentifier;
+import de.model.ServerGame;
 import de.model.ServerLobby;
 import de.model.User;
 import de.processes.Login;
@@ -11,7 +12,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -92,6 +92,25 @@ public class GameWebSocketHandler {
                     leaveLobby(data);
                 } else if (data[0].equals(LOBBY_PLAYERS.toString())) {
                     sendPlayerListUpdate(data);
+                } else if (data[0].equals(START_GAME.toString())) {
+                    startGame(data);
+                }
+            }
+        }
+    }
+
+
+    private void startGame(String[] data) {
+        ServerLobby lobby = lobbys.get(data[2]);
+        if (lobby.getGame() == null) {
+            if (lobby.getAdmin() == userSessions.get(data[1])) {
+                ArrayList<String> gameData = new ArrayList<>();
+                gameData.add(lobby.getLobbyName());
+                gameData.add(lobby.getGamemode());
+                gameData.add(lobby.getLobbyMap());
+                lobby.setGame(new ServerGame(lobby.getPlayers()));//TODO add rest of data
+                for (User player : lobby.getPlayers()) {
+                    player.getuSession().getAsyncRemote().sendObject(DataPacker.packData(START_GAME, DataPacker.stringCombiner(gameData)));
                 }
             }
         }
