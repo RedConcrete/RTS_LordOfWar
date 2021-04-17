@@ -11,24 +11,21 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 public class GameScreen extends Screens implements Screen {
@@ -65,9 +62,12 @@ public class GameScreen extends Screens implements Screen {
     private final int startingVillager = 5;
     private int goldAmount = 100;
     private float pointTimerCounter;
+    private Point2D.Float rectangleStart;//used to check where the select rectangle was started
+    private Point2D.Float rectangleEnd;
+    private float[] rectangleBounds;
 
     public GameScreen(LOW aGame, Skin aSkin, String lobbyID) {
-        super(aGame,aSkin);
+        super(aGame, aSkin);
         isPressed = false;
         entityName = new Label("", skin);
         castleImage = new Image(new Sprite(new Texture("maps/RTS_CASTEL_TILES.png")));
@@ -83,7 +83,9 @@ public class GameScreen extends Screens implements Screen {
         castle = new Castle();
         villagerLabel = new Label("", skin);
 
-
+        rectangleStart = null;//null bc rectangle was started
+        rectangleEnd = null;
+        rectangleBounds = new float[4];//0=originX1=originY2=width3=height
         villiagerSprite = new Sprite(unitAtlas.findRegion("Character_Green_B"));
 
         loader = new TmxMapLoader();
@@ -100,7 +102,41 @@ public class GameScreen extends Screens implements Screen {
     public void show() {
 
         Gdx.input.setInputProcessor(stage);
+        stage.addListener(
+                new InputListener() {
+                    @Override
+                    public void touchDragged(InputEvent event, float x, float y, int pointer) {
+                        float[] coords = new float[]{x, y};
+                        if (rectangleStart == null) {
+                            rectangleStart = new Point2D.Float(coords[0], coords[1]);
+                        }
+                        rectangleEnd = new Point2D.Float(coords[0], coords[1]);
+                    }
 
+                    @Override
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                        return true;
+                    }
+
+                    @Override
+                    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                        if (rectangleStart != null && rectangleEnd != null) {
+                            float[] recCoords = translateXYCoordinatesFromScreen(rectangleBounds[0], rectangleBounds[1]);
+                            float[] vilCoords;
+                            for (Villager villager : villagerArrayList) {
+                                vilCoords = translateXYCoordinatesToScreen(villager.getX(), villager.getY());
+                                if (vilCoords[0] >= recCoords[0] && vilCoords[1] >= recCoords[1]) {
+                                    if (vilCoords[0] + villager.getWidth() <= recCoords[0] + rectangleBounds[2] && vilCoords[1] + villager.getHeight() <= recCoords[1] + rectangleBounds[3]) {
+                                        villager.setSelected(true);
+                                    }
+                                }
+                            }
+                        }
+                        rectangleEnd = null;
+                        rectangleStart = null;
+                    }
+                }
+        );
         renderer = new OrthogonalTiledMapRenderer(map);
 
         for (int i = 0; i < startingVillager; i++) {
@@ -122,10 +158,9 @@ public class GameScreen extends Screens implements Screen {
         renderer.setView(camera);
         renderer.render();
 
-        debugRenderer.setAutoShapeType(true);
-
+        //debugRenderer.setAutoShapeType(true);
         renderer.getBatch().begin();
-        debugRenderer.begin();
+
 
         pointTimerCounter += delta;
         if (pointTimerCounter > 1) {//1 second update
@@ -147,38 +182,55 @@ public class GameScreen extends Screens implements Screen {
             }
             v.draw(renderer.getBatch());
 
-            if(v.isSelected()){
+            if (v.isSelected()) {
                 entityName.setText("Villager");
                 castleImage.setVisible(false);
                 Sprite s = new Sprite(uiAtlas.findRegion("button-normal"));
                 s.setColor(Color.RED);
-                s.setSize(v.getHp(),10);
-                s.setPosition(v.getX() + 5,v.getY() + 60);
+                s.setSize(v.getHp(), 10);
+                s.setPosition(v.getX() + 5, v.getY() + 60);
                 s.draw(renderer.getBatch());
             }
 
         }
 
         renderer.getBatch().end();
-        debugRenderer.end();
+        if (rectangleStart != null && rectangleEnd != null) {
+            //calc Rectangle
+            //todo find a more efficient way to do this?
+            rectangleBounds[0] = Math.min(rectangleStart.x, rectangleEnd.x);
+            rectangleBounds[1] = Math.min(rectangleStart.y, rectangleEnd.y);
+            rectangleBounds[2] = Math.max(rectangleStart.x, rectangleEnd.x) - rectangleBounds[0];
+            rectangleBounds[3] = Math.max(rectangleStart.y, rectangleEnd.y) - rectangleBounds[1];
+            //draw rectangle
+            debugRenderer.setAutoShapeType(true);
+            debugRenderer.begin();
+            debugRenderer.set(ShapeRenderer.ShapeType.Line);
+            debugRenderer.setColor(Color.WHITE);//white color for rect
+            debugRenderer.rect(rectangleBounds[0], rectangleBounds[1], rectangleBounds[2], rectangleBounds[3]);//origin=lower left (screen)
+            debugRenderer.end();
+            //draw rectangle here
+        }
 
-        if(castle.isSelected()){
+        if (castle.isSelected()) {
             entityName.setText("Castle");
             castleImage.setVisible(true);
         }
 
         // todo schau wo die maus ist und dann reagiere also x und y abfragen und dann camera moven falls passend
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-            if(!isPressed){
+            if (!isPressed) {
                 getClickedOnEntity();
                 isPressed = true;
-            }
-            else {
-                if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
+            } else {
+                if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
                     isPressed = false;
                 }
             }
+
+
         }
+
 
         mouseOnEdgeofCamera();
         stage.act();
@@ -234,14 +286,14 @@ public class GameScreen extends Screens implements Screen {
         Window resourceBarWindow = new Window("", skin);
         resourceBarWindow.setMovable(false);
 
-        Window resourceWindow = new Window("",skin);
+        Window resourceWindow = new Window("", skin);
         resourceWindow.setMovable(false);
-        resourceWindow.setSize(stage.getWidth(),stage.getHeight());
+        resourceWindow.setSize(stage.getWidth(), stage.getHeight());
 
         Window exitWindow = new Window("", skin);
         exitWindow.setMovable(false);
 
-        Window entityWindow = new Window("",skin);
+        Window entityWindow = new Window("", skin);
         entityWindow.setMovable(false);
 
         Window windowExit = new Window("Exit?", skin, "border");
@@ -266,7 +318,7 @@ public class GameScreen extends Screens implements Screen {
         scoreLabel = new Label("", skin);
 
 
-        Label villagerTextLabel = new Label("Villager :",skin);
+        Label villagerTextLabel = new Label("Villager :", skin);
 
         Label goldLabel = new Label("0", skin);
         goldLabel.setText(goldAmount);
@@ -378,7 +430,7 @@ public class GameScreen extends Screens implements Screen {
 
         entityWindow.add(entityName).row();
         entityWindow.add(castleImage);
-        entityWindow.setPosition(0,0);
+        entityWindow.setPosition(0, 0);
 
         packWindow(resourceBarWindow, stage);
         packWindow(exitWindow, stage);
@@ -412,6 +464,7 @@ public class GameScreen extends Screens implements Screen {
 
     /**
      * The Method processCameraMovement moves the Camera in the direction the mouse is pointing at.
+     *
      * @author Robin Hefner
      */
     private void processCameraMovement(float xClicked, float yClicked) {
@@ -483,27 +536,38 @@ public class GameScreen extends Screens implements Screen {
 
     public void getClickedOnEntity() {
 
-        Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-        camera.unproject(mousePos);
-
-        int x = (int) mousePos.x, y = (int) mousePos.y;
-
+        float[] coords = translateXYCoordinatesFromScreen(Gdx.input.getX(), Gdx.input.getY());
         for (Villager villager : villagerArrayList) {
 
-            if (villager.getX() < x && villager.getY() < y) {
-                if (villager.getX() + villager.getWidth() >= x && villager.getY() + villager.getHeight() >= y) {
+            if (villager.getX() < (int) coords[0] && villager.getY() < (int) coords[1]) {
+                if (villager.getX() + villager.getWidth() >= (int) coords[0] && villager.getY() + villager.getHeight() >= (int) coords[1]) {
                     villager.setSelected(!villager.isSelected());
                 }
             }
         }
 
         try {
-            if(collisionUnitLayer.getCell(x / collisionUnitLayer.getTileWidth(), y / collisionUnitLayer.getTileHeight())
-                    .getTile().getProperties().containsKey("isCastel")){
+            if (collisionUnitLayer.getCell((int) coords[0] / collisionUnitLayer.getTileWidth(), (int) coords[1] / collisionUnitLayer.getTileHeight())
+                    .getTile().getProperties().containsKey("isCastel")) {
                 castle.setSelected(!castle.isSelected());
             }
         } catch (Exception e) {
 
         }
+    }
+
+    //[0]=x[1]=y
+    private float[] translateXYCoordinatesFromScreen(float x, float y) {
+        Vector3 mousePos = new Vector3(x, y, 0);
+        camera.unproject(mousePos);
+
+        return new float[]{mousePos.x, mousePos.y};
+    }
+
+    private float[] translateXYCoordinatesToScreen(float x, float y) {
+        Vector3 mousePos = new Vector3(x, y, 0);
+        camera.project(mousePos);
+
+        return new float[]{mousePos.x, mousePos.y};
     }
 }
