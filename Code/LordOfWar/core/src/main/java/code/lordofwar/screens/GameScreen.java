@@ -32,6 +32,7 @@ public class GameScreen extends Screens implements Screen {
 
 
     private static final ShapeRenderer debugRenderer = new ShapeRenderer();
+    private ShapeRenderer rectangleRenderer;
 
     private final Vector2 vectorSpeed;
     private final TiledMapTileLayer collisionUnitLayer;
@@ -82,7 +83,7 @@ public class GameScreen extends Screens implements Screen {
         soldierArrayList = new ArrayList<>();
         castle = new Castle();
         villagerLabel = new Label("", skin);
-
+        rectangleRenderer = new ShapeRenderer();
         rectangleStart = null;//null bc rectangle was started
         rectangleEnd = null;
         rectangleBounds = new float[4];//0=originX1=originY2=width3=height
@@ -203,12 +204,12 @@ public class GameScreen extends Screens implements Screen {
             rectangleBounds[2] = Math.max(rectangleStart.x, rectangleEnd.x) - rectangleBounds[0];
             rectangleBounds[3] = Math.max(rectangleStart.y, rectangleEnd.y) - rectangleBounds[1];
             //draw rectangle
-            debugRenderer.setAutoShapeType(true);
-            debugRenderer.begin();
-            debugRenderer.set(ShapeRenderer.ShapeType.Line);
-            debugRenderer.setColor(Color.WHITE);//white color for rect
-            debugRenderer.rect(rectangleBounds[0], rectangleBounds[1], rectangleBounds[2], rectangleBounds[3]);//origin=lower left (screen)
-            debugRenderer.end();
+            rectangleRenderer.setAutoShapeType(true);
+            rectangleRenderer.begin();
+            rectangleRenderer.set(ShapeRenderer.ShapeType.Line);
+            rectangleRenderer.setColor(Color.WHITE);//white color for rect
+            rectangleRenderer.rect(rectangleBounds[0], rectangleBounds[1], rectangleBounds[2], rectangleBounds[3]);//origin=lower left (screen)
+            rectangleRenderer.end();
             //draw rectangle here
         }
 
