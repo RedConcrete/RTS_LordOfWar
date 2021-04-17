@@ -122,12 +122,12 @@ public class GameScreen extends Screens implements Screen {
                     @Override
                     public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                         if (rectangleStart != null && rectangleEnd != null) {
-                            float[] recCoords = translateXYCoordinatesFromScreen(rectangleBounds[0], rectangleBounds[1]);
+                            float[] recCoords = new float[]{rectangleBounds[0], rectangleBounds[1]};
                             float[] vilCoords;
                             for (Villager villager : villagerArrayList) {
-                                vilCoords = translateXYCoordinatesToScreen(villager.getX(), villager.getY());
+                                vilCoords = translateXYCoordinatesToScreen(villager.getX()+villager.getWidth()/2, villager.getY()+villager.getHeight()/2);
                                 if (vilCoords[0] >= recCoords[0] && vilCoords[1] >= recCoords[1]) {
-                                    if (vilCoords[0] + villager.getWidth() <= recCoords[0] + rectangleBounds[2] && vilCoords[1] + villager.getHeight() <= recCoords[1] + rectangleBounds[3]) {
+                                    if (vilCoords[0] <= recCoords[0] + rectangleBounds[2] && vilCoords[1]<= recCoords[1] + rectangleBounds[3]) {
                                         villager.setSelected(true);
                                     }
                                 }
@@ -175,7 +175,6 @@ public class GameScreen extends Screens implements Screen {
 
         for (Villager v : villagerArrayList) {
             if (v.isSelected()) {
-
                 v.draw(renderer.getBatch());
             } else {
 
@@ -192,6 +191,7 @@ public class GameScreen extends Screens implements Screen {
                 s.setPosition(v.getX() + 5, v.getY() + 60);
                 s.draw(renderer.getBatch());
             }
+
 
         }
 
