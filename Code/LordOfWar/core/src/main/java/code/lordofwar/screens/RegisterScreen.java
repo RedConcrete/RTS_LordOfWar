@@ -54,6 +54,12 @@ public class RegisterScreen extends Screens implements Screen {
         errorWindow.setMovable(false);
         errorWindow.defaults().pad(20f);
 
+        Label errorLabel = new Label("Failed to register. Try again",skin);
+        TextButton okButton = new TextButton("OK",skin);
+        errorWindow.add(errorLabel).row();
+        errorWindow.add(okButton).row();
+        errorWindow.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
+
         TextField passwordTextField = new TextField("Password", skin);
         passwordTextField.setPasswordCharacter('*');
         passwordTextField.setPasswordMode(true);
@@ -86,12 +92,11 @@ public class RegisterScreen extends Screens implements Screen {
                     stage.dispose();
 
                 } else {
-                    TextButton okButton = new TextButton("OK",skin);
+
 
                     errorWindow.setVisible(true);
                     registerWindow.setVisible(false);
 
-                    Label errorLabel = new Label("Failed to login. Try again",skin);
                     errorLabel.setFontScale(3f);
 
 
@@ -108,9 +113,7 @@ public class RegisterScreen extends Screens implements Screen {
                         }
                     });
 
-                    errorWindow.add(errorLabel).row();
-                    errorWindow.add(okButton).row();
-                    errorWindow.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
+
                     errorWindow.pack();
 
                     stage.addActor(errorWindow);

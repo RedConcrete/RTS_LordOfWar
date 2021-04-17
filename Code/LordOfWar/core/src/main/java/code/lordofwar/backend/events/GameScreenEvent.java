@@ -15,7 +15,7 @@ public class GameScreenEvent {
     LOW game;
     private int points;
     private final String lobbyID;
-    private int userScore;
+
     public GameScreenEvent(LOW aGame,String lobbyID) {
         points = 0;
         game = aGame;

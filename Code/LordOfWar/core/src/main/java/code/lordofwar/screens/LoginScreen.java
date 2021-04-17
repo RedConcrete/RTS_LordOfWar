@@ -128,7 +128,11 @@ public class LoginScreen extends Screens implements Screen {
         Window errorWindow = new Window("", skin, "border");
         errorWindow.setMovable(false);
         errorWindow.defaults().pad(20f);
-
+        Label errorLabel = new Label("Failed to login. Try again",skin);
+        TextButton okButton = new TextButton("OK",skin);
+        errorWindow.add(errorLabel).row();
+        errorWindow.add(okButton).row();
+        errorWindow.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
         loginButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
@@ -153,12 +157,8 @@ public class LoginScreen extends Screens implements Screen {
                 } else {
                     Rumble.rumble(1f, .2f);
 
-                    TextButton okButton = new TextButton("OK",skin);
-
                     errorWindow.setVisible(true);
                     windowLogin.setVisible(false);
-
-                    Label errorLabel = new Label("Failed to login. Try again",skin);
                     errorLabel.setFontScale(3f);
 
 
@@ -174,14 +174,8 @@ public class LoginScreen extends Screens implements Screen {
                             return true;
                         }
                     });
-
-                    errorWindow.add(errorLabel).row();
-                    errorWindow.add(okButton).row();
-                    errorWindow.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
                     errorWindow.pack();
-
                     stage.addActor(errorWindow);
-
                 }
             }
 
