@@ -75,7 +75,6 @@ public class GameScreen extends Screens implements Screen {
         castleImage.setVisible(false);
         pointTimerCounter = 10;
         gameScreenEvent = new GameScreenEvent(game, lobbyID);
-        posCameraDesired = new Vector3();
         isCameraDebug = false;
         vectorSpeed = new Vector2();
         posCameraDesired = new Vector3();
@@ -125,9 +124,9 @@ public class GameScreen extends Screens implements Screen {
                             float[] recCoords = new float[]{rectangleBounds[0], rectangleBounds[1]};
                             float[] vilCoords;
                             for (Villager villager : villagerArrayList) {
-                                vilCoords = translateXYCoordinatesToScreen(villager.getX()+villager.getWidth()/2, villager.getY()+villager.getHeight()/2);
+                                vilCoords = translateXYCoordinatesToScreen(villager.getX() + villager.getWidth() / 2, villager.getY() + villager.getHeight() / 2);
                                 if (vilCoords[0] >= recCoords[0] && vilCoords[1] >= recCoords[1]) {
-                                    if (vilCoords[0] <= recCoords[0] + rectangleBounds[2] && vilCoords[1]<= recCoords[1] + rectangleBounds[3]) {
+                                    if (vilCoords[0] <= recCoords[0] + rectangleBounds[2] && vilCoords[1] <= recCoords[1] + rectangleBounds[3]) {
                                         villager.setSelected(true);
                                     }
                                 }
