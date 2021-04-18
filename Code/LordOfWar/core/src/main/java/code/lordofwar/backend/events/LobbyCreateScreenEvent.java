@@ -9,16 +9,14 @@ import java.util.ArrayList;
 
 import static code.lordofwar.backend.MessageIdentifier.CREATE_LOBBY;
 
-public class LobbyCreateScreenEvent {
+public class LobbyCreateScreenEvent extends Events{
 
-    WebSocket webSocket;
-    LOW game;
+
     private String lobbyID;
     private boolean isCreated;
 
     public LobbyCreateScreenEvent(LOW aGame) {
-        game = aGame;
-        webSocket = aGame.getWebSocket();
+        super(aGame);
         isCreated = false;
     }
 
@@ -43,7 +41,7 @@ public class LobbyCreateScreenEvent {
     public void setLobbyID(String[] arr) {
         if (arr[1].equals("true")) {
             lobbyID = arr[2];
-            isCreated=true;
+            isCreated = true;
         }
     }
 

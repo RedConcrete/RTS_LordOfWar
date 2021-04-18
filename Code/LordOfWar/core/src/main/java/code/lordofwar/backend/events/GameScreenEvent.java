@@ -2,30 +2,24 @@ package code.lordofwar.backend.events;
 
 import code.lordofwar.backend.DataPacker;
 import code.lordofwar.main.LOW;
-import okhttp3.WebSocket;
 
 import java.util.ArrayList;
 
 import static code.lordofwar.backend.MessageIdentifier.GET_GAME_POINTS;
 import static code.lordofwar.backend.MessageIdentifier.LEAVE_LOBBY;
 
-public class GameScreenEvent {
-
-    WebSocket webSocket;
-    LOW game;
+public class GameScreenEvent extends Events {
     private int points;
     private final String lobbyID;
 
-    public GameScreenEvent(LOW aGame,String lobbyID) {
+    public GameScreenEvent(LOW aGame, String lobbyID) {
+        super(aGame);
         points = 0;
-        game = aGame;
-        webSocket = aGame.getWebSocket();
-        this.lobbyID=lobbyID;
+        this.lobbyID = lobbyID;
     }
 
     public void sendPointRequest() {
-        //TODO EDIT REQUEST AND GAME SO SERVER KNOWS WHICH LOBBY
-        ArrayList<String> data=new ArrayList<>();
+        ArrayList<String> data = new ArrayList<>();
         data.add(game.getSessionID());
         data.add(lobbyID);
         webSocket.send(DataPacker.packData(GET_GAME_POINTS, DataPacker.stringCombiner(data)));
@@ -40,8 +34,9 @@ public class GameScreenEvent {
             this.points = Integer.parseInt(arr[1]);
         }
     }
-    public void sendLeaveGameNotice(){
-        ArrayList<String> leaveData=new ArrayList<>();
+
+    public void sendLeaveGameNotice() {
+        ArrayList<String> leaveData = new ArrayList<>();
         leaveData.add(game.getSessionID());
         leaveData.add(lobbyID);
         webSocket.send(DataPacker.packData(LEAVE_LOBBY, DataPacker.stringCombiner(leaveData)));
