@@ -47,7 +47,7 @@ public class GameScreen extends Screens implements Screen {
     private final ArrayList<Soldier> soldierArrayList;
     private ArrayList<Object> entityArrayList;
     private final Sprite villiagerSprite;
-    private Castle castle;
+    private Castle myCastle;
     private Image castleImage;
     private Label entityName;
     private TextureAtlas uiAtlas = new TextureAtlas(Gdx.files.internal("ui/skin/uiskin.atlas"));
@@ -67,7 +67,7 @@ public class GameScreen extends Screens implements Screen {
     private Point2D.Float rectangleEnd;
     private float[] rectangleBounds;
 
-    public GameScreen(LOW aGame, Skin aSkin, String lobbyID) {
+    public GameScreen(LOW aGame, Skin aSkin, String lobbyID,int startingPosition) {
         super(aGame, aSkin);
         isPressed = false;
         entityName = new Label("", skin);
@@ -80,7 +80,7 @@ public class GameScreen extends Screens implements Screen {
         posCameraDesired = new Vector3();
         villagerArrayList = new ArrayList<>();
         soldierArrayList = new ArrayList<>();
-        castle = new Castle();
+        myCastle = new Castle();
         villagerLabel = new Label("", skin);
         rectangleRenderer = new ShapeRenderer();
         rectangleStart = null;//null bc rectangle was started
@@ -169,7 +169,7 @@ public class GameScreen extends Screens implements Screen {
         }
 
         scoreLabel.setText(gameScreenEvent.getPoints());
-        villagerLabel.setText(castle.getVillager());
+        villagerLabel.setText(myCastle.getVillager());
 
 
         for (Villager v : villagerArrayList) {
@@ -212,7 +212,7 @@ public class GameScreen extends Screens implements Screen {
             //draw rectangle here
         }
 
-        if (castle.isSelected()) {
+        if (myCastle.isSelected()) {
             entityName.setText("Castle");
             castleImage.setVisible(true);
         }
@@ -549,7 +549,7 @@ public class GameScreen extends Screens implements Screen {
         try {
             if (collisionUnitLayer.getCell((int) coords[0] / collisionUnitLayer.getTileWidth(), (int) coords[1] / collisionUnitLayer.getTileHeight())
                     .getTile().getProperties().containsKey("isCastel")) {
-                castle.setSelected(!castle.isSelected());
+                myCastle.setSelected(!myCastle.isSelected());
             }
         } catch (Exception e) {
 

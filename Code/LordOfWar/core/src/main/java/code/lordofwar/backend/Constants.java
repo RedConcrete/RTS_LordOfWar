@@ -9,6 +9,15 @@ public class Constants {
     public static final float CAMERASPEED = 500f;
     public static final String STRINGSEPERATOR = "///";
 
+    //GAME STATICS
+    //TODO FILL THESE ARRAYS with actual coords
+    private static final float[] MAP1CC1=new float[]{};//insert coords here
+    private static final float[] MAP1CC2=new float[]{};//insert coords here
+    private static final float[] MAP1CC3=new float[]{};//insert coords here
+    private static final float[] MAP1CC4=new float[]{};//insert coords here
+    private static final float[] MAP1CC5=new float[]{};//insert coords here
+    private static final float[] MAP1CC6=new float[]{};//insert coords here
+
     public Boolean WEBSOCKET_OPEN;
     public Boolean FPS;
     public Boolean MUSIC;
