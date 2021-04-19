@@ -1,6 +1,7 @@
 package code.lordofwar.screens;
 
 import code.lordofwar.backend.Castle;
+import code.lordofwar.backend.Constants;
 import code.lordofwar.backend.Soldier;
 import code.lordofwar.backend.Villager;
 import code.lordofwar.backend.events.GameScreenEvent;
@@ -47,7 +48,7 @@ public class GameScreen extends Screens implements Screen {
     private final ArrayList<Soldier> soldierArrayList;
     private ArrayList<Object> entityArrayList;
     private final Sprite villiagerSprite;
-    private Castle castle;
+    private Castle myCastle;
     private Image castleImage;
     private Label entityName;
     private TextureAtlas uiAtlas = new TextureAtlas(Gdx.files.internal("ui/skin/uiskin.atlas"));
@@ -67,7 +68,8 @@ public class GameScreen extends Screens implements Screen {
     private Point2D.Float rectangleEnd;
     private float[] rectangleBounds;
 
-    public GameScreen(LOW aGame, Skin aSkin, String lobbyID) {
+
+    public GameScreen(LOW aGame, Skin aSkin, String lobbyID, int startingPosition) {
         super(aGame, aSkin);
         isPressed = false;
         entityName = new Label("", skin);
@@ -75,13 +77,12 @@ public class GameScreen extends Screens implements Screen {
         castleImage.setVisible(false);
         pointTimerCounter = 10;
         gameScreenEvent = new GameScreenEvent(game, lobbyID);
-        posCameraDesired = new Vector3();
         isCameraDebug = false;
         vectorSpeed = new Vector2();
         posCameraDesired = new Vector3();
         villagerArrayList = new ArrayList<>();
         soldierArrayList = new ArrayList<>();
-        castle = new Castle();
+
         villagerLabel = new Label("", skin);
         rectangleRenderer = new ShapeRenderer();
         rectangleStart = null;//null bc rectangle was started
@@ -90,14 +91,45 @@ public class GameScreen extends Screens implements Screen {
         villiagerSprite = new Sprite(unitAtlas.findRegion("Character_Green_B"));
 
         loader = new TmxMapLoader();
-        map = loader.load("maps/map_1.tmx");
 
+
+        String mapPath = "maps/map_1.tmx";
+        map = loader.load(mapPath);
+        //TODO way to tell maps apart
+        float[] castlePosition;
+        switch (startingPosition) {
+            case 1:
+                castlePosition = Constants.MAP1CC1;
+                break;
+            case 2:
+                castlePosition = Constants.MAP1CC2;
+                break;
+            case 3:
+                castlePosition = Constants.MAP1CC3;
+                break;
+            case 4:
+                castlePosition = Constants.MAP1CC4;
+                break;
+            case 5:
+                castlePosition = Constants.MAP1CC5;
+                break;
+            case 6:
+                castlePosition = Constants.MAP1CC6;
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + startingPosition);//max of 6 players; thus error
+        }
+        myCastle = new Castle();
         camera = new OrthographicCamera();
+        //TODO why doesnt this work
+        posCameraDesired.x=castlePosition[0];
+        posCameraDesired.y=castlePosition[1];
         collisionUnitLayer = (TiledMapTileLayer) map.getLayers().get(1);
 
         setupUI();
 
     }
+
 
     @Override
     public void show() {
@@ -125,9 +157,9 @@ public class GameScreen extends Screens implements Screen {
                             float[] recCoords = new float[]{rectangleBounds[0], rectangleBounds[1]};
                             float[] vilCoords;
                             for (Villager villager : villagerArrayList) {
-                                vilCoords = translateXYCoordinatesToScreen(villager.getX()+villager.getWidth()/2, villager.getY()+villager.getHeight()/2);
+                                vilCoords = translateXYCoordinatesToScreen(villager.getX() + villager.getWidth() / 2, villager.getY() + villager.getHeight() / 2);
                                 if (vilCoords[0] >= recCoords[0] && vilCoords[1] >= recCoords[1]) {
-                                    if (vilCoords[0] <= recCoords[0] + rectangleBounds[2] && vilCoords[1]<= recCoords[1] + rectangleBounds[3]) {
+                                    if (vilCoords[0] <= recCoords[0] + rectangleBounds[2] && vilCoords[1] <= recCoords[1] + rectangleBounds[3]) {
                                         villager.setSelected(true);
                                     }
                                 }
@@ -156,9 +188,9 @@ public class GameScreen extends Screens implements Screen {
 
         fps(stage, skin);
 
+
         renderer.setView(camera);
         renderer.render();
-
         //debugRenderer.setAutoShapeType(true);
         renderer.getBatch().begin();
 
@@ -170,7 +202,7 @@ public class GameScreen extends Screens implements Screen {
         }
 
         scoreLabel.setText(gameScreenEvent.getPoints());
-        villagerLabel.setText(castle.getVillager());
+        villagerLabel.setText(myCastle.getVillager());
 
 
         for (Villager v : villagerArrayList) {
@@ -213,7 +245,7 @@ public class GameScreen extends Screens implements Screen {
             //draw rectangle here
         }
 
-        if (castle.isSelected()) {
+        if (myCastle.isSelected()) {
             entityName.setText("Castle");
             castleImage.setVisible(true);
         }
@@ -225,6 +257,8 @@ public class GameScreen extends Screens implements Screen {
                 isPressed = true;
             } else {
                 if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+
+                    System.out.println(Gdx.input.getX() + " " + Gdx.input.getY());
                     isPressed = false;
                 }
             }
@@ -550,7 +584,7 @@ public class GameScreen extends Screens implements Screen {
         try {
             if (collisionUnitLayer.getCell((int) coords[0] / collisionUnitLayer.getTileWidth(), (int) coords[1] / collisionUnitLayer.getTileHeight())
                     .getTile().getProperties().containsKey("isCastel")) {
-                castle.setSelected(!castle.isSelected());
+                myCastle.setSelected(!myCastle.isSelected());
             }
         } catch (Exception e) {
 

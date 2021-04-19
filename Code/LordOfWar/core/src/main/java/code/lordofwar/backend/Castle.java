@@ -4,14 +4,14 @@ public class Castle {
     private boolean selected;
     private int villager;
 
-
     public Castle() {
+
         villager = 0;
         increaseVilligerPerMinute();
     }
 
 
-    private void increaseVilligerPerMinute(){
+    private void increaseVilligerPerMinute() {
         new Thread(() -> {
             try {
                 villager = villager + 1;
@@ -24,9 +24,13 @@ public class Castle {
 
     }
 
-    public void setVillager(int villager) { this.villager = villager; }
+    public void setVillager(int villager) {
+        this.villager = villager;
+    }
 
-    public int getVillager() { return villager; }
+    public int getVillager() {
+        return villager;
+    }
 
     public boolean isSelected() {
         return selected;
@@ -35,4 +39,5 @@ public class Castle {
     public void setSelected(boolean selected) {
         this.selected = selected;
     }
+
 }

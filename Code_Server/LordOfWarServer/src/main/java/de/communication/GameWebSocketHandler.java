@@ -12,6 +12,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -109,8 +110,14 @@ public class GameWebSocketHandler {
                 gameData.add(lobby.getGamemode());
                 gameData.add(lobby.getLobbyMap());
                 lobby.setGame(new ServerGame(lobby.getPlayers()));//TODO add rest of data
+                int i=1;
+                String stringRep;
                 for (User player : lobby.getPlayers()) {
+                    stringRep=String.valueOf(i);
+                    gameData.add(stringRep);//give startingposition
                     player.getuSession().getAsyncRemote().sendObject(DataPacker.packData(START_GAME, DataPacker.stringCombiner(gameData)));
+                    gameData.remove(stringRep);//remove startingposition for next loop
+                    i++;
                 }
             }
         }

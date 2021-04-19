@@ -2,23 +2,20 @@ package code.lordofwar.backend.events;
 
 import code.lordofwar.backend.DataPacker;
 import code.lordofwar.main.LOW;
-import okhttp3.WebSocket;
 
 import java.util.ArrayList;
 
 import static code.lordofwar.backend.MessageIdentifier.*;
 
-public class LobbyScreenEvent {
-    WebSocket webSocket;
-    LOW game;
+public class LobbyScreenEvent extends Events {
+
     private String[] players;
     private boolean recievedData;
     private boolean startedGame;
     private String[] gameData;
 
     public LobbyScreenEvent(LOW aGame) {
-        game = aGame;
-        webSocket = aGame.getWebSocket();
+        super(aGame);
         players = null;
         recievedData = false;
         startedGame = false;
