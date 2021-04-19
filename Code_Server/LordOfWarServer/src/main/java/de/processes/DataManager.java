@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 
 //see https://howtodoinjava.com/jaxb/write-object-to-xml/
 public class DataManager {
-    public final static String directory = "E:\\Studium\\Semester 4\\LabSW\\Code_Server\\LordOfWarServer\\src\\main\\resources\\data\\";
+    public final static String directory = "src/main/resources/data/";
     public final static String extension = ".txt";
     public final static Path userIDPath = Paths.get(DataManager.directory + "userID.txt");
 
@@ -52,7 +52,7 @@ public class DataManager {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file.toPath().toString()), StandardCharsets.UTF_8))) {
                 String line = reader.readLine();
                 String[] data = line.split(Constants.STRINGSEPERATOR);
-                user=new User(data[1],data[2],Integer.parseInt(data[3]),Integer.parseInt(data[0]),null);
+                user = new User(data[1], data[2], Integer.parseInt(data[3]), Integer.parseInt(data[0]), null);
             } catch (IOException e) {
                 e.printStackTrace();
             }

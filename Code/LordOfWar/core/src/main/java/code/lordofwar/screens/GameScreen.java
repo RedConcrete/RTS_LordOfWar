@@ -412,7 +412,6 @@ public class GameScreen extends Screens implements Screen {
                     @Override
                     public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                         GameScreen.this.getGameScreenEvent().sendLeaveGameNotice();
-                        stage.dispose(); //already disposed wenn einmal abgelehnt ??
                         game.setScreen(new MenuScreen(game, skin));
                         stage.dispose();
                     }
