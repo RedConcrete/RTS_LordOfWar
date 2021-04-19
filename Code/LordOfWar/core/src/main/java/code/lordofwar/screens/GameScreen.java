@@ -1,9 +1,6 @@
 package code.lordofwar.screens;
 
-import code.lordofwar.backend.Castle;
-import code.lordofwar.backend.Pathfinding;
-import code.lordofwar.backend.Soldier;
-import code.lordofwar.backend.Villager;
+import code.lordofwar.backend.*;
 import code.lordofwar.backend.events.GameScreenEvent;
 import code.lordofwar.main.LOW;
 import com.badlogic.gdx.Gdx;
@@ -12,26 +9,23 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class GameScreen extends Screens implements Screen {
 
@@ -673,7 +667,13 @@ public class GameScreen extends Screens implements Screen {
         camera.unproject(mousePos);
 
         int x = (int) mousePos.x, y = (int) mousePos.y;
-        Pathfinding p = new Pathfinding(x, y, (int) v.getX() + 32, (int) v.getY() + 32, collisionUnitLayer);
+        PathCell p = new Pathfinding(x, y, (int) v.getX() + 32, (int) v.getY() + 32, collisionUnitLayer).algorithm();
+        LinkedList<PathCell> cellList=new LinkedList<>();
+        while (p!=null) {
+            cellList.add(p);
+            p=p.parent;
+        }
+        //end=start
 
     }
 }

@@ -29,32 +29,34 @@ public class Pathfinding {
 
     public Pathfinding(int xClicked, int yClicked, int xPosUnit, int yPosUnit, TiledMapTileLayer collisionLayer) {
         this.collisionLayer = collisionLayer;
+        getStartAndEndCell(xPosUnit, yPosUnit, xClicked, yClicked);
+        if (!checkPossible(xClicked, yClicked)) {
 
-       if (checkPossible(xClicked,yClicked)) {
-           getStartAndEndCell(xPosUnit, yPosUnit, xClicked, yClicked);
-           cache = new Vector2(xStartCell, yStartCell);
-           algorithm();
-           System.out.println("TEST SUCCESS");
-       }else {
-           System.out.println("impossible");
-       }
+            cache = new Vector2(xStartCell, yStartCell);
+        } else {
+
+            System.out.println("impossible");
+        }
     }
 
-    private boolean checkPossible(int x, int y){
-        int dest = getCellDistancesToEnd(x,y);
+    private boolean checkPossible(int x, int y) {
+        int dest = 0;
         int org = getCellDistancesToStart(x, y);
         int sum = dest + org;
 
-       return traversable(new PathCell(new Vector2(x,y),new int[]{sum, org, dest},null));
+        return traversable(new PathCell(new Vector2(x, y), new int[]{sum, org, dest}, null));
     }
 
     /**
+     * Starts the pathfinding algorithm.
+     *
      * @return {@link PathCell} of the endcell. Use {@link PathCell} to get route to walk.
      * NOTE: since you begin from the last cell order has to be reversed
      * can return {@code null} if something goes wrong with the logic
      * pretty sure that should never happen thought
      */
-    private PathCell algorithm() {
+    public PathCell algorithm() {
+
         PathCell current = new PathCell(cache, new int[]{getCellDistancesToEnd(cache.x, cache.y), 0, getCellDistancesToEnd(cache.x, cache.y)}, null);
         HashMap<Vector2, PathCell> closed = new HashMap<>();
         HashMap<Vector2, PathCell> open = new HashMap<>();
@@ -100,9 +102,11 @@ public class Pathfinding {
                 }
                 current = newCurrent;
             } else {
+                System.out.println("TEST SUCCESS");
                 return current;//TODO CURRENT IS GOAL
             }
         }
+
         return null;//something went very very wrong
     }
 
@@ -203,17 +207,5 @@ public class Pathfinding {
         this.collisionLayer = collisionLayer;
     }
 
-    private class PathCell {
-        Vector2 coords;
-        int[] distances;
-        //use this value to get most efficient path after arriving at the goal
-        PathCell parent;
-
-        public PathCell(Vector2 coords, int[] distances, PathCell parent) {
-            this.coords = coords;
-            this.distances = distances;
-            this.parent = parent;
-        }
-    }
 }
 
