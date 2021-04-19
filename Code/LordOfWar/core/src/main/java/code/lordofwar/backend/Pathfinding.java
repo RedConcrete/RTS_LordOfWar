@@ -1,6 +1,8 @@
 package code.lordofwar.backend;
 
 
+import com.badlogic.gdx.maps.MapProperties;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
 
@@ -28,13 +30,31 @@ public class Pathfinding {
     public Pathfinding(int xClicked, int yClicked, int xPosUnit, int yPosUnit, TiledMapTileLayer collisionLayer) {
         this.collisionLayer = collisionLayer;
 
-        getStartAndEndCell(xPosUnit, yPosUnit, xClicked, yClicked);
-        cache = new Vector2(xStartCell, yStartCell);
-        algorithm();
-        System.out.println("TEST SUCCESS");
+       if (checkPossible(xClicked,yClicked)) {
+           getStartAndEndCell(xPosUnit, yPosUnit, xClicked, yClicked);
+           cache = new Vector2(xStartCell, yStartCell);
+           algorithm();
+           System.out.println("TEST SUCCESS");
+       }else {
+           System.out.println("impossible");
+       }
     }
 
-    private void algorithm() {
+    private boolean checkPossible(int x, int y){
+        int dest = getCellDistancesToEnd(x,y);
+        int org = getCellDistancesToStart(x, y);
+        int sum = dest + org;
+
+       return traversable(new PathCell(new Vector2(x,y),new int[]{sum, org, dest},null));
+    }
+
+    /**
+     * @return {@link PathCell} of the endcell. Use {@link PathCell} to get route to walk.
+     * NOTE: since you begin from the last cell order has to be reversed
+     * can return {@code null} if something goes wrong with the logic
+     * pretty sure that should never happen thought
+     */
+    private PathCell algorithm() {
         PathCell current = new PathCell(cache, new int[]{getCellDistancesToEnd(cache.x, cache.y), 0, getCellDistancesToEnd(cache.x, cache.y)}, null);
         HashMap<Vector2, PathCell> closed = new HashMap<>();
         HashMap<Vector2, PathCell> open = new HashMap<>();
@@ -80,20 +100,33 @@ public class Pathfinding {
                 }
                 current = newCurrent;
             } else {
-                return;//TODO CURRENT IS GOAL
+                return current;//TODO CURRENT IS GOAL
             }
         }
+        return null;//something went very very wrong
     }
 
     /**
-     * Checks if the cell is traversable.
-     * @param cell the cell to be checked
-     * @return {@code true} if cell can be traversed
+     * Checks if the pathCell is traversable.
+     *
+     * @param pathCell the pathCell to be checked
+     * @return {@code true} if pathCell can be traversed
      */
-    private boolean traversable(PathCell cell) {
-        boolean traversable = false;
-        //implement code to check wether the cell is traversable
-        return true;
+    private boolean traversable(PathCell pathCell) {
+        //implement code to check wether the pathCell is traversable
+        if (pathCell.coords.x >= 0 && pathCell.coords.y >= 0) {
+            TiledMapTileLayer.Cell cell = collisionLayer.getCell((int) pathCell.coords.x, (int) pathCell.coords.y);
+            if (cell != null) {
+                TiledMapTile tile = cell.getTile();
+                if (tile != null) {
+                    MapProperties properties = tile.getProperties();
+                    if (!properties.containsKey("isCastle")) {//todo change this to generic blocked
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private HashMap<Vector2, int[]> getSurrounding(Vector2 current) {
@@ -173,6 +206,7 @@ public class Pathfinding {
     private class PathCell {
         Vector2 coords;
         int[] distances;
+        //use this value to get most efficient path after arriving at the goal
         PathCell parent;
 
         public PathCell(Vector2 coords, int[] distances, PathCell parent) {
