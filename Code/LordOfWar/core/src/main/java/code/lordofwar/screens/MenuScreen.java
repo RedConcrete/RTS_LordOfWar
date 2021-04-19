@@ -18,7 +18,6 @@ public class MenuScreen extends Screens implements Screen {
         super(aGame, aSkin);
 
         createBackground(stage);
-
         setupUI();
 
     }

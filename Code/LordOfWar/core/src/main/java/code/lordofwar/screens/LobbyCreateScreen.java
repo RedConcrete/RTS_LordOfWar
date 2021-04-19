@@ -127,10 +127,6 @@ public class LobbyCreateScreen extends Screens implements Screen {
 
                     printErrorWindow(windowLobbyCreate,"Lobbys has no Name");
 
-
-
-
-
                 } else {
                     Lobby lobby = new Lobby(lobbyName.getText(), mapSelctBox.getSelected(), playerAmountSelectBox.getSelected(), gameModeSelectBox.getSelected());
                     lobbyCreateScreenEvent.sendLobbyCreateRequest(lobby);

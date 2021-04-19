@@ -13,8 +13,6 @@ public class Villager extends Sprite {
     private float speed = 60 * 2;
     private int hp;
 
-
-
     private TiledMapTileLayer collisionLayer;
 
     public Villager(Sprite sprite, TiledMapTileLayer collisionLayer) {
@@ -68,17 +66,17 @@ public class Villager extends Sprite {
 
             //Top left
             collisionX = collisionLayer.getCell((int) (getX() / tileWidth), (int) ((getY() + getHeight()) / tileHeight))
-                    .getTile().getProperties().containsKey("isCastel");
+                    .getTile().getProperties().containsKey("isCastle");
 
             //Middel left
             if(!collisionX)
                 collisionX = collisionLayer.getCell((int) (getX() / tileWidth), (int) ((getY() + getHeight() / 2) / tileHeight))
-                        .getTile().getProperties().containsKey("isCastel");
+                        .getTile().getProperties().containsKey("isCastle");
 
             //Bottem left
             if(!collisionX)
                 collisionX = collisionLayer.getCell((int) (getX() / tileWidth), (int) (getY() / tileHeight))
-                        .getTile().getProperties().containsKey("isCastel");
+                        .getTile().getProperties().containsKey("isCastle");
 
         } else if (velocity.x > 0) {
 
@@ -87,17 +85,17 @@ public class Villager extends Sprite {
 
             //Top right
             collisionX = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) ((getY() + getHeight()) / tileHeight))
-                    .getTile().getProperties().containsKey("isCastel");
+                    .getTile().getProperties().containsKey("isCastle");
 
             //Middel right
             if(!collisionX)
                 collisionX = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) ((getY() + getHeight() / 2) / tileHeight))
-                        .getTile().getProperties().containsKey("isCastel");
+                        .getTile().getProperties().containsKey("isCastle");
 
             //Bottem right
             if(!collisionX)
                 collisionX = collisionLayer.getCell((int) ((getX() + getWidth())/ tileWidth), (int) (getY() / tileHeight))
-                        .getTile().getProperties().containsKey("isCastel");
+                        .getTile().getProperties().containsKey("isCastle");
 
         }
 
@@ -105,7 +103,6 @@ public class Villager extends Sprite {
         if(collisionX){
             setX(oldX);
             velocity.x = 0;
-            System.out.println("collision X");
         }
 
         // moving in y
@@ -116,30 +113,30 @@ public class Villager extends Sprite {
 
             //bottom left
             collisionY = collisionLayer.getCell((int) (getX() / tileWidth), (int) (getY()  / tileHeight))
-                    .getTile().getProperties().containsKey("isCastel");
+                    .getTile().getProperties().containsKey("isCastle");
             //bottom Middel
             if(!collisionY)
                 collisionY = collisionLayer.getCell((int) ((getX() + getWidth() / 2) / tileWidth ), (int) (getY() / tileHeight))
-                        .getTile().getProperties().containsKey("isCastel");
+                        .getTile().getProperties().containsKey("isCastle");
             //bottem right
             if(!collisionY)
                 collisionY = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) (getY() / tileHeight))
-                        .getTile().getProperties().containsKey("isCastel");
+                        .getTile().getProperties().containsKey("isCastle");
 
 
         } else if (velocity.y > 0) {
 
             //Top left
             collisionY = collisionLayer.getCell((int) (getX()  / tileWidth), (int) ((getY() + getHeight()) / tileHeight))
-                    .getTile().getProperties().containsKey("isCastel");
+                    .getTile().getProperties().containsKey("isCastle");
             //Top middel
             if(!collisionY)
                 collisionY = collisionLayer.getCell((int) ((getX() + getWidth() / 2) / tileWidth), (int) ((getY() + getHeight()/2) / tileHeight))
-                        .getTile().getProperties().containsKey("isCastel");
+                        .getTile().getProperties().containsKey("isCastle");
             //Top right
             if(!collisionY)
                 collisionY = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) ((getY() + getHeight()) / tileHeight))
-                        .getTile().getProperties().containsKey("isCastel");
+                        .getTile().getProperties().containsKey("isCastle");
 
         }
 
@@ -147,7 +144,6 @@ public class Villager extends Sprite {
         if(collisionY){
             setY(oldY);
             velocity.y = 0;
-            System.out.println("collision Y");
         }
 
     }

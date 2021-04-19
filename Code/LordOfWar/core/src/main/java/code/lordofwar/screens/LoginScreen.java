@@ -1,6 +1,5 @@
 package code.lordofwar.screens;
 
-
 import code.lordofwar.backend.Rumble;
 import code.lordofwar.backend.events.LoginScreenEvent;
 import code.lordofwar.main.LOW;
