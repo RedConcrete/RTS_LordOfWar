@@ -12,26 +12,32 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 public class GameScreen extends Screens implements Screen {
 
 
     private static final ShapeRenderer debugRenderer = new ShapeRenderer();
+    private ShapeRenderer rectangleRenderer;
     private static final ShapeRenderer debugMovement = new ShapeRenderer();
 
     private final Vector2 vectorSpeed;
@@ -65,6 +71,9 @@ public class GameScreen extends Screens implements Screen {
     private final int startingVillager = 5;
     private int goldAmount = 100;
     private float pointTimerCounter;
+    private Point2D.Float rectangleStart;//used to check where the select rectangle was started
+    private Point2D.Float rectangleEnd;
+    private float[] rectangleBounds;
 
     public GameScreen(LOW aGame, Skin aSkin, String lobbyID) {
         super(aGame, aSkin);
@@ -84,7 +93,10 @@ public class GameScreen extends Screens implements Screen {
         soldierArrayList = new ArrayList<>();
         castle = new Castle();
         villagerLabel = new Label("", skin);
-
+        rectangleRenderer = new ShapeRenderer();
+        rectangleStart = null;//null bc rectangle was started
+        rectangleEnd = null;
+        rectangleBounds = new float[4];//0=originX1=originY2=width3=height
         villiagerSprite = new Sprite(unitAtlas.findRegion("Character_Green_B"));
 
         loader = new TmxMapLoader();
@@ -101,7 +113,41 @@ public class GameScreen extends Screens implements Screen {
     public void show() {
 
         Gdx.input.setInputProcessor(stage);
+        stage.addListener(
+                new InputListener() {
+                    @Override
+                    public void touchDragged(InputEvent event, float x, float y, int pointer) {
+                        float[] coords = new float[]{x, y};
+                        if (rectangleStart == null) {
+                            rectangleStart = new Point2D.Float(coords[0], coords[1]);
+                        }
+                        rectangleEnd = new Point2D.Float(coords[0], coords[1]);
+                    }
 
+                    @Override
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                        return true;
+                    }
+
+                    @Override
+                    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                        if (rectangleStart != null && rectangleEnd != null) {
+                            float[] recCoords = new float[]{rectangleBounds[0], rectangleBounds[1]};
+                            float[] vilCoords;
+                            for (Villager villager : villagerArrayList) {
+                                vilCoords = translateXYCoordinatesToScreen(villager.getX() + villager.getWidth() / 2, villager.getY() + villager.getHeight() / 2);
+                                if (vilCoords[0] >= recCoords[0] && vilCoords[1] >= recCoords[1]) {
+                                    if (vilCoords[0] <= recCoords[0] + rectangleBounds[2] && vilCoords[1] <= recCoords[1] + rectangleBounds[3]) {
+                                        villager.setSelected(true);
+                                    }
+                                }
+                            }
+                        }
+                        rectangleEnd = null;
+                        rectangleStart = null;
+                    }
+                }
+        );
         renderer = new OrthogonalTiledMapRenderer(map);
 
         for (int i = 0; i < startingVillager; i++) {
@@ -155,92 +201,111 @@ public class GameScreen extends Screens implements Screen {
                     }
                 }
 
-                entityName.setText("Villager");
-                castleImage.setVisible(false);
-                Sprite s = new Sprite(uiAtlas.findRegion("button-normal"));
-                s.setColor(Color.RED);
-                s.setSize(v.getHp(), 10);
-                s.setPosition(v.getX() + 5, v.getY() + 60);
-                s.draw(renderer.getBatch());
+                if (v.isSelected()) {
+                    entityName.setText("Villager");
+                    castleImage.setVisible(false);
+                    Sprite s = new Sprite(uiAtlas.findRegion("button-normal"));
+                    s.setColor(Color.RED);
+                    s.setSize(v.getHp(), 10);
+                    s.setPosition(v.getX() + 5, v.getY() + 60);
+                    s.draw(renderer.getBatch());
+                }
+
             }
 
-        }
+            renderer.getBatch().end();
+            if (rectangleStart != null && rectangleEnd != null) {
+                //calc Rectangle
+                //todo find a more efficient way to do this?
+                rectangleBounds[0] = Math.min(rectangleStart.x, rectangleEnd.x);
+                rectangleBounds[1] = Math.min(rectangleStart.y, rectangleEnd.y);
+                rectangleBounds[2] = Math.max(rectangleStart.x, rectangleEnd.x) - rectangleBounds[0];
+                rectangleBounds[3] = Math.max(rectangleStart.y, rectangleEnd.y) - rectangleBounds[1];
+                //draw rectangle
+                rectangleRenderer.setAutoShapeType(true);
+                rectangleRenderer.begin();
+                rectangleRenderer.set(ShapeRenderer.ShapeType.Line);
+                rectangleRenderer.setColor(Color.WHITE);//white color for rect
+                rectangleRenderer.rect(rectangleBounds[0], rectangleBounds[1], rectangleBounds[2], rectangleBounds[3]);//origin=lower left (screen)
+                rectangleRenderer.end();
+                //draw rectangle here
+            }
 
-        if (castle.isSelected()) {
-            entityName.setText("Castle");
-            castleImage.setVisible(true);
-        }
+            if (castle.isSelected()) {
+                entityName.setText("Castle");
+                castleImage.setVisible(true);
+            }
 
-        // todo schau wo die maus ist und dann reagiere also x und y abfragen und dann camera moven falls passend
-        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-            if (!isLeftPressed) {
-                getClickedOnEntity();
-                isLeftPressed = true;
-            } else {
-                if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-                    isLeftPressed = false;
+            // todo schau wo die maus ist und dann reagiere also x und y abfragen und dann camera moven falls passend
+            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+                if (!isLeftPressed) {
+                    getClickedOnEntity();
+                    isLeftPressed = true;
+                } else {
+                    if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+                        isLeftPressed = false;
+                    }
                 }
             }
-        }
 
-        if(mapDebug){
-            //todo zeigt zwar ein Grid aber ist nicht ganz richtig :D glaube ich !!
-            for (int i = 0; i < 74; i++) {
-                Sprite lineH = new Sprite(uiAtlas.findRegion("line-h"));
-                Sprite lineV = new Sprite(uiAtlas.findRegion("line-v"));
-                lineV.setColor(Color.GREEN);
-                lineV.setSize(collisionUnitLayer.getHeight() * 64, 1);
-                lineV.setPosition(0, (i * 66) + (- 1 * i));
-                lineV.draw(renderer.getBatch());
-                lineH.setColor(Color.GREEN);
-                lineH.setSize(1, collisionUnitLayer.getHeight() * 64);
-                lineH.setPosition((i * 66) + (- 1 * i), 0);
-                lineH.draw(renderer.getBatch());
+            if (mapDebug) {
+                //todo zeigt zwar ein Grid aber ist nicht ganz richtig :D glaube ich !!
+                for (int i = 0; i < 74; i++) {
+                    Sprite lineH = new Sprite(uiAtlas.findRegion("line-h"));
+                    Sprite lineV = new Sprite(uiAtlas.findRegion("line-v"));
+                    lineV.setColor(Color.GREEN);
+                    lineV.setSize(collisionUnitLayer.getHeight() * 64, 1);
+                    lineV.setPosition(0, (i * 66) + (-1 * i));
+                    lineV.draw(renderer.getBatch());
+                    lineH.setColor(Color.GREEN);
+                    lineH.setSize(1, collisionUnitLayer.getHeight() * 64);
+                    lineH.setPosition((i * 66) + (-1 * i), 0);
+                    lineH.draw(renderer.getBatch());
+                }
             }
+
+            renderer.getBatch().end();
+            debugRenderer.end();
+            mouseOnEdgeofCamera();
+            stage.act();
+            stage.draw();
         }
 
-        renderer.getBatch().end();
-        debugRenderer.end();
-        mouseOnEdgeofCamera();
-        stage.act();
-        stage.draw();
-    }
+        @Override
+        public void resize ( int width, int height){
+            camera.position.set(stage.getWidth() / 2f, stage.getHeight() / 2f, 0);
+            camera.viewportWidth = width;
+            camera.viewportHeight = height;
+            camera.update();
+        }
 
-    @Override
-    public void resize(int width, int height) {
-        camera.position.set(stage.getWidth() / 2f, stage.getHeight() / 2f, 0);
-        camera.viewportWidth = width;
-        camera.viewportHeight = height;
-        camera.update();
-    }
+        @Override
+        public void pause () {
 
-    @Override
-    public void pause() {
+        }
 
-    }
+        @Override
+        public void resume () {
 
-    @Override
-    public void resume() {
+        }
 
-    }
+        @Override
+        public void hide () {
+            stage.clear();
+        }
 
-    @Override
-    public void hide() {
-        stage.clear();
-    }
+        @Override
+        public void dispose () {
+            stage.dispose();
+            map.dispose();
+            renderer.dispose();
+        }
 
-    @Override
-    public void dispose() {
-        stage.dispose();
-        map.dispose();
-        renderer.dispose();
-    }
+        private void setupUI () {
 
-    private void setupUI() {
+            //Todo https://www.youtube.com/watch?v=qik60F5I6J4&list=PLXY8okVWvwZ0qmqSBhOtqYRjzWtUCWylb <---------
 
-        //Todo https://www.youtube.com/watch?v=qik60F5I6J4&list=PLXY8okVWvwZ0qmqSBhOtqYRjzWtUCWylb <---------
-
-        //Todo später inGame um tasten zu belegen!!
+            //Todo später inGame um tasten zu belegen!!
         /*
         public void actionPerformed(ActionEvent e) {
             if(e.getSource() == btn1) {
@@ -252,348 +317,364 @@ public class GameScreen extends Screens implements Screen {
          }
          */
 
-        Window resourceBarWindow = new Window("", skin);
-        resourceBarWindow.setMovable(false);
+            Window resourceBarWindow = new Window("", skin);
+            resourceBarWindow.setMovable(false);
 
-        Window resourceWindow = new Window("",skin);
-        resourceWindow.setMovable(false);
-        resourceWindow.setSize(stage.getWidth(),stage.getHeight());
+            Window resourceWindow = new Window("", skin);
+            resourceWindow.setMovable(false);
+            resourceWindow.setSize(stage.getWidth(), stage.getHeight());
 
-        Window exitWindow = new Window("", skin);
-        exitWindow.setMovable(false);
+            Window exitWindow = new Window("", skin);
+            exitWindow.setMovable(false);
 
-        Window entityWindow = new Window("", skin);
-        entityWindow.setMovable(false);
+            Window entityWindow = new Window("", skin);
+            entityWindow.setMovable(false);
 
-        Window windowExit = new Window("Exit?", skin, "border");
-        windowExit.setMovable(false);
-        windowExit.defaults().pad(20f);
+            Window windowExit = new Window("Exit?", skin, "border");
+            windowExit.setMovable(false);
+            windowExit.defaults().pad(20f);
 
-        TextButton exitGameButton = new TextButton("Exit", skin);
-        exitGameButton.getLabel().setFontScale(3f);
+            TextButton exitGameButton = new TextButton("Exit", skin);
+            exitGameButton.getLabel().setFontScale(3f);
 
-        TextButton addGoldButton = new TextButton("AddGold", skin);
-        TextButton tackGoldButton = new TextButton("TackGold", skin);
+            TextButton addGoldButton = new TextButton("AddGold", skin);
+            TextButton tackGoldButton = new TextButton("TackGold", skin);
 
-        TextButton noButton = new TextButton("No", skin);
-        TextButton yesButton = new TextButton("Yes", skin);
+            TextButton noButton = new TextButton("No", skin);
+            TextButton yesButton = new TextButton("Yes", skin);
 
-        Label exitLabel = new Label("Do you realy want to Exit?", skin);
-        exitLabel.setFontScale(3f);
+            Label exitLabel = new Label("Do you realy want to Exit?", skin);
+            exitLabel.setFontScale(3f);
 
-        Label scoreTextLabel = new Label(" Your Score:", skin);
-
-
-        scoreLabel = new Label("", skin);
+            Label scoreTextLabel = new Label(" Your Score:", skin);
 
 
-        Label villagerTextLabel = new Label("Villager :",skin);
-
-        Label goldLabel = new Label("0", skin);
-        goldLabel.setText(goldAmount);
-
-        Image goldImage = new Image(new Sprite(new Texture("ui/gold_treasure_icons_16x16/gold.png")));
-
-        Image villagerImage = new Image(new Sprite(unitAtlas.findRegion("Character_Green_B")));
-
-        resourceBarWindow.setMovable(false);
-
-        exitWindow.setMovable(false);
-
-        windowExit.setMovable(false);
-        windowExit.defaults().pad(20f);
-
-        exitGameButton.setSize(exitGameButton.getWidth() * 5, exitGameButton.getHeight() * 5);
-        exitGameButton.setPosition(stage.getWidth(), stage.getHeight());
-
-        addGoldButton.addListener(new InputListener() {
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                goldLabel.setText(goldAmount = goldAmount + 100);
-            }
-
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
-        });
-
-        tackGoldButton.addListener(new InputListener() {
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                goldLabel.setText(goldAmount = goldAmount - 100);
-            }
-
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
-        });
+            scoreLabel = new Label("", skin);
 
 
-        exitGameButton.setSize(exitGameButton.getWidth() * 5, exitGameButton.getHeight() * 5);
-        exitGameButton.setPosition(stage.getWidth(), stage.getHeight());
+            Label villagerTextLabel = new Label("Villager :", skin);
 
-        exitGameButton.addListener(new InputListener() {
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+            Label goldLabel = new Label("0", skin);
+            goldLabel.setText(goldAmount);
 
-                windowExit.setVisible(true);
-                yesButton.getLabel().setFontScale(2f);
+            Image goldImage = new Image(new Sprite(new Texture("ui/gold_treasure_icons_16x16/gold.png")));
 
-                yesButton.addListener(new InputListener() {
-                    @Override
-                    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                        GameScreen.this.getGameScreenEvent().sendLeaveGameNotice();
-                        stage.dispose(); //already disposed wenn einmal abgelehnt ??
-                        game.setScreen(new MenuScreen(game, skin));
-                    }
+            Image villagerImage = new Image(new Sprite(unitAtlas.findRegion("Character_Green_B")));
 
-                    @Override
-                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+            resourceBarWindow.setMovable(false);
 
-                        return true;
-                    }
-                });
+            exitWindow.setMovable(false);
 
-                noButton.getLabel().setFontScale(2f);
+            windowExit.setMovable(false);
+            windowExit.defaults().pad(20f);
 
-                noButton.addListener(new InputListener() {
-                    @Override
-                    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                        windowExit.setVisible(false);
-                    }
+            exitGameButton.setSize(exitGameButton.getWidth() * 5, exitGameButton.getHeight() * 5);
+            exitGameButton.setPosition(stage.getWidth(), stage.getHeight());
 
-                    @Override
-                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                        return true;
-                    }
-                });
-                windowExit.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
-                windowExit.pack();
-                stage.addActor(windowExit);
-            }
+            addGoldButton.addListener(new InputListener() {
+                @Override
+                public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                    goldLabel.setText(goldAmount = goldAmount + 100);
+                }
 
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
-        });
+                @Override
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                    return true;
+                }
+            });
 
-        windowExit.add(exitLabel).colspan(2).row();
-        windowExit.add(yesButton);
-        windowExit.add(noButton);
+            tackGoldButton.addListener(new InputListener() {
+                @Override
+                public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                    goldLabel.setText(goldAmount = goldAmount - 100);
+                }
 
-        resourceBarWindow.add(scoreTextLabel).padTop(30f).padBottom(10f).padLeft(10f).padRight(10f);
-        resourceBarWindow.add(scoreLabel).padTop(30f).padBottom(10f).padRight(10f);
-        resourceBarWindow.add(goldImage).padTop(30f).padBottom(10f).padLeft(10f).padRight(10f);
-        resourceBarWindow.add(goldLabel).padTop(30f).padBottom(10f).padRight(10f);
-        resourceBarWindow.add(villagerImage).padTop(30f).padBottom(10f).padLeft(10f).padRight(10f);
-        resourceBarWindow.add(villagerLabel).padTop(30f).padBottom(10f).padRight(10f);
+                @Override
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                    return true;
+                }
+            });
 
-        resourceBarWindow.setPosition(0, stage.getHeight());
 
-        exitWindow.add(exitGameButton).padTop(30f);
-        exitWindow.setPosition(stage.getWidth(), stage.getHeight());
+            exitGameButton.setSize(exitGameButton.getWidth() * 5, exitGameButton.getHeight() * 5);
+            exitGameButton.setPosition(stage.getWidth(), stage.getHeight());
 
-        entityWindow.add(entityName).row();
-        entityWindow.add(castleImage);
-        entityWindow.setPosition(0,0);
+            exitGameButton.addListener(new InputListener() {
+                @Override
+                public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
 
-        packWindow(resourceBarWindow, stage);
-        packWindow(exitWindow, stage);
-        packWindow(entityWindow, stage);
+                    windowExit.setVisible(true);
 
-        stage.addActor(entityWindow);
-        stage.addActor(resourceBarWindow);
-        stage.addActor(exitWindow);
 
-        stage.setDebugAll(false);
-    }
+                    yesButton.getLabel().setFontScale(2f);
 
-    //Todo camera movement überarbeiten !!
-    private void mouseOnEdgeofCamera() {
+                    yesButton.addListener(new InputListener() {
+                        @Override
+                        public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                            GameScreen.this.getGameScreenEvent().sendLeaveGameNotice();
+                            stage.dispose(); //already disposed wenn einmal abgelehnt ??
+                            game.setScreen(new MenuScreen(game, skin));
+                            stage.dispose();
+                        }
 
-        float xClicked, yClicked;
+                        @Override
+                        public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 
-        xClicked = Gdx.input.getX();
-        yClicked = Gdx.input.getY();
+                            return true;
+                        }
+                    });
+
+                    noButton.getLabel().setFontScale(2f);
+
+                    noButton.addListener(new InputListener() {
+                        @Override
+                        public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                            windowExit.setVisible(false);
+                        }
+
+                        @Override
+                        public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                            return true;
+                        }
+                    });
+                    windowExit.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
+                    windowExit.pack();
+                    stage.addActor(windowExit);
+                }
+
+                @Override
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                    return true;
+                }
+            });
+
+            windowExit.add(exitLabel).colspan(2).row();
+            windowExit.add(yesButton);
+            windowExit.add(noButton);
+
+            resourceBarWindow.add(scoreTextLabel).padTop(30f).padBottom(10f).padLeft(10f).padRight(10f);
+            resourceBarWindow.add(scoreLabel).padTop(30f).padBottom(10f).padRight(10f);
+            resourceBarWindow.add(goldImage).padTop(30f).padBottom(10f).padLeft(10f).padRight(10f);
+            resourceBarWindow.add(goldLabel).padTop(30f).padBottom(10f).padRight(10f);
+            resourceBarWindow.add(villagerImage).padTop(30f).padBottom(10f).padLeft(10f).padRight(10f);
+            resourceBarWindow.add(villagerLabel).padTop(30f).padBottom(10f).padRight(10f);
+
+            resourceBarWindow.setPosition(0, stage.getHeight());
+
+            exitWindow.add(exitGameButton).padTop(30f);
+            exitWindow.setPosition(stage.getWidth(), stage.getHeight());
+
+            entityWindow.add(entityName).row();
+            entityWindow.add(castleImage);
+            entityWindow.setPosition(0, 0);
+
+            packWindow(resourceBarWindow, stage);
+            packWindow(exitWindow, stage);
+            packWindow(entityWindow, stage);
+
+            stage.addActor(entityWindow);
+            stage.addActor(resourceBarWindow);
+            stage.addActor(exitWindow);
+
+            stage.setDebugAll(false);
+        }
 
         //Todo camera movement überarbeiten !!
-        processCameraMovement(xClicked, yClicked);
+        private void mouseOnEdgeofCamera () {
 
-        camera.position.lerp(posCameraDesired, 0.1f);
+            float xClicked, yClicked;
 
-        if (cameraDebug) {
-            DrawDebugLine(new Vector2(camera.position.x, camera.position.y)
-                    , new Vector2(posCameraDesired.x, posCameraDesired.y)
-                    , 3, Color.RED, camera.combined);
-        }
-    }
+            xClicked = Gdx.input.getX();
+            yClicked = Gdx.input.getY();
 
-    /**
-     * The Method processCameraMovement moves the Camera in the direction the mouse is pointing at.
-     * @author Robin Hefner
-     */
-    private void processCameraMovement(float xClicked, float yClicked) {
+            //Todo camera movement überarbeiten !!
+            processCameraMovement(xClicked, yClicked);
 
-        //oben links
-        if (xClicked <= camera.viewportWidth * 2 / 32 && yClicked <= camera.viewportHeight * 1 / 18) {
-            posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
-            posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
+            camera.position.lerp(posCameraDesired, 0.1f);
 
             if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(0, camera.viewportHeight - camera.viewportHeight * 1 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 1 / 18);
-                debugMovement.end();
+                DrawDebugLine(new Vector2(camera.position.x, camera.position.y)
+                        , new Vector2(posCameraDesired.x, posCameraDesired.y)
+                        , 3, Color.RED, camera.combined);
             }
-
-            camera.update();
-        }
-        //mitte links
-        else if (xClicked <= camera.viewportWidth * 2 / 32 && yClicked >= camera.viewportHeight * 1 / 18 && yClicked <= camera.viewportHeight * 17 / 18) {
-            posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
-
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(0, camera.viewportHeight - camera.viewportHeight * 17 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 16 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
-        }
-        //unten links
-        else if (xClicked <= camera.viewportWidth * 2 / 32 && yClicked >= camera.viewportHeight * 17 / 18 && yClicked <= camera.viewportHeight) {
-            posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
-            posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
-
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(0, 0, camera.viewportWidth * 2 / 32, camera.viewportHeight * 1 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
         }
 
-        //oben rechts
-        else if (xClicked >= camera.viewportWidth * 30 / 32 && yClicked <= camera.viewportHeight * 1 / 18) {
-            posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
-            posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
+        /**
+         * The Method processCameraMovement moves the Camera in the direction the mouse is pointing at.
+     *
+         * @author Robin Hefner
+         */
+        private void processCameraMovement ( float xClicked, float yClicked){
 
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 2 / 32, camera.viewportHeight - camera.viewportHeight * 1 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 1 / 18);
-                debugMovement.end();
+            //oben links
+            if (xClicked <= camera.viewportWidth * 2 / 32 && yClicked <= camera.viewportHeight * 1 / 18) {
+                posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
+                posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
+
+                if (cameraDebug) {
+                    debugMovement.begin();
+                    debugMovement.rect(0, camera.viewportHeight - camera.viewportHeight * 1 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 1 / 18);
+                    debugMovement.end();
+                }
+
+                camera.update();
+            }
+            //mitte links
+            else if (xClicked <= camera.viewportWidth * 2 / 32 && yClicked >= camera.viewportHeight * 1 / 18 && yClicked <= camera.viewportHeight * 17 / 18) {
+                posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
+
+                if (cameraDebug) {
+                    debugMovement.begin();
+                    debugMovement.rect(0, camera.viewportHeight - camera.viewportHeight * 17 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 16 / 18);
+                    debugMovement.end();
+                }
+
+                camera.update();
+            }
+            //unten links
+            else if (xClicked <= camera.viewportWidth * 2 / 32 && yClicked >= camera.viewportHeight * 17 / 18 && yClicked <= camera.viewportHeight) {
+                posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
+                posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
+
+                if (cameraDebug) {
+                    debugMovement.begin();
+                    debugMovement.rect(0, 0, camera.viewportWidth * 2 / 32, camera.viewportHeight * 1 / 18);
+                    debugMovement.end();
+                }
+
+                camera.update();
             }
 
-            camera.update();
-        }
-        //mitte rechts
-        else if (xClicked >= camera.viewportWidth * 30 / 32 && yClicked >= camera.viewportHeight * 1 / 18 && yClicked <= camera.viewportHeight * 17 / 18) {
-            posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
+            //oben rechts
+            else if (xClicked >= camera.viewportWidth * 30 / 32 && yClicked <= camera.viewportHeight * 1 / 18) {
+                posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
+                posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
 
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 2 / 32, camera.viewportHeight - camera.viewportHeight * 17 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 16 / 18);
-                debugMovement.end();
+                if (cameraDebug) {
+                    debugMovement.begin();
+                    debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 2 / 32, camera.viewportHeight - camera.viewportHeight * 1 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 1 / 18);
+                    debugMovement.end();
+                }
+
+                camera.update();
             }
+            //mitte rechts
+            else if (xClicked >= camera.viewportWidth * 30 / 32 && yClicked >= camera.viewportHeight * 1 / 18 && yClicked <= camera.viewportHeight * 17 / 18) {
+                posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
 
-            camera.update();
-        }
-        //unten rechts
+                if (cameraDebug) {
+                    debugMovement.begin();
+                    debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 2 / 32, camera.viewportHeight - camera.viewportHeight * 17 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 16 / 18);
+                    debugMovement.end();
+                }
+
+                camera.update();
+            }
+            //unten rechts
         else if (xClicked >= camera.viewportWidth * 30 / 32 && yClicked >= camera.viewportHeight * 17 / 18) {
-            posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
-            posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
+                posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
+                posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
 
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 2 / 32, 0, camera.viewportWidth * 2 / 32, camera.viewportHeight * 1 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
-        }
-
-        //mitte oben
-        else if (xClicked >= camera.viewportWidth * 2 / 32 && xClicked <= camera.viewportWidth * 30 / 32 && yClicked <= camera.viewportHeight * 1 / 18) {
-            posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
-
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 30 / 32, camera.viewportHeight - camera.viewportHeight * 1 / 18, camera.viewportWidth * 28 / 32, camera.viewportHeight * 1 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
-        }
-        //mitte unten
-        else if (xClicked >= camera.viewportWidth * 2 / 32 && xClicked <= camera.viewportWidth * 30 / 32 && yClicked >= camera.viewportHeight * 17 / 18) {
-            posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
-
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 30 / 32, 0, camera.viewportWidth * 28 / 32, camera.viewportHeight * 1 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
-        } else {
-            camera.update();
-        }
-
-    }
-
-    public static void DrawDebugLine(Vector2 start, Vector2 end, int lineWidth, Color color, Matrix4 projectionMatrix) {
-        Gdx.gl.glLineWidth(lineWidth);
-        debugRenderer.setProjectionMatrix(projectionMatrix);
-        debugRenderer.begin(ShapeRenderer.ShapeType.Line);
-        debugRenderer.setColor(color);
-        debugRenderer.line(start, end);
-        debugRenderer.end();
-        Gdx.gl.glLineWidth(1);
-    }
-
-    public GameScreenEvent getGameScreenEvent() {
-        return gameScreenEvent;
-    }
-
-    public void getClickedOnEntity() {
-
-        Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-        camera.unproject(mousePos);
-
-        int x = (int) mousePos.x, y = (int) mousePos.y;
-
-        for (Villager villager : villagerArrayList) {
-
-            if (villager.getX() < x && villager.getY() < y) {
-                if (villager.getX() + villager.getWidth() >= x && villager.getY() + villager.getHeight() >= y) {
-                    villager.setSelected(!villager.isSelected());
+                if (cameraDebug) {
+                    debugMovement.begin();
+                    debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 2 / 32, 0, camera.viewportWidth * 2 / 32, camera.viewportHeight * 1 / 18);
+                    debugMovement.end();
                 }
-                else {
-                    villager.setSelected(false);
+
+                camera.update();
+            }
+
+            //mitte oben
+            else if (xClicked >= camera.viewportWidth * 2 / 32 && xClicked <= camera.viewportWidth * 30 / 32 && yClicked <= camera.viewportHeight * 1 / 18) {
+                posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
+
+                if (cameraDebug) {
+                    debugMovement.begin();
+                    debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 30 / 32, camera.viewportHeight - camera.viewportHeight * 1 / 18, camera.viewportWidth * 28 / 32, camera.viewportHeight * 1 / 18);
+                    debugMovement.end();
+                }
+
+                camera.update();
+            }
+            //mitte unten
+            else if (xClicked >= camera.viewportWidth * 2 / 32 && xClicked <= camera.viewportWidth * 30 / 32 && yClicked >= camera.viewportHeight * 17 / 18) {
+                posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
+
+                if (cameraDebug) {
+                    debugMovement.begin();
+                    debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 30 / 32, 0, camera.viewportWidth * 28 / 32, camera.viewportHeight * 1 / 18);
+                    debugMovement.end();
+                }
+
+                camera.update();
+            } else {
+                camera.update();
+            }
+
+        }
+
+        public static void DrawDebugLine (Vector2 start, Vector2 end,int lineWidth, Color color, Matrix4
+        projectionMatrix){
+            Gdx.gl.glLineWidth(lineWidth);
+            debugRenderer.setProjectionMatrix(projectionMatrix);
+            debugRenderer.begin(ShapeRenderer.ShapeType.Line);
+            debugRenderer.setColor(color);
+            debugRenderer.line(start, end);
+            debugRenderer.end();
+            Gdx.gl.glLineWidth(1);
+        }
+
+        public GameScreenEvent getGameScreenEvent () {
+            return gameScreenEvent;
+        }
+
+        public void getClickedOnEntity () {
+
+            float[] coords = translateXYCoordinatesFromScreen(Gdx.input.getX(), Gdx.input.getY());
+            for (Villager villager : villagerArrayList) {
+
+                if (villager.getX() < (int) coords[0] && villager.getY() < (int) coords[1]) {
+                    if (villager.getX() + villager.getWidth() >= (int) coords[0] && villager.getY() + villager.getHeight() >= (int) coords[1]) {
+                        villager.setSelected(!villager.isSelected());
+                    } else {
+                        villager.setSelected(false);
+                    }
                 }
             }
-        }
 
-        try {
-            if (collisionUnitLayer.getCell(x / collisionUnitLayer.getTileWidth(), y / collisionUnitLayer.getTileHeight())
-                    .getTile().getProperties().containsKey("isCastle")) {
-                castle.setSelected(!castle.isSelected());
+            try {
+                if (collisionUnitLayer.getCell((int) coords[0] / collisionUnitLayer.getTileWidth(), (int) coords[1] / collisionUnitLayer.getTileHeight())
+                        .getTile().getProperties().containsKey("isCastel")) {
+                    castle.setSelected(!castle.isSelected());
+                }
+            } catch (Exception e) {
+
             }
-        } catch (Exception e) {
+        }
+
+
+        //[0]=x[1]=y
+        private float[] translateXYCoordinatesFromScreen ( float x, float y){
+            Vector3 mousePos = new Vector3(x, y, 0);
+            camera.unproject(mousePos);
+
+            return new float[]{mousePos.x, mousePos.y};
+        }
+
+        private float[] translateXYCoordinatesToScreen ( float x, float y){
+            Vector3 mousePos = new Vector3(x, y, 0);
+            camera.project(mousePos);
+
+            return new float[]{mousePos.x, mousePos.y};
+        }
+
+        public void getPathFinding(Villager v){
+            //todo pathfinding programmieren
+            Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+            camera.unproject(mousePos);
+
+            int x = (int) mousePos.x, y = (int) mousePos.y;
+            Pathfinding p = new Pathfinding(x,y,(int) v.getX() + 32,(int) v.getY() + 32, collisionUnitLayer);
 
         }
     }
-
-    public void getPathFinding(Villager v){
-        //todo pathfinding programmieren
-        Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-        camera.unproject(mousePos);
-
-        int x = (int) mousePos.x, y = (int) mousePos.y;
-        Pathfinding p = new Pathfinding(x,y,(int) v.getX() + 32,(int) v.getY() + 32, collisionUnitLayer);
-
-    }
-}

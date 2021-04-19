@@ -13,8 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import java.util.Random;
-
 public abstract class Screens extends Constants {
     protected final Stage stage;
     protected final LOW game;
@@ -32,18 +30,16 @@ public abstract class Screens extends Constants {
 
     protected void createBackground(Stage stage) {
 
-        int number = lowerBound + (int)(Math.random() * ((upperBound - lowerBound) + 1));
-        Texture backgroundTexture = new Texture("ui/background/background.jpg");;
-        if(number == 1){
+        int number = lowerBound + (int) (Math.random() * ((upperBound - lowerBound) + 1));
+        Texture backgroundTexture = new Texture("ui/background/background.jpg");
+        ;
+        if (number == 1) {
             backgroundTexture = new Texture("ui/background/background.jpg");
-        }
-        else if(number == 2){
+        } else if (number == 2) {
             backgroundTexture = new Texture("ui/background/background_2.jpg");
-        }
-        else if(number == 3){
+        } else if (number == 3) {
             backgroundTexture = new Texture("ui/background/background_3.jpg");
-        }
-        else if(number == 4){
+        } else if (number == 4) {
             backgroundTexture = new Texture("ui/background/background_4.jpg");
         }
 
@@ -82,8 +78,6 @@ public abstract class Screens extends Constants {
                 stage.addActor(fps);
 
             } else {
-
-                System.out.println(fps.getStage());
                 fps.setText("fps: " + Gdx.graphics.getFramesPerSecond());
             }
 
@@ -95,8 +89,9 @@ public abstract class Screens extends Constants {
     }
 
     /**
-    Creates an backButton and adds an InputListener to it. If Button pressed Game will return to MenuScreen.
-    @author Robin Hefner
+     * Creates an backButton and adds an InputListener to it. If Button pressed Game will return to MenuScreen.
+     *
+     * @author Robin Hefner
      */
 
     protected void backButton(Stage stage, Skin skin, LOW game, Window window) {
@@ -123,8 +118,9 @@ public abstract class Screens extends Constants {
     }
 
     /**
-    Packs the passed Window and sets its position.
-    @author Robin Hefner
+     * Packs the passed Window and sets its position.
+     *
+     * @author Robin Hefner
      */
     protected void packAndSetWindow(Window window, Stage stage) {
         window.pack();

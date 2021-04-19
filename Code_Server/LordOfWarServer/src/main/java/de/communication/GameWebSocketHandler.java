@@ -193,6 +193,7 @@ public class GameWebSocketHandler {
                 dataList.add("true");
                 dataList.add(data[2]);
                 sessions.get(data[1]).getAsyncRemote().sendObject(DataPacker.packData(CREATE_LOBBY, DataPacker.stringCombiner(dataList)));
+                return;
             }
         }
         sessions.get(data[1]).getAsyncRemote().sendObject(DataPacker.packData(CREATE_LOBBY, "false"));
