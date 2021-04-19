@@ -13,8 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 
-import java.util.concurrent.TimeUnit;
-
 public class LobbyScreen extends Screens implements Screen {
 
 
@@ -48,7 +46,7 @@ public class LobbyScreen extends Screens implements Screen {
         if (lobbyScreenEvent.isStartedGame()) {
             String[] gameData = lobbyScreenEvent.getGameData();
             //[1]=lobbyname[2]=gamemode[3]=map
-            game.setScreen(new GameScreen(game, skin, gameData[0],Integer.parseInt(gameData[gameData.length-1])));//todo insert data here via lobbyScreenEvent.getData
+            game.setScreen(new GameScreen(game, skin, gameData[0], Integer.parseInt(gameData[gameData.length - 1])));//todo insert data here via lobbyScreenEvent.getData
         }
 
         if (!lobbyScreenEvent.isRecievedData()) {//later data requests (map etc) also go here

@@ -11,12 +11,12 @@ public class Constants {
 
     //GAME STATICS
     //TODO FILL THESE ARRAYS with actual coords
-    private static final float[] MAP1CC1=new float[]{};//insert coords here
-    private static final float[] MAP1CC2=new float[]{};//insert coords here
-    private static final float[] MAP1CC3=new float[]{};//insert coords here
-    private static final float[] MAP1CC4=new float[]{};//insert coords here
-    private static final float[] MAP1CC5=new float[]{};//insert coords here
-    private static final float[] MAP1CC6=new float[]{};//insert coords here
+    public static final float[] MAP1CC1=new float[]{400,300};//insert coords here
+    public static final float[] MAP1CC2=new float[]{};//insert coords here
+    public static final float[] MAP1CC3=new float[]{};//insert coords here
+    public static final float[] MAP1CC4=new float[]{};//insert coords here
+    public static final float[] MAP1CC5=new float[]{};//insert coords here
+    public static final float[] MAP1CC6=new float[]{};//insert coords here
 
     public Boolean WEBSOCKET_OPEN;
     public Boolean FPS;
