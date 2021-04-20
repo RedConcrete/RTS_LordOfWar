@@ -85,11 +85,18 @@ public class MenuScreen extends Screens implements Screen {
         Window windowMenu = new Window("", skin, "border");
         windowMenu.setMovable(false);
         windowMenu.defaults().pad(20f);
+        TextButton noButton = new TextButton("No", skin);
+        noButton.getLabel().setFontScale(2f);
 
         Window windowExit = new Window("Exit?", skin, "border");
         windowExit.setMovable(false);
         windowExit.defaults().pad(20f);
 
+        TextButton yesButton = new TextButton("Yes", skin);
+        yesButton.getLabel().setFontScale(2f);
+
+        Label exitLabel = new Label("Do you realy want to Exit?", skin);
+        exitLabel.setFontScale(3f);
 
         lobbyJoinButton.addListener(new InputListener() {
             @Override
@@ -133,17 +140,9 @@ public class MenuScreen extends Screens implements Screen {
         exitButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-
+                stage.addActor(windowExit);
                 windowMenu.setVisible(false);
                 windowExit.setVisible(true);
-
-
-                Label exitLabel = new Label("Do you realy want to Exit?", skin);
-                exitLabel.setFontScale(3f);
-
-
-                TextButton yesButton = new TextButton("Yes", skin);
-                yesButton.getLabel().setFontScale(2f);
 
                 yesButton.addListener(new InputListener() {
                     @Override
@@ -156,11 +155,6 @@ public class MenuScreen extends Screens implements Screen {
                         return true;
                     }
                 });
-
-
-                TextButton noButton = new TextButton("No", skin);
-                noButton.getLabel().setFontScale(2f);
-
                 noButton.addListener(new InputListener() {
                     @Override
                     public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
@@ -173,15 +167,6 @@ public class MenuScreen extends Screens implements Screen {
                         return true;
                     }
                 });
-
-                windowExit.add(exitLabel).colspan(2).row();
-                windowExit.add(yesButton);
-                windowExit.add(noButton);
-                windowExit.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
-                windowExit.pack();
-
-                stage.addActor(windowExit);
-
             }
 
             @Override
@@ -189,6 +174,13 @@ public class MenuScreen extends Screens implements Screen {
                 return true;
             }
         });
+
+        windowExit.add(exitLabel).colspan(2).row();
+        windowExit.add(yesButton);
+        windowExit.add(noButton);
+        windowExit.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
+        windowExit.pack();
+
 
 
         windowMenu.add(lobbyCreateButton).row();

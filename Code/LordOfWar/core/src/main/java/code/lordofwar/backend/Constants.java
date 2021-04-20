@@ -21,11 +21,12 @@ public class Constants {
     public Boolean WEBSOCKET_OPEN;
     public Boolean FPS;
     public Boolean MUSIC;
-
+    public int STANDARD_TIME_WAIT;
     public Constants(){
         WEBSOCKET_OPEN = false;
         FPS = false;
         MUSIC = true;
+        STANDARD_TIME_WAIT=2000;
     }
 
     public Boolean getMUSIC() {

@@ -14,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 public class LoginScreen extends Screens implements Screen {
 
@@ -59,7 +58,7 @@ public class LoginScreen extends Screens implements Screen {
             img2.setColor(Color.RED);
         }
 
-        if (Rumble.getRumbleTimeLeft() > 0){
+        if (Rumble.getRumbleTimeLeft() > 0) {
             Rumble.tick(Gdx.graphics.getDeltaTime());
             stage.getCamera().translate(Rumble.getPos());
         }
@@ -96,7 +95,6 @@ public class LoginScreen extends Screens implements Screen {
     private void setupUI() {
 
 
-
         Label name = new Label("Username", skin);
         name.setAlignment(Align.center);
         name.setFontScale(4f);
@@ -128,55 +126,67 @@ public class LoginScreen extends Screens implements Screen {
         Window errorWindow = new Window("", skin, "border");
         errorWindow.setMovable(false);
         errorWindow.defaults().pad(20f);
-        Label errorLabel = new Label("Failed to login. Try again",skin);
-        TextButton okButton = new TextButton("OK",skin);
+        Label errorLabel = new Label("Failed to login. Try again", skin);
+        TextButton okButton = new TextButton("OK", skin);
         errorWindow.add(errorLabel).row();
         errorWindow.add(okButton).row();
         errorWindow.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
         loginButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                ArrayList<String> loginArray= new ArrayList<>();
+                ArrayList<String> loginArray = new ArrayList<>();
                 loginArray.add(game.getSessionID());
                 loginArray.add(usernameTextField.getText());
                 loginArray.add(passwordTextField.getText());
 
                 loginScreenEvent.sendUserData(loginArray);
 
-                try {
-                    TimeUnit.SECONDS.sleep(2); // todo schauen ob delay immer ausreicht!
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(game.getCon().STANDARD_TIME_WAIT);//2 sec
 
-                if (loginScreenEvent.isLoginAnswer()) {
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    Gdx.app.postRunnable(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (loginScreenEvent.isLoginAnswer()) {
 
-                    game.setScreen(new MenuScreen(game, skin));
-                    stage.dispose();
+                                        game.setScreen(new MenuScreen(game, skin));
+                                        stage.dispose();
 
-                } else {
-                    Rumble.rumble(1f, .2f);
+                                    } else {
+                                        Rumble.rumble(1f, .2f);
 
-                    errorWindow.setVisible(true);
-                    windowLogin.setVisible(false);
-                    errorLabel.setFontScale(3f);
+                                        errorWindow.setVisible(true);
+                                        windowLogin.setVisible(false);
+                                        errorLabel.setFontScale(3f);
 
 
-                    okButton.addListener(new InputListener(){
+                                        okButton.addListener(new InputListener() {
 
-                        @Override
-                        public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                            errorWindow.setVisible(false);
-                            windowLogin.setVisible(true);
-                        }
-                        @Override
-                        public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                            return true;
-                        }
-                    });
-                    errorWindow.pack();
-                    stage.addActor(errorWindow);
-                }
+                                            @Override
+                                            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                                                errorWindow.setVisible(false);
+                                                windowLogin.setVisible(true);
+                                            }
+
+                                            @Override
+                                            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                                                return true;
+                                            }
+                                        });
+                                        errorWindow.pack();
+                                        stage.addActor(errorWindow);
+                                    }
+                                }
+                            }
+                    );
+
+                }).start();
+
             }
 
             @Override
