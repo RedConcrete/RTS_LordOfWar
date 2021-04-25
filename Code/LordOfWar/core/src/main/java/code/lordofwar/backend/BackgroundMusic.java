@@ -80,13 +80,28 @@ public class BackgroundMusic {
      *
      * @param volume the given volume in percent
      */
-    public synchronized void setVolume(float volume) {
+    public synchronized void setVolume(int volume) {
         //6.0206 -80.0 were the values on my pc TODO Check the sout on others pc
-        if (currentClip != null) {
-            float range=Math.abs(((FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN)).getMinimum()-((FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN)).getMaximum());
-            ((FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN)).setValue(((FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN)).getMinimum()+((range/100)*volume));//might have to change type to MASTER_GAIN if exception is thrown
+        //Volume is basically 0 at 50% maybe find way to
+        if (currentClip != null&&constants.MUSIC) {
+            constants.musicVolume = volume;
+            float range = Math.abs(((FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN)).getMinimum() - ((FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN)).getMaximum());
+            ((FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN)).setValue(((range / 100) * volume) + ((FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN)).getMinimum());
         }
     }
+
+    public synchronized void mute() {
+        if (currentClip != null) {
+            ((FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN)).setValue(((FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN)).getMinimum());
+        }
+    }
+
+    public synchronized void unmute() {
+        if (currentClip != null) {
+            setVolume(constants.musicVolume);
+        }
+    }
+
 
     //might delete later TODO
 //    /**

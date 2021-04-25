@@ -89,7 +89,7 @@ public class LOW extends Game {
 		gameWebSocketListener.setWebSocket(webSocket);
 	}
 
-	public Constants getCon() {
+	public Constants getConstants() {
 		return con;
 	}
 
