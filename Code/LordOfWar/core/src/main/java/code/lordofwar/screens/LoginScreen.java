@@ -153,7 +153,6 @@ public class LoginScreen extends Screens implements Screen {
                                 @Override
                                 public void run() {
                                     if (loginScreenEvent.isLoginAnswer()) {
-
                                         game.setScreen(new MenuScreen(game, skin));
                                         stage.dispose();
 

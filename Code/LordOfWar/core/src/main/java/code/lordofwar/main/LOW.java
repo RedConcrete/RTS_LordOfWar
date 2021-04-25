@@ -32,11 +32,12 @@ public class LOW extends Game {
 	private Skin skin;
 	private WebSocket webSocket;
 	private Constants con;
-
+	private BackgroundMusic player;
 	private String sessionID;
 
 	public LOW() {
 		con = new Constants();
+		player=new BackgroundMusic(con);
 		buildWebSocketConnection();
 	}
 
@@ -53,7 +54,7 @@ public class LOW extends Game {
 
 		this.setScreen(new LoginScreen(this, skin));
 
-		//BackgroundMusic.music("assets/music/ireland.wav");
+		player.music("Ireland_2.wav");
 		new Sounds();
 
 	}
@@ -106,5 +107,9 @@ public class LOW extends Game {
 
 	public void setSessionID(String sessionID) {
 		this.sessionID = sessionID;
+	}
+
+	public BackgroundMusic getPlayer() {
+		return player;
 	}
 }
