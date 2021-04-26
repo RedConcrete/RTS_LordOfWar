@@ -13,26 +13,23 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class GameScreen extends Screens implements Screen {
 
@@ -333,6 +330,7 @@ public class GameScreen extends Screens implements Screen {
         stage.dispose();
         map.dispose();
         renderer.dispose();
+
     }
 
     private void setupUI() {
@@ -442,37 +440,10 @@ public class GameScreen extends Screens implements Screen {
 
                 yesButton.getLabel().setFontScale(2f);
 
-                yesButton.addListener(new InputListener() {
-                    @Override
-                    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                        GameScreen.this.getGameScreenEvent().sendLeaveGameNotice();
-                        stage.dispose(); //already disposed wenn einmal abgelehnt ??
-                        game.setScreen(new MenuScreen(game, skin));
-                        stage.dispose();
-                    }
-
-                    @Override
-                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-
-                        return true;
-                    }
-                });
 
                 noButton.getLabel().setFontScale(2f);
 
-                noButton.addListener(new InputListener() {
-                    @Override
-                    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                        windowExit.setVisible(false);
-                    }
 
-                    @Override
-                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                        return true;
-                    }
-                });
-                windowExit.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
-                windowExit.pack();
                 stage.addActor(windowExit);
             }
 
@@ -481,10 +452,37 @@ public class GameScreen extends Screens implements Screen {
                 return true;
             }
         });
+        yesButton.addListener(new InputListener() {
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                GameScreen.this.getGameScreenEvent().sendLeaveGameNotice();
+                game.setScreen(new MenuScreen(game, skin));
+                dispose();
+            }
 
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+
+                return true;
+            }
+        });
+
+        noButton.addListener(new InputListener() {
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                windowExit.setVisible(false);
+            }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+        });
         windowExit.add(exitLabel).colspan(2).row();
         windowExit.add(yesButton);
         windowExit.add(noButton);
+        windowExit.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
+        windowExit.pack();
 
         resourceBarWindow.add(scoreTextLabel).padTop(30f).padBottom(10f).padLeft(10f).padRight(10f);
         resourceBarWindow.add(scoreLabel).padTop(30f).padBottom(10f).padRight(10f);
@@ -708,7 +706,13 @@ public class GameScreen extends Screens implements Screen {
         camera.unproject(mousePos);
 
         int x = (int) mousePos.x, y = (int) mousePos.y;
-        Pathfinding p = new Pathfinding(x, y, (int) v.getX() + 32, (int) v.getY() + 32, collisionUnitLayer);
+        PathCell p = new Pathfinding(x, y, (int) v.getX() + 32, (int) v.getY() + 32, collisionUnitLayer).algorithm();
+        LinkedList<PathCell> cellList = new LinkedList<>();
+        while (p != null) {
+            cellList.add(p);
+            p = p.parent;
+        }
+        //end=start
 
     }
 }

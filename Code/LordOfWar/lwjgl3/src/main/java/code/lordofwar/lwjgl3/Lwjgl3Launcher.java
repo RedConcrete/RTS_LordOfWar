@@ -11,9 +11,6 @@ import static code.lordofwar.backend.Constants.WORLD_WIDTH_PIXEL;
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
 
-
-
-
 	public static void main(String[] args) {
 		createApplication();
 	}
