@@ -9,14 +9,24 @@ public class Constants {
     public static final float CAMERASPEED = 500f;
     public static final String STRINGSEPERATOR = "///";
 
+    //GAME STATICS
+    //TODO FILL THESE ARRAYS with actual coords
+    public static final float[] MAP1CC1=new float[]{400,300};//insert coords here
+    public static final float[] MAP1CC2=new float[]{};//insert coords here
+    public static final float[] MAP1CC3=new float[]{};//insert coords here
+    public static final float[] MAP1CC4=new float[]{};//insert coords here
+    public static final float[] MAP1CC5=new float[]{};//insert coords here
+    public static final float[] MAP1CC6=new float[]{};//insert coords here
+
     public Boolean WEBSOCKET_OPEN;
     public Boolean FPS;
     public Boolean MUSIC;
-
+    public int STANDARD_TIME_WAIT;
     public Constants(){
         WEBSOCKET_OPEN = false;
         FPS = false;
         MUSIC = true;
+        STANDARD_TIME_WAIT=2000;
     }
 
     public Boolean getMUSIC() {

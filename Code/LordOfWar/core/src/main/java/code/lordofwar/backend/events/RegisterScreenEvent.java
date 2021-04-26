@@ -8,15 +8,12 @@ import java.util.ArrayList;
 
 import static code.lordofwar.backend.MessageIdentifier.REGISTER;
 
-public class RegisterScreenEvent {
-    WebSocket webSocket;
-    LOW game;
+public class RegisterScreenEvent extends Events{
 
     boolean registerAnswer;
 
     public RegisterScreenEvent(LOW aGame) {
-        game = aGame;
-        webSocket = aGame.getWebSocket();
+        super(aGame);
 
     }
 

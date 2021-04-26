@@ -9,12 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-
-
-import java.util.concurrent.TimeUnit;
 
 public class LobbyCreateScreen extends Screens implements Screen {
 
@@ -22,7 +17,7 @@ public class LobbyCreateScreen extends Screens implements Screen {
     private final LobbyCreateScreenEvent lobbyCreateScreenEvent;
 
     public LobbyCreateScreen(LOW aGame, Skin aSkin) {
-       super(aGame,aSkin);
+        super(aGame, aSkin);
 
         lobbyCreateScreenEvent = new LobbyCreateScreenEvent(game);
 
@@ -84,7 +79,6 @@ public class LobbyCreateScreen extends Screens implements Screen {
         windowLobbyCreate.setMovable(false);
 
 
-
         TextButton lobbyCreateButton = new TextButton("Create Lobby", skin);
         lobbyCreateButton.getLabel().setFontScale(3f);
 
@@ -103,9 +97,8 @@ public class LobbyCreateScreen extends Screens implements Screen {
         mapLabel.setFontScale(2f);
 
 
-
         SelectBox<Integer> playerAmountSelectBox = new SelectBox(skin);
-        playerAmountSelectBox.setItems(2,4,6);
+        playerAmountSelectBox.setItems(2, 4, 6);
 
         SelectBox<String> gameModeSelectBox = new SelectBox(skin);
         gameModeSelectBox.setItems(" Normal ", " Expert ");
@@ -125,26 +118,37 @@ public class LobbyCreateScreen extends Screens implements Screen {
 
                     Rumble.rumble(1f, .2f);
 
-                    printErrorWindow(windowLobbyCreate,"Lobbys has no Name");
+                    printErrorWindow(windowLobbyCreate, "Lobbys has no Name");
+
 
                 } else {
                     Lobby lobby = new Lobby(lobbyName.getText(), mapSelctBox.getSelected(), playerAmountSelectBox.getSelected(), gameModeSelectBox.getSelected());
                     lobbyCreateScreenEvent.sendLobbyCreateRequest(lobby);
-                    try {
-                        TimeUnit.SECONDS.sleep(2); // todo schauen ob delay immer ausreicht!
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
 
-                    if (lobbyCreateScreenEvent.isCreated()) {
-                        game.setScreen(new LobbyScreen(game, skin, lobbyCreateScreenEvent.getLobbyID()));
+                    new Thread(() -> {
+                        try {
+                            Thread.sleep(game.getCon().STANDARD_TIME_WAIT);//2 sec
 
-                    } else {
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        Gdx.app.postRunnable(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (lobbyCreateScreenEvent.isCreated()) {
+                                            game.setScreen(new LobbyScreen(game, skin, lobbyCreateScreenEvent.getLobbyID()));
 
-                        Rumble.rumble(1f, .2f);
+                                        } else {
 
-                        printErrorWindow(windowLobbyCreate,"Can´t create Lobby");
-                    }
+                                            Rumble.rumble(1f, .2f);
+
+                                            printErrorWindow(windowLobbyCreate, "Can´t create Lobby");
+                                        }
+                                    }
+                                });
+                    }).start();
+
                 }
 
 
@@ -177,27 +181,28 @@ public class LobbyCreateScreen extends Screens implements Screen {
         stage.setDebugAll(false);
     }
 
-    private void printErrorWindow(Window windowLobbyCreate, String text){
+    private void printErrorWindow(Window windowLobbyCreate, String text) {
 
         Window errorWindow = new Window("", skin, "border");
         errorWindow.setMovable(false);
         errorWindow.defaults().pad(20f);
 
-        TextButton okButton = new TextButton("OK",skin);
+        TextButton okButton = new TextButton("OK", skin);
 
         errorWindow.setVisible(true);
         windowLobbyCreate.setVisible(false);
 
-        Label errorLabel = new Label(text,skin);
+        Label errorLabel = new Label(text, skin);
         errorLabel.setFontScale(3f);
 
-        okButton.addListener(new InputListener(){
+        okButton.addListener(new InputListener() {
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 errorWindow.setVisible(false);
                 windowLobbyCreate.setVisible(true);
             }
+
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;

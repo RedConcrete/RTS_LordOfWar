@@ -13,17 +13,14 @@ import static code.lordofwar.backend.MessageIdentifier.LOGIN;
         @author Robin Hefner
      */
 
-public class LoginScreenEvent {
+public class LoginScreenEvent extends Events{
 
-    WebSocket webSocket;
-    LOW game;
 
     boolean loginAnswer;
 
 
     public LoginScreenEvent(LOW aGame) {
-        this.game = aGame;
-        webSocket = aGame.getWebSocket();
+        super(aGame);
     }
 
 

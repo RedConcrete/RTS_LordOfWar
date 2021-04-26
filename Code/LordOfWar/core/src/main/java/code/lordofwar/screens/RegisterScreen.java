@@ -11,12 +11,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 
 /**
-The class Register Screen allows the User to create a Account, that he can use the Login the next time.
-@author Robin Hefner
+ * The class Register Screen allows the User to create a Account, that he can use the Login the next time.
+ *
+ * @author Robin Hefner
  */
 public class RegisterScreen extends Screens implements Screen {
 
@@ -54,8 +54,8 @@ public class RegisterScreen extends Screens implements Screen {
         errorWindow.setMovable(false);
         errorWindow.defaults().pad(20f);
 
-        Label errorLabel = new Label("Failed to register. Try again",skin);
-        TextButton okButton = new TextButton("OK",skin);
+        Label errorLabel = new Label("Failed to register. Try again", skin);
+        TextButton okButton = new TextButton("OK", skin);
         errorWindow.add(errorLabel).row();
         errorWindow.add(okButton).row();
         errorWindow.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
@@ -78,46 +78,52 @@ public class RegisterScreen extends Screens implements Screen {
 
                 registerScreenEvent.sendUserData(registerArray);
 
-                try {
-                    TimeUnit.SECONDS.sleep(2); // todo schauen ob delay immer ausreicht!
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(game.getCon().STANDARD_TIME_WAIT);//2 sec
 
-                if (registerScreenEvent.isRegisterAnswer()) {
-                    //TODO FEEDBACK GEBEN
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    Gdx.app.postRunnable(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (registerScreenEvent.isRegisterAnswer()) {
+                                        //TODO FEEDBACK GEBEN
+                                        game.setScreen(new LoginScreen(game, skin));//CHANGED TO loginscreen
+                                        stage.dispose();
+                                    } else {
+                                        errorWindow.setVisible(true);
+                                        registerWindow.setVisible(false);
 
-                    game.setScreen(new LoginScreen(game, skin));//CHANGED TO loginscreen
-
-                    stage.dispose();
-
-                } else {
-
-
-                    errorWindow.setVisible(true);
-                    registerWindow.setVisible(false);
-
-                    errorLabel.setFontScale(3f);
-
-
-                    okButton.addListener(new InputListener(){
-
-                        @Override
-                        public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                            errorWindow.setVisible(false);
-                            registerWindow.setVisible(true);
-                        }
-                        @Override
-                        public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                            return true;
-                        }
-                    });
+                                        errorLabel.setFontScale(3f);
 
 
-                    errorWindow.pack();
+                                        okButton.addListener(new InputListener() {
 
-                    stage.addActor(errorWindow);
-                }
+                                            @Override
+                                            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                                                errorWindow.setVisible(false);
+                                                registerWindow.setVisible(true);
+                                            }
+
+                                            @Override
+                                            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                                                return true;
+                                            }
+                                        });
+
+
+                                        errorWindow.pack();
+
+                                        stage.addActor(errorWindow);
+                                    }
+                                }
+                            });
+                }).start();
+
+
             }
 
             @Override
