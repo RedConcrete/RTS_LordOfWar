@@ -1,10 +1,6 @@
 package code.lordofwar.screens;
 
-import code.lordofwar.backend.Castle;
-import code.lordofwar.backend.Pathfinding;
-import code.lordofwar.backend.Constants;
-import code.lordofwar.backend.Soldier;
-import code.lordofwar.backend.Villager;
+import code.lordofwar.backend.*;
 import code.lordofwar.backend.events.GameScreenEvent;
 import code.lordofwar.main.LOW;
 import com.badlogic.gdx.Gdx;
@@ -29,6 +25,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 
 public class GameScreen extends Screens implements Screen {
@@ -43,6 +40,8 @@ public class GameScreen extends Screens implements Screen {
     private final boolean cameraDebug;
     private final boolean mapDebug;
 
+    private boolean knowTheWay = false;
+    private LinkedList<PathCell> theKnowenWay;
     private Vector3 posCameraDesired;
     private final TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
@@ -129,8 +128,8 @@ public class GameScreen extends Screens implements Screen {
         myCastle = new Castle();
         camera = new OrthographicCamera();
         //TODO why doesnt this work
-        posCameraDesired.x=castlePosition[0];
-        posCameraDesired.y=castlePosition[1];
+        posCameraDesired.x = castlePosition[0];
+        posCameraDesired.y = castlePosition[1];
         collisionUnitLayer = (TiledMapTileLayer) map.getLayers().get(1);
 
         setupUI();
@@ -183,7 +182,6 @@ public class GameScreen extends Screens implements Screen {
             Villager villager = new Villager(villiagerSprite, collisionUnitLayer);
             villagerArrayList.add(villager);
             villager.setPosition(villager.getCollisionLayer().getTileWidth(), i * villager.getCollisionLayer().getTileHeight());
-            vectorSpeed.x = 100;
             villager.setVelocity(new Vector2(vectorSpeed));
         }
 
@@ -218,6 +216,32 @@ public class GameScreen extends Screens implements Screen {
         for (Villager v : villagerArrayList) {
             v.draw(renderer.getBatch());
 
+            if (v.getDestination() != null) {
+                if (v.getDestination().isEmpty()) {
+                    v.setDestination(null);
+                } else {
+                    int vX = (int) (v.getX() / 64);
+                    int vY = (int) (v.getY() / 64);
+
+                    if (vX != v.getDestination().get(0).coords.x || vY != v.getDestination().get(0).coords.y) {
+                        v.translateX(v.getDestination().get(0).coords.x - vX);
+                        v.translateY(v.getDestination().get(0).coords.y - vY);
+
+                    } else {
+                        if (v.getDestination().get(0).coords.x == theKnowenWay.get(theKnowenWay.size() - 1).coords.x &&
+                                v.getDestination().get(0).coords.y == theKnowenWay.get(theKnowenWay.size() - 1).coords.y) {
+                            v.translateX(v.getDestination().get(0).coords.x - vX);
+                            v.translateY(v.getDestination().get(0).coords.y - vY);
+                        }
+
+                        if (v.getDestination().size() >= 1) {
+                            v.getDestination().remove(0);
+                        }
+                    }
+
+                }
+            }
+
             if (v.isSelected()) {
 
                 //todo braucht seine eigene forEach !!
@@ -242,6 +266,7 @@ public class GameScreen extends Screens implements Screen {
 
             }
         }
+
 
         if (rectangleStart != null && rectangleEnd != null) {
             //calc Rectangle
@@ -283,18 +308,22 @@ public class GameScreen extends Screens implements Screen {
                 Sprite lineH = new Sprite(uiAtlas.findRegion("line-h"));
                 Sprite lineV = new Sprite(uiAtlas.findRegion("line-v"));
                 lineV.setColor(Color.GREEN);
-                lineV.setSize(collisionUnitLayer.getHeight() * 64, 1);
+                lineV.setSize(collisionUnitLayer.getHeight() * 63, 1);
                 lineV.setPosition(0, (i * 66) + (-1 * i));
                 lineV.draw(renderer.getBatch());
                 lineH.setColor(Color.GREEN);
-                lineH.setSize(1, collisionUnitLayer.getHeight() * 64);
+                lineH.setSize(1, collisionUnitLayer.getHeight() * 63);
                 lineH.setPosition((i * 66) + (-1 * i), 0);
                 lineH.draw(renderer.getBatch());
             }
         }
 
-        renderer.getBatch().end();
+
+        renderer.getBatch().
+
+                end();
         debugRenderer.end();
+
         mouseOnEdgeofCamera();
 
         stage.act();
@@ -684,7 +713,6 @@ public class GameScreen extends Screens implements Screen {
         }
     }
 
-
     //[0]=x[1]=y
     private float[] translateXYCoordinatesFromScreen(float x, float y) {
         Vector3 mousePos = new Vector3(x, y, 0);
@@ -708,12 +736,19 @@ public class GameScreen extends Screens implements Screen {
         int x = (int) mousePos.x, y = (int) mousePos.y;
         PathCell p = new Pathfinding(x, y, (int) v.getX() + 32, (int) v.getY() + 32, collisionUnitLayer).algorithm();
         LinkedList<PathCell> cellList = new LinkedList<>();
+
         while (p != null) {
             cellList.add(p);
             p = p.parent;
         }
+
+        Collections.reverse(cellList);
+        v.setDestination(cellList);
+        theKnowenWay = cellList;
+
         //end=start
 
     }
+
 }
 

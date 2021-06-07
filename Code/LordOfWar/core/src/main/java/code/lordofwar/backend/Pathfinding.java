@@ -57,6 +57,7 @@ public class Pathfinding {
      */
     public PathCell algorithm() {
 
+        //todo wenn man auf x:0 und y:0 drückt crashed es hier!!!
         PathCell current = new PathCell(cache, new int[]{getCellDistancesToEnd(cache.x, cache.y), 0, getCellDistancesToEnd(cache.x, cache.y)}, null);
         HashMap<Vector2, PathCell> closed = new HashMap<>();
         HashMap<Vector2, PathCell> open = new HashMap<>();

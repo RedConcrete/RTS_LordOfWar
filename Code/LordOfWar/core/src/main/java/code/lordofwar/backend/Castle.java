@@ -9,7 +9,7 @@ public class Castle {
         villager = 0;
         increaseVilligerPerMinute();
     }
-
+    //todo Burg als Sprite erzeugen lassen
 
     private void increaseVilligerPerMinute() {
         new Thread(() -> {

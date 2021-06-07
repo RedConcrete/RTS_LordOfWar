@@ -93,7 +93,6 @@ public class LoginScreen extends Screens implements Screen {
 
     private void setupUI() {
 
-
         Label name = new Label("Username", skin);
         name.setAlignment(Align.center);
         name.setFontScale(4f);
