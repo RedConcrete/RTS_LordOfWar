@@ -127,7 +127,7 @@ public class LobbyCreateScreen extends Screens implements Screen {
 
                     new Thread(() -> {
                         try {
-                            Thread.sleep(game.getCon().STANDARD_TIME_WAIT);//2 sec
+                            Thread.sleep(game.getConstants().STANDARD_TIME_WAIT);//2 sec
 
                         } catch (InterruptedException e) {
                             e.printStackTrace();

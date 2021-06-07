@@ -49,7 +49,7 @@ public class LoginScreen extends Screens implements Screen {
 
         clearStage();
 
-        if (game.getCon().getWEBSOCKET_OPEN()) {
+        if (game.getConstants().getWEBSOCKET_OPEN()) {
             img.setColor(Color.GREEN);
             img2.setColor(Color.GREEN);
         } else {
@@ -141,7 +141,7 @@ public class LoginScreen extends Screens implements Screen {
 
                 new Thread(() -> {
                     try {
-                        Thread.sleep(game.getCon().STANDARD_TIME_WAIT);//2 sec
+                        Thread.sleep(game.getConstants().STANDARD_TIME_WAIT);//2 sec
 
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -151,7 +151,6 @@ public class LoginScreen extends Screens implements Screen {
                                 @Override
                                 public void run() {
                                     if (loginScreenEvent.isLoginAnswer()) {
-
                                         game.setScreen(new MenuScreen(game, skin));
                                         stage.dispose();
 

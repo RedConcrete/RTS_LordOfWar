@@ -106,7 +106,7 @@ public class GameWebSocketListener extends WebSocketListener {
     @Override
     public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
 
-        game.getCon().setWEBSOCKET_OPEN(true);
+        game.getConstants().setWEBSOCKET_OPEN(true);
 
     }
 

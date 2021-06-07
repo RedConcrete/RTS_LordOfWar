@@ -22,11 +22,13 @@ public class Constants {
     public Boolean FPS;
     public Boolean MUSIC;
     public int STANDARD_TIME_WAIT;
+    public int musicVolume;//volume of the music(percentage ->0=mute 100=full)
     public Constants(){
         WEBSOCKET_OPEN = false;
         FPS = false;
         MUSIC = true;
         STANDARD_TIME_WAIT=2000;
+        musicVolume=100;
     }
 
     public Boolean getMUSIC() {
