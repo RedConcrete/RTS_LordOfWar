@@ -68,7 +68,7 @@ public abstract class Screens extends Constants {
     }
 
     protected void fps(Stage stage, Skin skin) {
-        if (game.getCon().getFPS()) {
+        if (game.getConstants().getFPS()) {
 
             if (fps == null) {
                 fps = new Label("fps: " + Gdx.graphics.getFramesPerSecond(), skin);
