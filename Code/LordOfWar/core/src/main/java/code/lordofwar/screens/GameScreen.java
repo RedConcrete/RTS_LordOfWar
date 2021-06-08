@@ -47,15 +47,17 @@ public class GameScreen extends Screens implements Screen {
     private OrthogonalTiledMapRenderer renderer;
     private Soldier soldier;
     private final ArrayList<Villager> villagerArrayList;
+    private final ArrayList<Castle> castleArrayList;
     private final ArrayList<Soldier> soldierArrayList;
     private ArrayList<Object> entityArrayList;
     private final Sprite villiagerSprite;
-    private Castle myCastle;
-    private Image castleImage;
+    private Sprite castleImage;
     private Label entityName;
     private TextureAtlas uiAtlas = new TextureAtlas(Gdx.files.internal("ui/skin/uiskin.atlas"));
     private TextureAtlas unitAtlas = new TextureAtlas(Gdx.files.internal("maps/RTS_UNITS_TILES.txt"));
+    private TextureAtlas mapAtlas = new TextureAtlas(Gdx.files.internal("maps/RTSSimple.txt"));
     private boolean isLeftPressed;
+    Castle myCastle;
     private boolean isRightPressed;
     private Label villagerLabel;
 
@@ -65,6 +67,7 @@ public class GameScreen extends Screens implements Screen {
     private final GameScreenEvent gameScreenEvent;
 
     private final int startingVillager = 5;
+    private final int startingCastle = 1;
     private int goldAmount = 100;
     private float pointTimerCounter;
     private Point2D.Float rectangleStart;//used to check where the select rectangle was started
@@ -78,8 +81,7 @@ public class GameScreen extends Screens implements Screen {
         isLeftPressed = false;
         isRightPressed = false;
         entityName = new Label("", skin);
-        castleImage = new Image(new Sprite(new Texture("maps/RTS_CASTEL_TILES.png")));
-        castleImage.setVisible(false);
+        castleImage = new Sprite(mapAtlas.findRegion("Castle"));
         pointTimerCounter = 10;
         gameScreenEvent = new GameScreenEvent(game, lobbyID);
         posCameraDesired = new Vector3();
@@ -88,6 +90,7 @@ public class GameScreen extends Screens implements Screen {
         posCameraDesired = new Vector3();
         villagerArrayList = new ArrayList<>();
         soldierArrayList = new ArrayList<>();
+        castleArrayList = new ArrayList<>();
 
         villagerLabel = new Label("", skin);
         rectangleRenderer = new ShapeRenderer();
@@ -95,9 +98,7 @@ public class GameScreen extends Screens implements Screen {
         rectangleEnd = null;
         rectangleBounds = new float[4];//0=originX1=originY2=width3=height
         villiagerSprite = new Sprite(unitAtlas.findRegion("Character_Green_B"));
-
         loader = new TmxMapLoader();
-
 
         String mapPath = "maps/map_1.tmx";
         map = loader.load(mapPath);
@@ -125,17 +126,15 @@ public class GameScreen extends Screens implements Screen {
             default:
                 throw new IllegalStateException("Unexpected value: " + startingPosition);//max of 6 players; thus error
         }
-        myCastle = new Castle();
         camera = new OrthographicCamera();
         //TODO why doesnt this work
         posCameraDesired.x = castlePosition[0];
         posCameraDesired.y = castlePosition[1];
         collisionUnitLayer = (TiledMapTileLayer) map.getLayers().get(1);
-
+        myCastle = new Castle(castleImage, collisionUnitLayer);
         setupUI();
 
     }
-
 
     @Override
     public void show() {
@@ -178,13 +177,18 @@ public class GameScreen extends Screens implements Screen {
         );
         renderer = new OrthogonalTiledMapRenderer(map);
 
+        for (int i = 0; i < startingCastle; i++) {
+            Castle c = new Castle(castleImage, collisionUnitLayer);
+            castleArrayList.add(c);
+            c.setPosition(Constants.MAP1CC1[0], Constants.MAP1CC1[1]);
+        }
+
         for (int i = 0; i < startingVillager; i++) {
             Villager villager = new Villager(villiagerSprite, collisionUnitLayer);
             villagerArrayList.add(villager);
             villager.setPosition(villager.getCollisionLayer().getTileWidth(), i * villager.getCollisionLayer().getTileHeight());
             villager.setVelocity(new Vector2(vectorSpeed));
         }
-
     }
 
     @Override
@@ -211,8 +215,16 @@ public class GameScreen extends Screens implements Screen {
         }
 
         scoreLabel.setText(gameScreenEvent.getPoints());
+
         villagerLabel.setText(myCastle.getVillager());
 
+        for (Castle c : castleArrayList) {
+            c.draw(renderer.getBatch());
+
+
+        }
+
+        // TODO villager zu Soldier machen!!!!!!!!!!!!
         for (Villager v : villagerArrayList) {
             v.draw(renderer.getBatch());
 
@@ -222,17 +234,27 @@ public class GameScreen extends Screens implements Screen {
                 } else {
                     int vX = (int) (v.getX() / 64);
                     int vY = (int) (v.getY() / 64);
+                    System.out.println(vX + " | " + vY + " | " + v.getDestination().get(0).coords.x + " | " + v.getDestination().get(0).coords.y);
 
+//                    if(v.getDestination().size() == 1){
+//                        if(vX > v.getDestination().get(0).coords.x ){
+//                            v.getDestination().get(0).coords.x -= 1;
+//                        }else if(vY > v.getDestination().get(0).coords.y){
+//                            v.getDestination().get(0).coords.y -= 1;
+//                        }
+//                    }
                     if (vX != v.getDestination().get(0).coords.x || vY != v.getDestination().get(0).coords.y) {
+
                         v.translateX(v.getDestination().get(0).coords.x - vX);
                         v.translateY(v.getDestination().get(0).coords.y - vY);
 
+
                     } else {
-                        if (v.getDestination().get(0).coords.x == theKnowenWay.get(theKnowenWay.size() - 1).coords.x &&
-                                v.getDestination().get(0).coords.y == theKnowenWay.get(theKnowenWay.size() - 1).coords.y) {
-                            v.translateX(v.getDestination().get(0).coords.x - vX);
-                            v.translateY(v.getDestination().get(0).coords.y - vY);
-                        }
+//                        if (v.getDestination().get(0).coords.x == theKnowenWay.get(theKnowenWay.size() - 1).coords.x &&
+//                                v.getDestination().get(0).coords.y == theKnowenWay.get(theKnowenWay.size() - 1).coords.y) {
+                        v.translateX(v.getDestination().get(0).coords.x - vX);
+                        v.translateY(v.getDestination().get(0).coords.y - vY);
+//                        }
 
                         if (v.getDestination().size() >= 1) {
                             v.getDestination().remove(0);
@@ -257,7 +279,6 @@ public class GameScreen extends Screens implements Screen {
                 }
 
                 entityName.setText("Villager");
-                castleImage.setVisible(false);
                 Sprite s = new Sprite(uiAtlas.findRegion("button-normal"));
                 s.setColor(Color.RED);
                 s.setSize(v.getHp(), 10);
@@ -287,7 +308,6 @@ public class GameScreen extends Screens implements Screen {
 
         if (myCastle.isSelected()) {
             entityName.setText("Castle");
-            castleImage.setVisible(true);
         }
 
         // todo schau wo die maus ist und dann reagiere also x und y abfragen und dann camera moven falls passend
@@ -302,26 +322,25 @@ public class GameScreen extends Screens implements Screen {
             }
         }
 
+
         if (mapDebug) {
             //todo zeigt zwar ein Grid aber ist nicht ganz richtig :D glaube ich !!
             for (int i = 0; i < 74; i++) {
                 Sprite lineH = new Sprite(uiAtlas.findRegion("line-h"));
                 Sprite lineV = new Sprite(uiAtlas.findRegion("line-v"));
                 lineV.setColor(Color.GREEN);
-                lineV.setSize(collisionUnitLayer.getHeight() * 63, 1);
-                lineV.setPosition(0, (i * 66) + (-1 * i));
+                lineV.setSize(collisionUnitLayer.getHeight() * 62, 1);
+                lineV.setPosition(0, (i * 74) + (-1 * i));
                 lineV.draw(renderer.getBatch());
                 lineH.setColor(Color.GREEN);
-                lineH.setSize(1, collisionUnitLayer.getHeight() * 63);
-                lineH.setPosition((i * 66) + (-1 * i), 0);
+                lineH.setSize(1, collisionUnitLayer.getHeight() * 62);
+                lineH.setPosition((i * 74) + (-1 * i), 0);
                 lineH.draw(renderer.getBatch());
             }
         }
 
 
-        renderer.getBatch().
-
-                end();
+        renderer.getBatch().end();
         debugRenderer.end();
 
         mouseOnEdgeofCamera();
@@ -526,7 +545,6 @@ public class GameScreen extends Screens implements Screen {
         exitWindow.setPosition(stage.getWidth(), stage.getHeight());
 
         entityWindow.add(entityName).row();
-        entityWindow.add(castleImage);
         entityWindow.setPosition(0, 0);
 
         packWindow(resourceBarWindow, stage);
@@ -702,6 +720,16 @@ public class GameScreen extends Screens implements Screen {
                 }
             }
         }
+        for (Castle c : castleArrayList) {
+
+            if (c.getX() < (int) coords[0] && c.getY() < (int) coords[1]) {
+                if (c.getX() + c.getWidth() >= (int) coords[0] && c.getY() + c.getHeight() >= (int) coords[1]) {
+                    c.setSelected(!c.isSelected());
+                } else {
+                    c.setSelected(false);
+                }
+            }
+        }
 
         try {
             if (collisionUnitLayer.getCell((int) coords[0] / collisionUnitLayer.getTileWidth(), (int) coords[1] / collisionUnitLayer.getTileHeight())
@@ -741,10 +769,31 @@ public class GameScreen extends Screens implements Screen {
             cellList.add(p);
             p = p.parent;
         }
+        if (cellList.size() >= 2) {
+            if (cellList.get(0).coords.x < cellList.get(1).coords.x || cellList.get(0).coords.y < cellList.get(1).coords.y) {
+
+
+                Vector2 newVector = new Vector2(cellList.get(0).coords.x, cellList.get(0).coords.y);
+                if (cellList.get(0).coords.x < cellList.get(1).coords.x) {
+                    newVector.x -= 1;
+                }
+                if (cellList.get(0).coords.y < cellList.get(1).coords.y) {
+                    newVector.y -= 1;
+                }
+                PathCell pNew = new PathCell(newVector, null, null);
+                cellList.get(0).parent = pNew;
+                cellList.addFirst(pNew);
+            }
+        }
+
 
         Collections.reverse(cellList);
         v.setDestination(cellList);
         theKnowenWay = cellList;
+        for (PathCell t : cellList) {
+            System.out.println(t.coords);
+
+        }
 
         //end=start
 

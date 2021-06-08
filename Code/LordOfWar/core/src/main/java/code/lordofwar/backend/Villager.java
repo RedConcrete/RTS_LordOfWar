@@ -16,7 +16,6 @@ public class Villager extends Sprite {
     private int hp;
     private List<PathCell> destination;
 
-
     private TiledMapTileLayer collisionLayer;
 
     public Villager(Sprite sprite, TiledMapTileLayer collisionLayer) {
@@ -35,7 +34,6 @@ public class Villager extends Sprite {
     private void update(float deltaTime) {
         endOfMapCollision();
         setPosition(getX() + velocity.x * deltaTime,getY()+ velocity.y * deltaTime);
-
         objectCollision(deltaTime);
     }
 
@@ -152,7 +150,6 @@ public class Villager extends Sprite {
 //        }
 //
     }
-
 
     public Vector2 getVelocity() {
         return velocity;

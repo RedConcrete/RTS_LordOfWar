@@ -1,5 +1,6 @@
 package code.lordofwar.main;
 
+import code.lordofwar.backend.BackgroundMusic;
 import code.lordofwar.backend.Constants;
 import code.lordofwar.backend.GameWebSocketListener;
 import code.lordofwar.backend.Sounds;

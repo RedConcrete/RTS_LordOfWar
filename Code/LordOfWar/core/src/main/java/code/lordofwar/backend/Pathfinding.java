@@ -40,11 +40,11 @@ public class Pathfinding {
     }
 
     private boolean checkPossible(int x, int y) {
-        int dest = 0;
-        int org = getCellDistancesToStart(x, y);
-        int sum = dest + org;
+        double dest = 0;
+        double org = getCellDistancesToStart(x, y);
+        double sum = dest + org;
 
-        return traversable(new PathCell(new Vector2(x, y), new int[]{sum, org, dest}, null));
+        return traversable(new PathCell(new Vector2(x, y), new double[]{sum, org, dest}, null));
     }
 
     /**
@@ -58,7 +58,7 @@ public class Pathfinding {
     public PathCell algorithm() {
 
         //todo wenn man auf x:0 und y:0 drückt crashed es hier!!!
-        PathCell current = new PathCell(cache, new int[]{getCellDistancesToEnd(cache.x, cache.y), 0, getCellDistancesToEnd(cache.x, cache.y)}, null);
+        PathCell current = new PathCell(cache, new double[]{getCellDistancesToEnd(cache.x, cache.y), 0, getCellDistancesToEnd(cache.x, cache.y)}, null);
         HashMap<Vector2, PathCell> closed = new HashMap<>();
         HashMap<Vector2, PathCell> open = new HashMap<>();
         //HashSet<PathCell> open = new HashSet<>();
@@ -69,7 +69,7 @@ public class Pathfinding {
             if (!(current.coords.x == xEndCell && current.coords.y == yEndCell)) {
                 open.remove(current.coords);
                 closed.put(current.coords, current);
-                for (Map.Entry<Vector2, int[]> entry : getSurrounding(current.coords).entrySet()) {
+                for (Map.Entry<Vector2, double[]> entry : getSurrounding(current.coords).entrySet()) {
                     //TODO current is not goal
                     PathCell newCell = new PathCell(entry.getKey(), entry.getValue(), current);
                     if (traversable(newCell)) {//TODO CHECK IF TRAVERSABLE BEFORE THIS
@@ -83,8 +83,8 @@ public class Pathfinding {
                         }
                     }
                 }
-                int lowestSUM = Integer.MAX_VALUE;
-                int lowestDST = Integer.MAX_VALUE;
+                double lowestSUM = Integer.MAX_VALUE;
+                double lowestDST = Integer.MAX_VALUE;
                 PathCell newCurrent = null;
                 for (Map.Entry<Vector2, PathCell> entry : open.entrySet()) {
                     if (lowestSUM == entry.getValue().distances[0]) {
@@ -134,8 +134,8 @@ public class Pathfinding {
         return false;
     }
 
-    private HashMap<Vector2, int[]> getSurrounding(Vector2 current) {
-        HashMap<Vector2, int[]> returnMap = new HashMap<>();
+    private HashMap<Vector2, double[]> getSurrounding(Vector2 current) {
+        HashMap<Vector2, double[]> returnMap = new HashMap<>();
         if (current.x != xEndCell || current.y != yEndCell) {
             Vector2[] surrounding = new Vector2[]{
                     new Vector2(current.x + 1, current.y + 1),//rechtsOben
@@ -148,29 +148,27 @@ public class Pathfinding {
                     new Vector2(current.x, current.y - 1)      //untenMitte
             };
             for (Vector2 vector : surrounding) {
-                int dest = getCellDistancesToEnd(vector.x, vector.y);
-                int org = getCellDistancesToStart(vector.x, vector.y);
-                int sum = dest + org;
-                returnMap.put(vector, new int[]{sum, org, dest});
+                double dest = getCellDistancesToEnd(vector.x, vector.y);
+                double org = getCellDistancesToStart(vector.x, vector.y);
+                double sum = dest + org;
+                returnMap.put(vector, new double[]{sum, org, dest});
             }
         }
         return returnMap;
     }
 
-    public int getCellDistancesToStart(float x, float y) {
+    public double getCellDistancesToStart(float x, float y) {
         double calculatiedX = x - xStartCell;
         double calculatiedY = y - yStartCell;
         double squareSum = Math.pow(calculatiedX, 2) + Math.pow(calculatiedY, 2);
-        double cellDistance = Math.sqrt(squareSum);
-        return (int) cellDistance;
+        return Math.sqrt(squareSum);
     }
 
-    public int getCellDistancesToEnd(float x, float y) {
+    public double getCellDistancesToEnd(float x, float y) {
         double xCalced = x - xEndCell;
         double yCalced = y - yEndCell;
         double squareSum = Math.pow(xCalced, 2) + Math.pow(yCalced, 2);
-        double cellDistance = Math.sqrt(squareSum);
-        return (int) cellDistance;
+        return Math.sqrt(squareSum);
     }
 
     public void getStartAndEndCell(int xPosUnit, int yPosUnit, int xClicked, int yClicked) {
