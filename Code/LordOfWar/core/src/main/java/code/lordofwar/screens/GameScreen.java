@@ -1,9 +1,6 @@
 package code.lordofwar.screens;
 
-import code.lordofwar.backend.Castle;
-import code.lordofwar.backend.Constants;
-import code.lordofwar.backend.Soldier;
-import code.lordofwar.backend.Villager;
+import code.lordofwar.backend.*;
 import code.lordofwar.backend.events.GameScreenEvent;
 import code.lordofwar.main.LOW;
 import com.badlogic.gdx.Gdx;
@@ -28,32 +25,40 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 
 public class GameScreen extends Screens implements Screen {
 
-
     private static final ShapeRenderer debugRenderer = new ShapeRenderer();
+    private static final ShapeRenderer debugMovement = new ShapeRenderer();
     private ShapeRenderer rectangleRenderer;
 
     private final Vector2 vectorSpeed;
     private final TiledMapTileLayer collisionUnitLayer;
     private final OrthographicCamera camera;
-    private final boolean isCameraDebug;
+    private final boolean cameraDebug;
+    private final boolean mapDebug;
 
+    private boolean knowTheWay = false;
+    private LinkedList<PathCell> theKnowenWay;
     private Vector3 posCameraDesired;
     private final TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
     private Soldier soldier;
     private final ArrayList<Villager> villagerArrayList;
+    private final ArrayList<Castle> castleArrayList;
     private final ArrayList<Soldier> soldierArrayList;
     private ArrayList<Object> entityArrayList;
     private final Sprite villiagerSprite;
-    private Castle myCastle;
-    private Image castleImage;
+    private Sprite castleImage;
     private Label entityName;
     private TextureAtlas uiAtlas = new TextureAtlas(Gdx.files.internal("ui/skin/uiskin.atlas"));
     private TextureAtlas unitAtlas = new TextureAtlas(Gdx.files.internal("maps/RTS_UNITS_TILES.txt"));
-    private boolean isPressed;
+    private TextureAtlas mapAtlas = new TextureAtlas(Gdx.files.internal("maps/RTSSimple.txt"));
+    private boolean isLeftPressed;
+    Castle myCastle;
+    private boolean isRightPressed;
     private Label villagerLabel;
 
 
@@ -62,6 +67,7 @@ public class GameScreen extends Screens implements Screen {
     private final GameScreenEvent gameScreenEvent;
 
     private final int startingVillager = 5;
+    private final int startingCastle = 1;
     private int goldAmount = 100;
     private float pointTimerCounter;
     private Point2D.Float rectangleStart;//used to check where the select rectangle was started
@@ -71,17 +77,20 @@ public class GameScreen extends Screens implements Screen {
 
     public GameScreen(LOW aGame, Skin aSkin, String lobbyID, int startingPosition) {
         super(aGame, aSkin);
-        isPressed = false;
+        mapDebug = true;
+        isLeftPressed = false;
+        isRightPressed = false;
         entityName = new Label("", skin);
-        castleImage = new Image(new Sprite(new Texture("maps/RTS_CASTEL_TILES.png")));
-        castleImage.setVisible(false);
+        castleImage = new Sprite(mapAtlas.findRegion("Castle"));
         pointTimerCounter = 10;
         gameScreenEvent = new GameScreenEvent(game, lobbyID);
-        isCameraDebug = false;
+        posCameraDesired = new Vector3();
+        cameraDebug = true;
         vectorSpeed = new Vector2();
         posCameraDesired = new Vector3();
         villagerArrayList = new ArrayList<>();
         soldierArrayList = new ArrayList<>();
+        castleArrayList = new ArrayList<>();
 
         villagerLabel = new Label("", skin);
         rectangleRenderer = new ShapeRenderer();
@@ -89,9 +98,7 @@ public class GameScreen extends Screens implements Screen {
         rectangleEnd = null;
         rectangleBounds = new float[4];//0=originX1=originY2=width3=height
         villiagerSprite = new Sprite(unitAtlas.findRegion("Character_Green_B"));
-
         loader = new TmxMapLoader();
-
 
         String mapPath = "maps/map_1.tmx";
         map = loader.load(mapPath);
@@ -119,17 +126,15 @@ public class GameScreen extends Screens implements Screen {
             default:
                 throw new IllegalStateException("Unexpected value: " + startingPosition);//max of 6 players; thus error
         }
-        myCastle = new Castle();
         camera = new OrthographicCamera();
         //TODO why doesnt this work
-        posCameraDesired.x=castlePosition[0];
-        posCameraDesired.y=castlePosition[1];
+        posCameraDesired.x = castlePosition[0];
+        posCameraDesired.y = castlePosition[1];
         collisionUnitLayer = (TiledMapTileLayer) map.getLayers().get(1);
-
+        myCastle = new Castle(castleImage, collisionUnitLayer);
         setupUI();
 
     }
-
 
     @Override
     public void show() {
@@ -172,14 +177,18 @@ public class GameScreen extends Screens implements Screen {
         );
         renderer = new OrthogonalTiledMapRenderer(map);
 
+        for (int i = 0; i < startingCastle; i++) {
+            Castle c = new Castle(castleImage, collisionUnitLayer);
+            castleArrayList.add(c);
+            c.setPosition(Constants.MAP1CC1[0], Constants.MAP1CC1[1]);
+        }
+
         for (int i = 0; i < startingVillager; i++) {
             Villager villager = new Villager(villiagerSprite, collisionUnitLayer);
             villagerArrayList.add(villager);
             villager.setPosition(villager.getCollisionLayer().getTileWidth(), i * villager.getCollisionLayer().getTileHeight());
-            vectorSpeed.x = 100;
             villager.setVelocity(new Vector2(vectorSpeed));
         }
-
     }
 
     @Override
@@ -191,43 +200,114 @@ public class GameScreen extends Screens implements Screen {
 
         renderer.setView(camera);
         renderer.render();
-        //debugRenderer.setAutoShapeType(true);
+
+        debugRenderer.setAutoShapeType(true);
+        debugMovement.setAutoShapeType(true);
+
+        debugRenderer.begin();
         renderer.getBatch().begin();
 
 
         pointTimerCounter += delta;
-        if (pointTimerCounter > 1) {//1 second update
+        if (pointTimerCounter > 1) { //1 second update
             gameScreenEvent.sendPointRequest();//TODO move this to server???
             pointTimerCounter = 0;
         }
 
         scoreLabel.setText(gameScreenEvent.getPoints());
+
         villagerLabel.setText(myCastle.getVillager());
 
+        for (Castle c : castleArrayList) {
+            c.draw(renderer.getBatch());
 
+
+        }
+
+        // TODO villager zu Soldier machen!!!!!!!!!!!!
         for (Villager v : villagerArrayList) {
-            if (v.isSelected()) {
-                v.draw(renderer.getBatch());
-            } else {
-
-                v.draw(renderer.getBatch());
-            }
             v.draw(renderer.getBatch());
 
+            if (v.getDestination() != null) {
+                if (v.getDestination().isEmpty()) {
+                    v.setDestination(null);
+                } else {
+
+                    int vX = (int) (v.getX() / 64);
+                    int vY = (int) (v.getY() / 64);
+                    System.out.println(v.getX());
+                    System.out.println(v.getY());
+                    System.out.println(vX);
+                    System.out.println(vY);
+                    System.out.println(v.getDestination().get(0).coords.x);
+                    System.out.println(v.getDestination().get(0).coords.y );
+                    System.out.println();
+                    // System.out.println(vX + " | " + vY + " | " + v.getDestination().get(0).coords.x + " | " + v.getDestination().get(0).coords.y);
+
+//                    if(v.getDestination().size() == 1){
+//                        if(vX > v.getDestination().get(0).coords.x ){
+//                            v.getDestination().get(0).coords.x -= 1;
+//                        }else if(vY > v.getDestination().get(0).coords.y){
+//                            v.getDestination().get(0).coords.y -= 1;
+//                        }
+//                    }
+
+                    if (vX != v.getDestination().get(0).coords.x || vY != v.getDestination().get(0).coords.y) {
+/*
+   if (vX != v.getDestination().get(0).coords.x || vY != v.getDestination().get(0).coords.y) {
+                        if (v.getDestination().get(0).coords.x>vX){
+                            v.translateX(1);
+                        }else if (v.getDestination().get(0).coords.x<vX){
+                            v.translateX(-1);
+                        }
+                        if (v.getDestination().get(0).coords.y>vY){
+                            v.translateY(1);
+                        }else if (v.getDestination().get(0).coords.y<vY){
+                            v.translateY(-1);
+                        }
+                          //  v.translateX(v.getDestination().get(0).coords.x - vX);
+                        //v.translateY(v.getDestination().get(0).coords.y - vY);
+
+ */
+                        v.translateX(v.getDestination().get(0).coords.x - vX);
+                        v.translateY(v.getDestination().get(0).coords.y - vY);
+
+
+
+                    } else if (vX == v.getDestination().get(0).coords.x && vY == v.getDestination().get(0).coords.y){
+                        if (v.getDestination().size() >= 1) {
+                            v.getDestination().remove(0);
+                        }
+                    }
+
+                }
+            }
+
             if (v.isSelected()) {
+
+                //todo braucht seine eigene forEach !!
+                if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
+                    if (!isRightPressed) {
+                        getPathFinding(v);
+                        isRightPressed = true;
+                    } else {
+                        if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
+                            isRightPressed = false;
+                        }
+                    }
+                }
+
                 entityName.setText("Villager");
-                castleImage.setVisible(false);
                 Sprite s = new Sprite(uiAtlas.findRegion("button-normal"));
                 s.setColor(Color.RED);
                 s.setSize(v.getHp(), 10);
                 s.setPosition(v.getX() + 5, v.getY() + 60);
                 s.draw(renderer.getBatch());
+
             }
-
-
         }
 
-        renderer.getBatch().end();
+
         if (rectangleStart != null && rectangleEnd != null) {
             //calc Rectangle
             //todo find a more efficient way to do this?
@@ -247,34 +327,51 @@ public class GameScreen extends Screens implements Screen {
 
         if (myCastle.isSelected()) {
             entityName.setText("Castle");
-            castleImage.setVisible(true);
         }
 
         // todo schau wo die maus ist und dann reagiere also x und y abfragen und dann camera moven falls passend
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-            if (!isPressed) {
+            if (!isLeftPressed) {
                 getClickedOnEntity();
-                isPressed = true;
+                isLeftPressed = true;
             } else {
                 if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-
-                    System.out.println(Gdx.input.getX() + " " + Gdx.input.getY());
-                    isPressed = false;
+                    isLeftPressed = false;
                 }
             }
-
-
         }
 
 
+        if (mapDebug) {
+            //todo zeigt zwar ein Grid aber ist nicht ganz richtig :D glaube ich !!
+            for (int i = 0; i < 74; i++) {
+                Sprite lineH = new Sprite(uiAtlas.findRegion("line-h"));
+                Sprite lineV = new Sprite(uiAtlas.findRegion("line-v"));
+                lineV.setColor(Color.GREEN);
+                lineV.setSize(collisionUnitLayer.getHeight() * 63, 1);
+                lineV.setPosition(0, (i * 66) + (-1 * i));
+                lineV.draw(renderer.getBatch());
+                lineH.setColor(Color.GREEN);
+                lineH.setSize(1, collisionUnitLayer.getHeight() * 63);
+                lineH.setPosition((i * 66) + (-1 * i), 0);
+                lineH.draw(renderer.getBatch());
+            }
+        }
+
+
+        renderer.getBatch().end();
+        debugRenderer.end();
+
         mouseOnEdgeofCamera();
+
         stage.act();
         stage.draw();
     }
 
+
     @Override
     public void resize(int width, int height) {
-        camera.position.set(width / 2f, height / 2f, 0);
+        camera.position.set(stage.getWidth() / 2f, stage.getHeight() / 2f, 0);
         camera.viewportWidth = width;
         camera.viewportHeight = height;
         camera.update();
@@ -300,6 +397,7 @@ public class GameScreen extends Screens implements Screen {
         stage.dispose();
         map.dispose();
         renderer.dispose();
+
     }
 
     private void setupUI() {
@@ -409,35 +507,10 @@ public class GameScreen extends Screens implements Screen {
 
                 yesButton.getLabel().setFontScale(2f);
 
-                yesButton.addListener(new InputListener() {
-                    @Override
-                    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                        GameScreen.this.getGameScreenEvent().sendLeaveGameNotice();
-                        game.setScreen(new MenuScreen(game, skin));
-                        stage.dispose();
-                    }
-
-                    @Override
-                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                        return true;
-                    }
-                });
 
                 noButton.getLabel().setFontScale(2f);
 
-                noButton.addListener(new InputListener() {
-                    @Override
-                    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                        windowExit.setVisible(false);
-                    }
 
-                    @Override
-                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                        return true;
-                    }
-                });
-                windowExit.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
-                windowExit.pack();
                 stage.addActor(windowExit);
             }
 
@@ -446,10 +519,37 @@ public class GameScreen extends Screens implements Screen {
                 return true;
             }
         });
+        yesButton.addListener(new InputListener() {
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                GameScreen.this.getGameScreenEvent().sendLeaveGameNotice();
+                game.setScreen(new MenuScreen(game, skin));
+                dispose();
+            }
 
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+
+                return true;
+            }
+        });
+
+        noButton.addListener(new InputListener() {
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                windowExit.setVisible(false);
+            }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+        });
         windowExit.add(exitLabel).colspan(2).row();
         windowExit.add(yesButton);
         windowExit.add(noButton);
+        windowExit.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
+        windowExit.pack();
 
         resourceBarWindow.add(scoreTextLabel).padTop(30f).padBottom(10f).padLeft(10f).padRight(10f);
         resourceBarWindow.add(scoreLabel).padTop(30f).padBottom(10f).padRight(10f);
@@ -464,7 +564,6 @@ public class GameScreen extends Screens implements Screen {
         exitWindow.setPosition(stage.getWidth(), stage.getHeight());
 
         entityWindow.add(entityName).row();
-        entityWindow.add(castleImage);
         entityWindow.setPosition(0, 0);
 
         packWindow(resourceBarWindow, stage);
@@ -488,9 +587,10 @@ public class GameScreen extends Screens implements Screen {
 
         //Todo camera movement überarbeiten !!
         processCameraMovement(xClicked, yClicked);
+
         camera.position.lerp(posCameraDesired, 0.1f);
 
-        if (isCameraDebug) {
+        if (cameraDebug) {
             DrawDebugLine(new Vector2(camera.position.x, camera.position.y)
                     , new Vector2(posCameraDesired.x, posCameraDesired.y)
                     , 3, Color.RED, camera.combined);
@@ -505,49 +605,105 @@ public class GameScreen extends Screens implements Screen {
     private void processCameraMovement(float xClicked, float yClicked) {
 
         //oben links
-        if (xClicked <= camera.viewportWidth * 3 / 16 && yClicked <= camera.viewportHeight * 2 / 9) {
+        if (xClicked <= camera.viewportWidth * 2 / 32 && yClicked <= camera.viewportHeight * 1 / 18) {
             posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
             posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
+
+            if (cameraDebug) {
+                debugMovement.begin();
+                debugMovement.rect(0, camera.viewportHeight - camera.viewportHeight * 1 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 1 / 18);
+                debugMovement.end();
+            }
+
             camera.update();
         }
         //mitte links
-        else if (xClicked <= camera.viewportWidth * 3 / 16 && yClicked >= camera.viewportHeight * 2 / 9 && yClicked <= camera.viewportHeight * 7 / 9) {
+        else if (xClicked <= camera.viewportWidth * 2 / 32 && yClicked >= camera.viewportHeight * 1 / 18 && yClicked <= camera.viewportHeight * 17 / 18) {
             posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
+
+            if (cameraDebug) {
+                debugMovement.begin();
+                debugMovement.rect(0, camera.viewportHeight - camera.viewportHeight * 17 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 16 / 18);
+                debugMovement.end();
+            }
+
             camera.update();
         }
         //unten links
-        else if (xClicked <= camera.viewportWidth * 3 / 16 && yClicked >= camera.viewportHeight * 7 / 9 && yClicked <= camera.viewportHeight) {
+        else if (xClicked <= camera.viewportWidth * 2 / 32 && yClicked >= camera.viewportHeight * 17 / 18 && yClicked <= camera.viewportHeight) {
             posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
             posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
+
+            if (cameraDebug) {
+                debugMovement.begin();
+                debugMovement.rect(0, 0, camera.viewportWidth * 2 / 32, camera.viewportHeight * 1 / 18);
+                debugMovement.end();
+            }
+
             camera.update();
         }
 
         //oben rechts
-        else if (xClicked >= camera.viewportWidth * 13 / 16 && yClicked <= camera.viewportHeight * 2 / 9) {
+        else if (xClicked >= camera.viewportWidth * 30 / 32 && yClicked <= camera.viewportHeight * 1 / 18) {
             posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
             posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
+
+            if (cameraDebug) {
+                debugMovement.begin();
+                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 2 / 32, camera.viewportHeight - camera.viewportHeight * 1 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 1 / 18);
+                debugMovement.end();
+            }
+
             camera.update();
         }
         //mitte rechts
-        else if (xClicked >= camera.viewportWidth * 13 / 16 && yClicked >= camera.viewportHeight * 2 / 9 && yClicked <= camera.viewportHeight * 7 / 9) {
+        else if (xClicked >= camera.viewportWidth * 30 / 32 && yClicked >= camera.viewportHeight * 1 / 18 && yClicked <= camera.viewportHeight * 17 / 18) {
             posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
+
+            if (cameraDebug) {
+                debugMovement.begin();
+                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 2 / 32, camera.viewportHeight - camera.viewportHeight * 17 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 16 / 18);
+                debugMovement.end();
+            }
+
             camera.update();
         }
         //unten rechts
-        else if (xClicked >= camera.viewportWidth * 13 / 16 && yClicked >= camera.viewportHeight * 7 / 9) {
+        else if (xClicked >= camera.viewportWidth * 30 / 32 && yClicked >= camera.viewportHeight * 17 / 18) {
             posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
             posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
+
+            if (cameraDebug) {
+                debugMovement.begin();
+                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 2 / 32, 0, camera.viewportWidth * 2 / 32, camera.viewportHeight * 1 / 18);
+                debugMovement.end();
+            }
+
             camera.update();
         }
 
         //mitte oben
-        else if (xClicked >= camera.viewportWidth * 3 / 16 && xClicked <= camera.viewportWidth * 13 / 16 && yClicked <= camera.viewportHeight * 2 / 9) {
+        else if (xClicked >= camera.viewportWidth * 2 / 32 && xClicked <= camera.viewportWidth * 30 / 32 && yClicked <= camera.viewportHeight * 1 / 18) {
             posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
+
+            if (cameraDebug) {
+                debugMovement.begin();
+                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 30 / 32, camera.viewportHeight - camera.viewportHeight * 1 / 18, camera.viewportWidth * 28 / 32, camera.viewportHeight * 1 / 18);
+                debugMovement.end();
+            }
+
             camera.update();
         }
         //mitte unten
-        else if (xClicked >= camera.viewportWidth * 3 / 16 && xClicked <= camera.viewportWidth * 13 / 16 && yClicked >= camera.viewportHeight * 7 / 9) {
+        else if (xClicked >= camera.viewportWidth * 2 / 32 && xClicked <= camera.viewportWidth * 30 / 32 && yClicked >= camera.viewportHeight * 17 / 18) {
             posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
+
+            if (cameraDebug) {
+                debugMovement.begin();
+                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 30 / 32, 0, camera.viewportWidth * 28 / 32, camera.viewportHeight * 1 / 18);
+                debugMovement.end();
+            }
+
             camera.update();
         } else {
             camera.update();
@@ -555,10 +711,11 @@ public class GameScreen extends Screens implements Screen {
 
     }
 
-    public static void DrawDebugLine(Vector2 start, Vector2 end, int lineWidth, Color color, Matrix4 projectionMatrix) {
+    public static void DrawDebugLine(Vector2 start, Vector2 end, int lineWidth, Color color, Matrix4
+            projectionMatrix) {
         Gdx.gl.glLineWidth(lineWidth);
-        debugRenderer.setProjectionMatrix(projectionMatrix);
         debugRenderer.begin(ShapeRenderer.ShapeType.Line);
+        debugRenderer.setProjectionMatrix(projectionMatrix);
         debugRenderer.setColor(color);
         debugRenderer.line(start, end);
         debugRenderer.end();
@@ -577,6 +734,18 @@ public class GameScreen extends Screens implements Screen {
             if (villager.getX() < (int) coords[0] && villager.getY() < (int) coords[1]) {
                 if (villager.getX() + villager.getWidth() >= (int) coords[0] && villager.getY() + villager.getHeight() >= (int) coords[1]) {
                     villager.setSelected(!villager.isSelected());
+                } else {
+                    villager.setSelected(false);
+                }
+            }
+        }
+        for (Castle c : castleArrayList) {
+
+            if (c.getX() < (int) coords[0] && c.getY() < (int) coords[1]) {
+                if (c.getX() + c.getWidth() >= (int) coords[0] && c.getY() + c.getHeight() >= (int) coords[1]) {
+                    c.setSelected(!c.isSelected());
+                } else {
+                    c.setSelected(false);
                 }
             }
         }
@@ -605,4 +774,48 @@ public class GameScreen extends Screens implements Screen {
 
         return new float[]{mousePos.x, mousePos.y};
     }
+
+    public void getPathFinding(Villager v) {
+        //todo pathfinding programmieren
+        Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        camera.unproject(mousePos);
+
+        int x = (int) mousePos.x, y = (int) mousePos.y;
+        PathCell p = new Pathfinding(x, y, (int) v.getX() + 32, (int) v.getY() + 32, collisionUnitLayer).algorithm();
+        LinkedList<PathCell> cellList = new LinkedList<>();
+
+        while (p != null) {
+            cellList.add(p);
+            p = p.parent;
+        }
+        if (cellList.size() >= 2) {
+            if ((cellList.get(0).coords.x < cellList.get(1).coords.x || cellList.get(0).coords.y < cellList.get(1).coords.y)) {
+               // Vector2 newVector = new Vector2(cellList.get(0).coords.x, cellList.get(0).coords.y);
+                if (cellList.get(0).coords.x < cellList.get(1).coords.x) {
+                    cellList.get(0).coords.x -= 1;
+                }
+                if (cellList.get(0).coords.y < cellList.get(1).coords.y) {
+                    cellList.get(0).coords.y -= 1;
+                }
+
+               // PathCell pNew = new PathCell(newVector, null, null);
+               // cellList.get(0).parent = pNew;
+               // cellList.addFirst(pNew);
+            }
+        }
+
+
+        Collections.reverse(cellList);
+        v.setDestination(cellList);
+        theKnowenWay = cellList;
+        for (PathCell t : cellList) {
+            System.out.println(t.coords);
+
+        }
+
+        //end=start
+
+    }
+
 }
+

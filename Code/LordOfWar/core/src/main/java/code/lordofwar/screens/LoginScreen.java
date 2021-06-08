@@ -1,6 +1,5 @@
 package code.lordofwar.screens;
 
-
 import code.lordofwar.backend.Rumble;
 import code.lordofwar.backend.events.LoginScreenEvent;
 import code.lordofwar.main.LOW;
@@ -93,7 +92,6 @@ public class LoginScreen extends Screens implements Screen {
     }
 
     private void setupUI() {
-
 
         Label name = new Label("Username", skin);
         name.setAlignment(Align.center);

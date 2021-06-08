@@ -49,12 +49,12 @@ public class GameWebSocketListener extends WebSocketListener {
     }
 
     private String[] depackData(String message) {
-        System.out.println(message);
+
         return message.split(STRINGSEPERATOR);
     }
 
     private void checkDataDir(String[] strings) {
-        System.out.println(Arrays.toString(strings));
+        //System.out.println(Arrays.toString(strings));
         for (MessageIdentifier messageIdentifier : MessageIdentifier.values()) {
             if (strings[0].equals(messageIdentifier.toString())) {
                 if (strings[0].equals(LOGIN_VALID.toString())) {

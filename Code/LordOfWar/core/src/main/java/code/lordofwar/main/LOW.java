@@ -7,7 +7,6 @@ import code.lordofwar.backend.Sounds;
 import code.lordofwar.screens.LoginScreen;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -16,7 +15,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.WebSocket;
 
-import java.awt.*;
 import java.util.concurrent.TimeUnit;
 
 import static code.lordofwar.backend.Constants.WORLD_HEIGHT_PIXEL;
@@ -78,7 +76,6 @@ public class LOW extends Game {
 		HttpUrl httpUrl = HttpUrl.parse("http://localhost:8080/api/v1/ws");
 		//HttpUrl httpUrl = HttpUrl.parse("http://93.221.8.85:25565/api/v1/ws");
 
-
 		Request request = new Request.Builder()
 				.url(httpUrl)
 				.addHeader("Authorization", "Basic " + "MToxMjM0")
@@ -87,6 +84,7 @@ public class LOW extends Game {
 		GameWebSocketListener gameWebSocketListener = new GameWebSocketListener(this);
 		webSocket = client.newWebSocket(request,gameWebSocketListener);
 		gameWebSocketListener.setWebSocket(webSocket);
+
 	}
 
 	public Constants getConstants() {
