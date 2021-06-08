@@ -11,12 +11,14 @@ public class Castle extends Sprite {
     private int villager;
     private int hp;
     private TiledMapTileLayer collisionLayer;
+    private Sprite sprite;
 
     public Castle(Sprite sprite, TiledMapTileLayer collisionLayer) {
         super(sprite);
         this.collisionLayer = collisionLayer;
+        this.sprite = sprite;
         villager = 0;
-        hp = 50;
+        hp = 100;
         increaseVilligerPerMinute();
     }
 
@@ -62,4 +64,17 @@ public class Castle extends Sprite {
     public TiledMapTileLayer getCollisionLayer() {
         return collisionLayer;
     }
+
+    public int getHp() {
+        return hp;
+    }
+
+    public void setHp(int hp) {
+        this.hp = hp;
+    }
+
+    public Sprite getSprite() {
+        return sprite;
+    }
+
 }
