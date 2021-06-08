@@ -277,25 +277,55 @@ public class GameScreen extends Screens implements Screen {
                 if (v.getDestination().isEmpty()) {
                     v.setDestination(null);
                 } else {
+
                     int vX = (int) (v.getX() / 64);
                     int vY = (int) (v.getY() / 64);
-                    System.out.println(vX + " | " + vY + " | " + v.getDestination().get(0).coords.x + " | " + v.getDestination().get(0).coords.y);
+                    System.out.println(v.getX());
+                    System.out.println(v.getY());
+                    System.out.println(vX);
+                    System.out.println(vY);
+                    System.out.println(v.getDestination().get(0).coords.x);
+                    System.out.println(v.getDestination().get(0).coords.y );
+                    System.out.println();
+                    // System.out.println(vX + " | " + vY + " | " + v.getDestination().get(0).coords.x + " | " + v.getDestination().get(0).coords.y);
+
+//                    if(v.getDestination().size() == 1){
+//                        if(vX > v.getDestination().get(0).coords.x ){
+//                            v.getDestination().get(0).coords.x -= 1;
+//                        }else if(vY > v.getDestination().get(0).coords.y){
+//                            v.getDestination().get(0).coords.y -= 1;
+//                        }
+//                    }
 
                     if (vX != v.getDestination().get(0).coords.x || vY != v.getDestination().get(0).coords.y) {
+/*
+   if (vX != v.getDestination().get(0).coords.x || vY != v.getDestination().get(0).coords.y) {
+                        if (v.getDestination().get(0).coords.x>vX){
+                            v.translateX(1);
+                        }else if (v.getDestination().get(0).coords.x<vX){
+                            v.translateX(-1);
+                        }
+                        if (v.getDestination().get(0).coords.y>vY){
+                            v.translateY(1);
+                        }else if (v.getDestination().get(0).coords.y<vY){
+                            v.translateY(-1);
+                        }
+                          //  v.translateX(v.getDestination().get(0).coords.x - vX);
+                        //v.translateY(v.getDestination().get(0).coords.y - vY);
 
+ */
                         v.translateX(v.getDestination().get(0).coords.x - vX);
                         v.translateY(v.getDestination().get(0).coords.y - vY);
-                    } else {
 
-                        v.translateX(v.getDestination().get(0).coords.x - vX);
-                        v.translateY(v.getDestination().get(0).coords.y - vY);
+
+
+                    } else if (vX == v.getDestination().get(0).coords.x && vY == v.getDestination().get(0).coords.y){
+                        if (v.getDestination().size() >= 1) {
+                            v.getDestination().remove(0);
+                        }
                     }
 
-                    if (v.getDestination().size() >= 1) {
-                        v.getDestination().remove(0);
-                    }
                 }
-
             }
 
             if (v.isSelected()) {
@@ -358,6 +388,7 @@ public class GameScreen extends Screens implements Screen {
                 }
             }
         }
+
 
         if (mapDebug) {
             Sprite lineH = new Sprite(uiAtlas.findRegion("line-h"));
@@ -594,7 +625,7 @@ public class GameScreen extends Screens implements Screen {
         stage.addActor(exitWindow);
 
         stage.setDebugAll(true);
-        test = true;
+
     }
 
     //Todo camera movement überarbeiten !!
@@ -809,19 +840,18 @@ public class GameScreen extends Screens implements Screen {
             p = p.parent;
         }
         if (cellList.size() >= 2) {
-            if (cellList.get(0).coords.x < cellList.get(1).coords.x || cellList.get(0).coords.y < cellList.get(1).coords.y) {
-
-
-                Vector2 newVector = new Vector2(cellList.get(0).coords.x, cellList.get(0).coords.y);
+            if ((cellList.get(0).coords.x < cellList.get(1).coords.x || cellList.get(0).coords.y < cellList.get(1).coords.y)) {
+               // Vector2 newVector = new Vector2(cellList.get(0).coords.x, cellList.get(0).coords.y);
                 if (cellList.get(0).coords.x < cellList.get(1).coords.x) {
-                    newVector.x -= 1;
+                    cellList.get(0).coords.x -= 1;
                 }
                 if (cellList.get(0).coords.y < cellList.get(1).coords.y) {
-                    newVector.y -= 1;
+                    cellList.get(0).coords.y -= 1;
                 }
-                PathCell pNew = new PathCell(newVector, null, null);
-                cellList.get(0).parent = pNew;
-                cellList.addFirst(pNew);
+
+               // PathCell pNew = new PathCell(newVector, null, null);
+               // cellList.get(0).parent = pNew;
+               // cellList.addFirst(pNew);
             }
         }
 
