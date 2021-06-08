@@ -12,11 +12,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -32,6 +34,7 @@ public class GameScreen extends Screens implements Screen {
 
     private static final ShapeRenderer debugRenderer = new ShapeRenderer();
     private static final ShapeRenderer debugMovement = new ShapeRenderer();
+
     private ShapeRenderer rectangleRenderer;
 
     private final Vector2 vectorSpeed;
@@ -322,28 +325,27 @@ public class GameScreen extends Screens implements Screen {
             }
         }
 
-
         if (mapDebug) {
-            //todo zeigt zwar ein Grid aber ist nicht ganz richtig :D glaube ich !!
-            for (int i = 0; i < 74; i++) {
-                Sprite lineH = new Sprite(uiAtlas.findRegion("line-h"));
-                Sprite lineV = new Sprite(uiAtlas.findRegion("line-v"));
-                lineV.setColor(Color.GREEN);
-                lineV.setSize(collisionUnitLayer.getHeight() * 62, 1);
-                lineV.setPosition(0, (i * 74) + (-1 * i));
+            Sprite lineH = new Sprite(uiAtlas.findRegion("line-h"));
+            Sprite lineV = new Sprite(uiAtlas.findRegion("line-v"));
+            lineV.setColor(Color.GREEN);
+            lineH.setColor(Color.GREEN);
+            lineV.setSize(collisionUnitLayer.getWidth() * 64, 1);
+            lineH.setSize(1, collisionUnitLayer.getHeight() * 64);
+
+
+            /
+            for (int i = 1; i < 76; i++) {
+                lineV.setPosition(0, (i * 64));
+                lineH.setPosition((i * 64), 0);
                 lineV.draw(renderer.getBatch());
-                lineH.setColor(Color.GREEN);
-                lineH.setSize(1, collisionUnitLayer.getHeight() * 62);
-                lineH.setPosition((i * 74) + (-1 * i), 0);
                 lineH.draw(renderer.getBatch());
             }
         }
-
-
-        renderer.getBatch().end();
         debugRenderer.end();
-
+        renderer.getBatch().end();
         mouseOnEdgeofCamera();
+
 
         stage.act();
         stage.draw();
