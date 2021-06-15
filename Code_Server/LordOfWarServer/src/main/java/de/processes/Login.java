@@ -35,10 +35,9 @@ public class Login{
 
         if(loginValid){
             session.getAsyncRemote().sendObject(DataPacker.packData(LOGIN_VALID,"true"));
-
         }
         else{
-
+        //todo fehlt etwas
         }
         return validUser;
     }
