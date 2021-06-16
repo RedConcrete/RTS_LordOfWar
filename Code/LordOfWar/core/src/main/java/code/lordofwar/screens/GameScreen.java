@@ -179,18 +179,36 @@ public class GameScreen extends Screens implements Screen {
 
                     @Override
                     public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                        if (rectangleStart != null && rectangleEnd != null) {
-                            float[] recCoords = new float[]{rectangleBounds[0], rectangleBounds[1]};
-                            float[] vilCoords;
-                            for (Villager villager : villagerArrayList) {
-                                vilCoords = translateXYCoordinatesToScreen(villager.getX() + villager.getWidth() / 2, villager.getY() + villager.getHeight() / 2);
-                                if (vilCoords[0] >= recCoords[0] && vilCoords[1] >= recCoords[1]) {
-                                    if (vilCoords[0] <= recCoords[0] + rectangleBounds[2] && vilCoords[1] <= recCoords[1] + rectangleBounds[3]) {
-                                        villager.setSelected(true);
+                        switch (event.getButton()) {
+                            case Input.Buttons.RIGHT:
+                                for (Villager v : villagerArrayList) {
+                                    if (v.isSelected()) {
+                                        getPathFinding(v);
                                     }
                                 }
-                            }
+                                break;
+                            case Input.Buttons.LEFT:
+                                if (rectangleStart != null && rectangleEnd != null) {
+                                    float[] recCoords = new float[]{rectangleBounds[0], rectangleBounds[1]};
+                                    float[] vilCoords;
+                                    for (Villager villager : villagerArrayList) {
+                                        vilCoords = translateXYCoordinatesToScreen(villager.getX() + villager.getWidth() / 2, villager.getY() + villager.getHeight() / 2);
+                                        if (vilCoords[0] >= recCoords[0] && vilCoords[1] >= recCoords[1]) {
+                                            if (vilCoords[0] <= recCoords[0] + rectangleBounds[2] && vilCoords[1] <= recCoords[1] + rectangleBounds[3]) {
+                                                villager.setSelected(true);
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    getClickedOnEntity();
+                                }
+                                break;
+                            default:
+                                break;
                         }
+
+
+                        //rectange should be reset no matter what
                         rectangleEnd = null;
                         rectangleStart = null;
                     }
@@ -285,7 +303,7 @@ public class GameScreen extends Screens implements Screen {
                     System.out.println(vX);
                     System.out.println(vY);
                     System.out.println(v.getDestination().get(0).coords.x);
-                    System.out.println(v.getDestination().get(0).coords.y );
+                    System.out.println(v.getDestination().get(0).coords.y);
                     System.out.println();
                     // System.out.println(vX + " | " + vY + " | " + v.getDestination().get(0).coords.x + " | " + v.getDestination().get(0).coords.y);
 
@@ -318,8 +336,7 @@ public class GameScreen extends Screens implements Screen {
                         v.translateY(v.getDestination().get(0).coords.y - vY);
 
 
-
-                    } else if (vX == v.getDestination().get(0).coords.x && vY == v.getDestination().get(0).coords.y){
+                    } else if (vX == v.getDestination().get(0).coords.x && vY == v.getDestination().get(0).coords.y) {
                         if (v.getDestination().size() >= 1) {
                             v.getDestination().remove(0);
                         }
@@ -334,24 +351,12 @@ public class GameScreen extends Screens implements Screen {
                 castleImage.setVisible(false);
 
                 //todo braucht seine eigene forEach !!
-                if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
-                    if (!isRightPressed) {
-                        getPathFinding(v);
-                        isRightPressed = true;
-                    } else {
-                        if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
-                            isRightPressed = false;
-                        }
-                    }
-                }
-                //todo Progresbar benutzen
                 entityName.setText("Villager");
                 Sprite s = new Sprite(uiAtlas.findRegion("button-normal"));
                 s.setColor(Color.RED);
                 s.setSize(v.getHp(), 10);
                 s.setPosition(v.getX() + 5, v.getY() + 60);
                 s.draw(renderer.getBatch());
-
             }
         }
 
@@ -376,19 +381,6 @@ public class GameScreen extends Screens implements Screen {
         if (myCastle.isSelected()) {
             entityName.setText("Castle");
         }
-
-        // todo schau wo die maus ist und dann reagiere also x und y abfragen und dann camera moven falls passend
-        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-            if (!isLeftPressed) {
-                getClickedOnEntity();
-                isLeftPressed = true;
-            } else {
-                if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-                    isLeftPressed = false;
-                }
-            }
-        }
-
 
         if (mapDebug) {
             Sprite lineH = new Sprite(uiAtlas.findRegion("line-h"));
@@ -841,7 +833,7 @@ public class GameScreen extends Screens implements Screen {
         }
         if (cellList.size() >= 2) {
             if ((cellList.get(0).coords.x < cellList.get(1).coords.x || cellList.get(0).coords.y < cellList.get(1).coords.y)) {
-               // Vector2 newVector = new Vector2(cellList.get(0).coords.x, cellList.get(0).coords.y);
+                // Vector2 newVector = new Vector2(cellList.get(0).coords.x, cellList.get(0).coords.y);
                 if (cellList.get(0).coords.x < cellList.get(1).coords.x) {
                     cellList.get(0).coords.x -= 1;
                 }
@@ -849,9 +841,9 @@ public class GameScreen extends Screens implements Screen {
                     cellList.get(0).coords.y -= 1;
                 }
 
-               // PathCell pNew = new PathCell(newVector, null, null);
-               // cellList.get(0).parent = pNew;
-               // cellList.addFirst(pNew);
+                // PathCell pNew = new PathCell(newVector, null, null);
+                // cellList.get(0).parent = pNew;
+                // cellList.addFirst(pNew);
             }
         }
 
