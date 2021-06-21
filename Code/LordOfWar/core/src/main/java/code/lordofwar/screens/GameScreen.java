@@ -359,6 +359,23 @@ public class GameScreen extends Screens implements Screen {
                 s.draw(renderer.getBatch());
             }
         }
+        if (mapDebug) {
+            Sprite lineH = new Sprite(uiAtlas.findRegion("line-h"));
+            Sprite lineV = new Sprite(uiAtlas.findRegion("line-v"));
+            lineV.setColor(Color.GREEN);
+            lineH.setColor(Color.GREEN);
+            lineV.setSize(collisionUnitLayer.getWidth() * 64, 1);
+            lineH.setSize(1, collisionUnitLayer.getHeight() * 64);
+
+            for (int i = 1; i < 76; i++) {
+                lineV.setPosition(0, (i * 64));
+                lineH.setPosition((i * 64), 0);
+                lineV.draw(renderer.getBatch());
+                lineH.draw(renderer.getBatch());
+            }
+        }
+        debugRenderer.end();
+        renderer.getBatch().end();
 
 
         if (rectangleStart != null && rectangleEnd != null) {
@@ -382,23 +399,6 @@ public class GameScreen extends Screens implements Screen {
             entityName.setText("Castle");
         }
 
-        if (mapDebug) {
-            Sprite lineH = new Sprite(uiAtlas.findRegion("line-h"));
-            Sprite lineV = new Sprite(uiAtlas.findRegion("line-v"));
-            lineV.setColor(Color.GREEN);
-            lineH.setColor(Color.GREEN);
-            lineV.setSize(collisionUnitLayer.getWidth() * 64, 1);
-            lineH.setSize(1, collisionUnitLayer.getHeight() * 64);
-
-            for (int i = 1; i < 76; i++) {
-                lineV.setPosition(0, (i * 64));
-                lineH.setPosition((i * 64), 0);
-                lineV.draw(renderer.getBatch());
-                lineH.draw(renderer.getBatch());
-            }
-        }
-        debugRenderer.end();
-        renderer.getBatch().end();
 
         mouseOnEdgeofCamera();
 
