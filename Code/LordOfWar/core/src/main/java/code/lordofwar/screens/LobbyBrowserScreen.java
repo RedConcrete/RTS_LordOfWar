@@ -109,9 +109,8 @@ public class LobbyBrowserScreen extends Screens implements Screen {
                                             e.printStackTrace();
                                         }
 
-                                        if (lobbyBrowserScreenEvent.getJoined() != null) {
-
-                                            game.setScreen(new LobbyScreen(game, skin, lobbyBrowserScreenEvent.getJoined()));//TODO does this work?
+                                        if (lobbyBrowserScreenEvent.getLobbyInfo() != null) {
+                                            game.setScreen(new LobbyScreen(game, skin, lobbyBrowserScreenEvent.getLobbyInfo()));//TODO does this work?
                                             stage.dispose();
 
                                         } else {
