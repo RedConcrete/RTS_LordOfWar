@@ -41,6 +41,8 @@ public class ServerGame {
         }
     }
 
+    //TODO kill all relevant units of a player if he leaves
+
     public int getPoints(String sessionID){
         return pointMap.get(sessionIDMap.get(sessionID));
     }

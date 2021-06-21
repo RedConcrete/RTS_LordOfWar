@@ -22,7 +22,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -188,7 +187,9 @@ public class GameScreen extends Screens implements Screen {
                                 }
                                 break;
                             case Input.Buttons.LEFT:
-                                if (rectangleStart != null && rectangleEnd != null) {
+                                if (rectangleStart == null && rectangleEnd == null) {
+                                    getClickedOnEntity();
+                                } else {
                                     float[] recCoords = new float[]{rectangleBounds[0], rectangleBounds[1]};
                                     float[] vilCoords;
                                     for (Villager villager : villagerArrayList) {
@@ -199,8 +200,6 @@ public class GameScreen extends Screens implements Screen {
                                             }
                                         }
                                     }
-                                } else {
-                                    getClickedOnEntity();
                                 }
                                 break;
                             default:
@@ -460,11 +459,11 @@ public class GameScreen extends Screens implements Screen {
         Window entityWindow = new Window("", skin);
         entityWindow.setMovable(false);
 
-        Window windowExit = new Window("Exit?", skin, "border");
+        Window windowExit = new Window("Surrender?", skin, "border");
         windowExit.setMovable(false);
         windowExit.defaults().pad(20f);
 
-        TextButton exitGameButton = new TextButton("Exit", skin);
+        TextButton exitGameButton = new TextButton("Surrender", skin);
         exitGameButton.getLabel().setFontScale(3f);
 
         TextButton addGoldButton = new TextButton("AddGold", skin);
@@ -473,7 +472,7 @@ public class GameScreen extends Screens implements Screen {
         TextButton noButton = new TextButton("No", skin);
         TextButton yesButton = new TextButton("Yes", skin);
 
-        Label exitLabel = new Label("Do you realy want to Exit?", skin);
+        Label exitLabel = new Label("Do you really want to Surrender?", skin);
         exitLabel.setFontScale(3f);
 
         Label scoreTextLabel = new Label(" Your Score:", skin);
@@ -773,13 +772,14 @@ public class GameScreen extends Screens implements Screen {
 
         float[] coords = translateXYCoordinatesFromScreen(Gdx.input.getX(), Gdx.input.getY());
         for (Villager villager : villagerArrayList) {
-
-            if (villager.getX() < (int) coords[0] && villager.getY() < (int) coords[1]) {
-                if (villager.getX() + villager.getWidth() >= (int) coords[0] && villager.getY() + villager.getHeight() >= (int) coords[1]) {
-                    villager.setSelected(!villager.isSelected());
-                } else {
-                    villager.setSelected(false);
-                }
+            float[] checkCoordsRect = new float[]{villager.getX() - villager.getWidth(),
+                    villager.getY() - villager.getHeight(),
+                    villager.getX() + villager.getWidth(),
+                    villager.getY() + villager.getHeight()};
+            if ((coords[0] >= checkCoordsRect[0] && coords[1] >= checkCoordsRect[1]) && (coords[0] <= checkCoordsRect[2] && coords[1] <= checkCoordsRect[3])) {
+                villager.setSelected(!villager.isSelected());
+            } else {
+                villager.setSelected(false);
             }
         }
         for (Castle c : castleArrayList) {

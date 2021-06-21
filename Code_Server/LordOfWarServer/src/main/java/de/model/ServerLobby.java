@@ -70,6 +70,7 @@ public class ServerLobby {
             players.remove(user);
             playerNames.remove(user.getUsername());
             joinOrder.remove(user);
+            //TODO Kill all relevant units of the player if the lobby is ingame
             if (admin == user) {
                 User newAdmin = null;
                 int lowest = Integer.MAX_VALUE;
