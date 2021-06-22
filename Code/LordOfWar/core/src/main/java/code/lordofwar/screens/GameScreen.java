@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -48,6 +49,7 @@ public class GameScreen extends Screens implements Screen {
     private LinkedList<PathCell> theKnowenWay;
     private Vector3 posCameraDesired;
     private final TiledMap map;
+    private final int[] mapSizes;
     private OrthogonalTiledMapRenderer renderer;
     private Soldier soldier;
 
@@ -73,8 +75,9 @@ public class GameScreen extends Screens implements Screen {
     private boolean isRightPressed;
     private Castle myCastle;
 
-    private Label villagerLabel;
+    private Label soldierLabel;
     private Label goldLabel;
+
     private final TmxMapLoader loader;
     private Label scoreLabel;
     private final GameScreenEvent gameScreenEvent;
@@ -101,13 +104,13 @@ public class GameScreen extends Screens implements Screen {
         pointTimerCounter = 10;
         gameScreenEvent = new GameScreenEvent(game, lobbyID);
         posCameraDesired = new Vector3();
-        cameraDebug = true;
+        cameraDebug = false;
         vectorSpeed = new Vector2();
         posCameraDesired = new Vector3();
         soldierArrayList = new ArrayList<>();
         castleArrayList = new ArrayList<>();
 
-        villagerLabel = new Label("", skin);
+        soldierLabel = new Label("", skin);
         goldLabel = new Label("",skin);
         entityHp = new Label("", skin);
 
@@ -121,6 +124,16 @@ public class GameScreen extends Screens implements Screen {
         gameScreenEvent.getConnectedPlayer(connectedPlayers);
         String mapPath = "maps/map_1.tmx";
         map = loader.load(mapPath);
+        MapProperties mapProperties = map.getProperties();
+        mapSizes = new int[]{
+                mapProperties.get("width", Integer.class),//tiles
+                mapProperties.get("height", Integer.class),//tiles
+                mapProperties.get("tilewidth", Integer.class),//tile
+                mapProperties.get("tileheight", Integer.class),//tile
+                //tile*tiles
+                mapProperties.get("width", Integer.class) * mapProperties.get("tilewidth", Integer.class),
+                mapProperties.get("height", Integer.class) * mapProperties.get("tileheight", Integer.class)
+        };
         //TODO way to tell maps apart
         float[] castlePosition;
         switch (startingPosition) {
@@ -187,7 +200,9 @@ public class GameScreen extends Screens implements Screen {
                                 }
                                 break;
                             case Input.Buttons.LEFT:
-                                if (rectangleStart != null && rectangleEnd != null) {
+                                if (rectangleStart == null && rectangleEnd == null) {
+                                    getClickedOnEntity();
+                                } else {
                                     float[] recCoords = new float[]{rectangleBounds[0], rectangleBounds[1]};
                                     float[] vilCoords;
                                     for (Soldier soldier : soldierArrayList) {
@@ -198,8 +213,6 @@ public class GameScreen extends Screens implements Screen {
                                             }
                                         }
                                     }
-                                } else {
-                                    getClickedOnEntity();
                                 }
                                 break;
                             default:
@@ -245,8 +258,9 @@ public class GameScreen extends Screens implements Screen {
 
         scoreLabel.setText(gameScreenEvent.getPoints());
 
-        villagerLabel.setText(myCastle.getVillager());
+        soldierLabel.setText(myCastle.getVillager());
         goldLabel.setText(myCastle.getGold());
+
         for (Castle c : castleArrayList) {
             c.draw(renderer.getBatch());
 
@@ -349,6 +363,23 @@ public class GameScreen extends Screens implements Screen {
                 s.draw(renderer.getBatch());
             }
         }
+        if (mapDebug) {
+            Sprite lineH = new Sprite(uiAtlas.findRegion("line-h"));
+            Sprite lineV = new Sprite(uiAtlas.findRegion("line-v"));
+            lineV.setColor(Color.GREEN);
+            lineH.setColor(Color.GREEN);
+            lineV.setSize(collisionUnitLayer.getWidth() * 64, 1);
+            lineH.setSize(1, collisionUnitLayer.getHeight() * 64);
+
+            for (int i = 1; i < 76; i++) {
+                lineV.setPosition(0, (i * 64));
+                lineH.setPosition((i * 64), 0);
+                lineV.draw(renderer.getBatch());
+                lineH.draw(renderer.getBatch());
+            }
+        }
+        debugRenderer.end();
+        renderer.getBatch().end();
 
 
         if (rectangleStart != null && rectangleEnd != null) {
@@ -372,34 +403,6 @@ public class GameScreen extends Screens implements Screen {
             entityName.setText("Castle");
         }
 
-        // todo schau wo die maus ist und dann reagiere also x und y abfragen und dann camera moven falls passend
-        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-            if (!isLeftPressed) {
-                getClickedOnEntity();
-                isLeftPressed = true;
-            } else {
-                if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-                    isLeftPressed = false;
-                }
-            }
-        }
-
-
-        if (mapDebug) {
-            Sprite lineH = new Sprite(uiAtlas.findRegion("line-h"));
-            Sprite lineV = new Sprite(uiAtlas.findRegion("line-v"));
-            lineV.setColor(Color.GREEN);
-            lineH.setColor(Color.GREEN);
-            lineV.setSize(collisionUnitLayer.getWidth() * 64, 1);
-            lineH.setSize(1, collisionUnitLayer.getHeight() * 64);
-
-            for (int i = 1; i < 76; i++) {
-                lineV.setPosition(0, (i * 64));
-                lineH.setPosition((i * 64), 0);
-                lineV.draw(renderer.getBatch());
-                lineH.draw(renderer.getBatch());
-            }
-        }
         debugRenderer.end();
         renderer.getBatch().end();
 
@@ -463,14 +466,13 @@ public class GameScreen extends Screens implements Screen {
         Window entityWindow = new Window("", skin);
         entityWindow.setMovable(false);
 
-        Window windowExit = new Window("Exit?", skin, "border");
-
         TextButton backButton = new TextButton("Back", skin);
         TextButton backButton2 = new TextButton("Back", skin);
 
 
 
-        Window windowNoVillager = new Window("", skin, "border");
+         TextButton exitButton = new TextButton("Back", skin);
+        Window windowNoVillager = new Window("NoVillager", skin, "border");
         windowNoVillager.setVisible(false);
         windowNoVillager.setMovable(false);
         windowNoVillager.add(new Label("You have not enough Villager to recruit a Soldier",skin)).padTop(20f).padRight(10f).padLeft(10f).row();
@@ -512,10 +514,11 @@ public class GameScreen extends Screens implements Screen {
 
 
 
+        Window windowExit = new Window("Surrender?", skin, "border");
         windowExit.setMovable(false);
         windowExit.defaults().pad(20f);
 
-        TextButton exitGameButton = new TextButton("Exit", skin);
+        TextButton exitGameButton = new TextButton("Surrender", skin);
         exitGameButton.getLabel().setFontScale(3f);
 
         TextButton addGoldButton = new TextButton("AddGold", skin);
@@ -524,7 +527,7 @@ public class GameScreen extends Screens implements Screen {
         TextButton noButton = new TextButton("No", skin);
         TextButton yesButton = new TextButton("Yes", skin);
 
-        Label exitLabel = new Label("Do you realy want to Exit?", skin);
+        Label exitLabel = new Label("Do you really want to Surrender?", skin);
         exitLabel.setFontScale(3f);
 
         Label scoreTextLabel = new Label(" Your Score:", skin);
@@ -629,7 +632,7 @@ public class GameScreen extends Screens implements Screen {
         resourceBarWindow.add(goldImage).padTop(30f).padBottom(10f).padLeft(10f).padRight(10f);
         resourceBarWindow.add(goldLabel).padTop(30f).padBottom(10f).padRight(10f);
         resourceBarWindow.add(soldierImage).padTop(30f).padBottom(10f).padLeft(10f).padRight(10f);
-        resourceBarWindow.add(villagerLabel).padTop(30f).padBottom(10f).padRight(10f);
+        resourceBarWindow.add(soldierLabel).padTop(30f).padBottom(10f).padRight(10f);
 
         resourceBarWindow.setPosition(0, stage.getHeight());
 
@@ -738,13 +741,36 @@ public class GameScreen extends Screens implements Screen {
 
         //Todo camera movement überarbeiten !!
         processCameraMovement(xClicked, yClicked);
-
         camera.position.lerp(posCameraDesired, 0.1f);
+        keepCameraInBounds();
 
         if (cameraDebug) {
             DrawDebugLine(new Vector2(camera.position.x, camera.position.y)
                     , new Vector2(posCameraDesired.x, posCameraDesired.y)
                     , 3, Color.RED, camera.combined);
+        }
+    }
+
+    /**
+     * Keeps the camera from going out of the tiledmap
+     */
+    private void keepCameraInBounds() {
+        //horizontal
+        if (camera.position.x < camera.viewportWidth / 2) {//height and width /2 because camera goes to right and left by half the width
+            //need to change both actual camera value AND desired camera value to prevent lockup
+            posCameraDesired.x = camera.viewportWidth / 2;
+            camera.position.x = camera.viewportWidth / 2;
+        } else if (camera.position.x > mapSizes[4] - camera.viewportWidth / 2) {
+            posCameraDesired.x = mapSizes[4] - camera.viewportWidth / 2;
+            camera.position.x = mapSizes[4] - camera.viewportWidth / 2;
+        }
+        // Vertical
+        if (camera.position.y < camera.viewportHeight / 2) {
+            posCameraDesired.y = camera.viewportHeight / 2;
+            camera.position.y = camera.viewportHeight / 2;
+        } else if (camera.position.y > mapSizes[5] - camera.viewportHeight / 2) {
+            posCameraDesired.y = mapSizes[5] - camera.viewportHeight / 2;
+            camera.position.y = mapSizes[5] - camera.viewportHeight / 2;
         }
     }
 
@@ -898,13 +924,14 @@ public class GameScreen extends Screens implements Screen {
 
         float[] coords = translateXYCoordinatesFromScreen(Gdx.input.getX(), Gdx.input.getY());
         for (Soldier soldier : soldierArrayList) {
-
-            if (soldier.getX() < (int) coords[0] && soldier.getY() < (int) coords[1]) {
-                if (soldier.getX() + soldier.getWidth() >= (int) coords[0] && soldier.getY() + soldier.getHeight() >= (int) coords[1]) {
-                    soldier.setSelected(!soldier.isSelected());
-                } else {
-                    soldier.setSelected(false);
-                }
+            float[] checkCoordsRect = new float[]{soldier.getX() - soldier.getWidth(),
+                    soldier.getY() - soldier.getHeight(),
+                    soldier.getX() + soldier.getWidth(),
+                    soldier.getY() + soldier.getHeight()};
+            if ((coords[0] >= checkCoordsRect[0] && coords[1] >= checkCoordsRect[1]) && (coords[0] <= checkCoordsRect[2] && coords[1] <= checkCoordsRect[3])) {
+                soldier.setSelected(!soldier.isSelected());
+            } else {
+                soldier.setSelected(false);
             }
         }
         for (Castle c : castleArrayList) {
