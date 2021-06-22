@@ -41,7 +41,8 @@ public class GameScreen extends Screens implements Screen {
     private final boolean cameraDebug;
     private final boolean mapDebug;
 
-    private TextButton buttonRekrut;
+    private TextButton buttonRecruit;
+    private TextButton buttonIncreaseMaxUnits;
 
     private boolean knowTheWay = false;
     private LinkedList<PathCell> theKnowenWay;
@@ -252,7 +253,7 @@ public class GameScreen extends Screens implements Screen {
             if (c.isSelected()) {
 
                 entityHp.setText(c.getHp());
-                buttonRekrut.setVisible(true);
+                buttonRecruit.setVisible(true);
 
 
                 //todo braucht seine eigene forEach !!
@@ -337,7 +338,7 @@ public class GameScreen extends Screens implements Screen {
 
             if (soldier.isSelected()) {
                 entityHp.setText(soldier.getHp());
-                buttonRekrut.setVisible(false);
+                buttonRecruit.setVisible(false);
 
                 //todo braucht seine eigene forEach !!
                 entityName.setText("Soldier");
@@ -463,12 +464,53 @@ public class GameScreen extends Screens implements Screen {
         entityWindow.setMovable(false);
 
         Window windowExit = new Window("Exit?", skin, "border");
-        TextButton exitButton = new TextButton("Back", skin);
-        Window windowNoVillager = new Window("NoVillager", skin, "border");
+
+        TextButton backButton = new TextButton("Back", skin);
+        TextButton backButton2 = new TextButton("Back", skin);
+
+
+
+        Window windowNoVillager = new Window("", skin, "border");
         windowNoVillager.setVisible(false);
         windowNoVillager.setMovable(false);
-        windowNoVillager.add(new Label("not enough Villager",skin)).row();//todo add listener
-        windowNoVillager.add(exitButton);
+        windowNoVillager.add(new Label("You have not enough Villager to recruit a Soldier",skin)).padTop(20f).padRight(10f).padLeft(10f).row();
+        windowNoVillager.add(backButton);
+
+        backButton.addListener(new InputListener(){
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                windowNoVillager.setVisible(false);
+            }
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+
+
+        });
+
+
+        Window windowNoGold = new Window("", skin, "border");
+        windowNoGold.setVisible(false);
+        windowNoGold.setMovable(false);
+        windowNoGold.add(new Label("You have not enough Gold",skin)).padTop(20f).padRight(10f).padLeft(10f).row();
+        windowNoGold.add(backButton2);
+
+        backButton2.addListener(new InputListener(){
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                windowNoGold.setVisible(false);
+            }
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+
+
+        });
+
+
+
 
         windowExit.setMovable(false);
         windowExit.defaults().pad(20f);
@@ -600,36 +642,72 @@ public class GameScreen extends Screens implements Screen {
         Label atkLabel = new Label("ATK", skin);
         Label defLabel = new Label("DEF", skin);
 
-        buttonRekrut = new TextButton("Rekrutieren", skin);
+        buttonRecruit = new TextButton("Recruit", skin);
+        buttonIncreaseMaxUnits = new TextButton("Upgrade Max Units", skin);
 
-        buttonRekrut.addListener(new InputListener() {
+        buttonRecruit.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("Villiger rekrut");
-                if(myCastle.getVillager() != 0){
-                    myCastle.setVillager(myCastle.getVillager() - 1);
-                    soldierSprite.setColor(gameScreenEvent.getTeamHashMap().get("Username").getColor());// todo username richtig abfragen
-                    Soldier soldier = new Soldier(soldierSprite,collisionUnitLayer,gameScreenEvent.getTeamHashMap().get("Username"));// todo username richtig abfragen
-                    soldierArrayList.add(soldier);
+                System.out.println("Recruit Villager");
+                if(myCastle.getVillager() != 0 && myCastle.getGold()-10 >= 0){
+                    if(soldierArrayList.size() <= myCastle.getMaxUnits()) {
+                        myCastle.setVillager(myCastle.getVillager() - 1);
+                        myCastle.setGold(myCastle.getGold() - 10);
+                        soldierSprite.setColor(gameScreenEvent.getTeamHashMap().get("Username").getColor());// todo username richtig abfragen
+                        Soldier soldier = new Soldier(soldierSprite, collisionUnitLayer, gameScreenEvent.getTeamHashMap().get("Username"));// todo username richtig abfragen
+                        soldierArrayList.add(soldier);
+                    }
                 }
                 else {
                     windowNoVillager.setPosition(stage.getWidth() / 2,stage.getHeight() / 2);
                     windowNoVillager.setVisible(true);
                 }
             }
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+
+        });
+
+
+        buttonIncreaseMaxUnits.addListener(new InputListener(){
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+
+                if(myCastle.getGold() - myCastle.getMaxUnits() >= 0){
+                    myCastle.setGold(myCastle.getGold() - myCastle.getMaxUnits());
+                    myCastle.setMaxUnits(myCastle.getMaxUnits() + 10);
+                }
+                else{
+                    windowNoGold.setPosition(stage.getWidth() / 2,stage.getHeight() / 2);
+                    windowNoGold.setVisible(true);
+                }
+
+
+
+
+
+
+            }
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
+
+
         });
+
 
         entityWindow.add(hpLabel);
         entityWindow.add(entityHp).padRight(30f).row();
         entityWindow.add(atkLabel);
         entityWindow.add(entityATK);
-        entityWindow.add(buttonRekrut).padRight(30f).row();
+        entityWindow.add(buttonRecruit).padRight(30f).row();
         entityWindow.add(defLabel);
+        entityWindow.add(buttonIncreaseMaxUnits).padRight(30f).row();;
         entityWindow.add(entityDEF);
         entityWindow.setPosition(stage.getWidth() / 2 - 300, 0);
 
@@ -638,11 +716,13 @@ public class GameScreen extends Screens implements Screen {
         packWindow(exitWindow, stage);
         packWindow(entityWindow, stage);
         packWindow(windowNoVillager, stage);
+        packWindow(windowNoGold,stage);
 
         stage.addActor(windowNoVillager);
         stage.addActor(entityWindow);
         stage.addActor(resourceBarWindow);
         stage.addActor(exitWindow);
+        stage.addActor(windowNoGold);
 
         stage.setDebugAll(false);
 
