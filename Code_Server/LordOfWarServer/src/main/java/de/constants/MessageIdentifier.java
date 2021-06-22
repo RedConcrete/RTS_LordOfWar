@@ -13,7 +13,8 @@ public enum MessageIdentifier {
     JOIN_LOBBY,
     LEAVE_LOBBY,
     LOBBY_PLAYERS,
-    START_GAME
+    START_GAME,
+    GET_LOBBY_INFO
     ;
 
 }
