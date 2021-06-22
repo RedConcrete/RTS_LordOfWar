@@ -6,8 +6,6 @@ public class Main {
 
     public static void main(String[] args) {
         Quarkus.run();
-        LowServer server = new LowServer();
-
     }
 
 }
