@@ -196,7 +196,9 @@ public class GameScreen extends Screens implements Screen {
                                 }
                                 break;
                             case Input.Buttons.LEFT:
-                                if (rectangleStart != null && rectangleEnd != null) {
+                                if (rectangleStart == null && rectangleEnd == null) {
+                                    getClickedOnEntity();
+                                } else {
                                     float[] recCoords = new float[]{rectangleBounds[0], rectangleBounds[1]};
                                     float[] vilCoords;
                                     for (Soldier soldier : soldierArrayList) {
@@ -207,8 +209,6 @@ public class GameScreen extends Screens implements Screen {
                                             }
                                         }
                                     }
-                                } else {
-                                    getClickedOnEntity();
                                 }
                                 break;
                             default:
@@ -398,19 +398,6 @@ public class GameScreen extends Screens implements Screen {
             entityName.setText("Castle");
         }
 
-        // todo schau wo die maus ist und dann reagiere also x und y abfragen und dann camera moven falls passend
-        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-            if (!isLeftPressed) {
-                getClickedOnEntity();
-                isLeftPressed = true;
-            } else {
-                if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-                    isLeftPressed = false;
-                }
-            }
-        }
-
-
         if (mapDebug) {
             Sprite lineH = new Sprite(uiAtlas.findRegion("line-h"));
             Sprite lineV = new Sprite(uiAtlas.findRegion("line-v"));
@@ -489,18 +476,18 @@ public class GameScreen extends Screens implements Screen {
         Window entityWindow = new Window("", skin);
         entityWindow.setMovable(false);
 
-        Window windowExit = new Window("Exit?", skin, "border");
-        TextButton exitButton = new TextButton("Back", skin);
+         TextButton exitButton = new TextButton("Back", skin);
         Window windowNoVillager = new Window("NoVillager", skin, "border");
         windowNoVillager.setVisible(false);
         windowNoVillager.setMovable(false);
         windowNoVillager.add(new Label("not enough Villlager", skin)).row();
         windowNoVillager.add(exitButton);
 
+        Window windowExit = new Window("Surrender?", skin, "border");
         windowExit.setMovable(false);
         windowExit.defaults().pad(20f);
 
-        TextButton exitGameButton = new TextButton("Exit", skin);
+        TextButton exitGameButton = new TextButton("Surrender", skin);
         exitGameButton.getLabel().setFontScale(3f);
 
         TextButton addGoldButton = new TextButton("AddGold", skin);
@@ -509,7 +496,7 @@ public class GameScreen extends Screens implements Screen {
         TextButton noButton = new TextButton("No", skin);
         TextButton yesButton = new TextButton("Yes", skin);
 
-        Label exitLabel = new Label("Do you realy want to Exit?", skin);
+        Label exitLabel = new Label("Do you really want to Surrender?", skin);
         exitLabel.setFontScale(3f);
 
         Label scoreTextLabel = new Label(" Your Score:", skin);
@@ -869,13 +856,14 @@ public class GameScreen extends Screens implements Screen {
 
         float[] coords = translateXYCoordinatesFromScreen(Gdx.input.getX(), Gdx.input.getY());
         for (Soldier soldier : soldierArrayList) {
-
-            if (soldier.getX() < (int) coords[0] && soldier.getY() < (int) coords[1]) {
-                if (soldier.getX() + soldier.getWidth() >= (int) coords[0] && soldier.getY() + soldier.getHeight() >= (int) coords[1]) {
-                    soldier.setSelected(!soldier.isSelected());
-                } else {
-                    soldier.setSelected(false);
-                }
+            float[] checkCoordsRect = new float[]{soldier.getX() - soldier.getWidth(),
+                    soldier.getY() - soldier.getHeight(),
+                    soldier.getX() + soldier.getWidth(),
+                    soldier.getY() + soldier.getHeight()};
+            if ((coords[0] >= checkCoordsRect[0] && coords[1] >= checkCoordsRect[1]) && (coords[0] <= checkCoordsRect[2] && coords[1] <= checkCoordsRect[3])) {
+                soldier.setSelected(!soldier.isSelected());
+            } else {
+                soldier.setSelected(false);
             }
         }
         for (Castle c : castleArrayList) {
