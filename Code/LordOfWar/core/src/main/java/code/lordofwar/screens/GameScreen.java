@@ -268,7 +268,7 @@ public class GameScreen extends Screens implements Screen {
                 Sprite s = new Sprite(uiAtlas.findRegion("button-normal"));
                 s.setColor(Color.RED);
                 s.setSize(c.getHp(), 10);
-                s.setPosition(c.getX() + c.getSprite().getWidth() / 2/3, c.getY() + c.getSprite().getHeight() - 50);
+                s.setPosition(c.getX() + c.getSprite().getWidth() / 2 / 3, c.getY() + c.getSprite().getHeight() - 50);
                 s.draw(renderer.getBatch());
 
             }
@@ -465,7 +465,7 @@ public class GameScreen extends Screens implements Screen {
         Window windowNoVillager = new Window("NoVillager", skin, "border");
         windowNoVillager.setVisible(false);
         windowNoVillager.setMovable(false);
-        windowNoVillager.add(new Label("not enough Villlager",skin)).row();
+        windowNoVillager.add(new Label("not enough Villlager", skin)).row();
         windowNoVillager.add(exitButton);
 
         windowExit.setMovable(false);
@@ -599,19 +599,20 @@ public class GameScreen extends Screens implements Screen {
         Label atkLabel = new Label("ATK", skin);
         Label defLabel = new Label("DEF", skin);
 
-        buttonRekrut = new TextButton("Rekrutieren",skin);
+        buttonRekrut = new TextButton("Rekrutieren", skin);
 
         buttonRekrut.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("Villiger rekrut");
-                if(myCastle.getVillager() != 0){
-                    myCastle.setVillager(myCastle.getVillager() - 1);
-                    Soldier soldier = new Soldier(soldierSprite,collisionUnitLayer);
-                    soldierArrayList.add(soldier);
-                }
-                else {
-                    windowNoVillager.setPosition(stage.getWidth() / 2,stage.getHeight() / 2);
+                if (myCastle.getVillager() != 0) {
+                    if (soldierArrayList.size() <= myCastle.getMaxUnits()) {
+                        myCastle.setVillager(myCastle.getVillager() - 1);
+                        Soldier soldier = new Soldier(soldierSprite, collisionUnitLayer);
+                        soldierArrayList.add(soldier);
+                    }
+                } else {
+                    windowNoVillager.setPosition(stage.getWidth() / 2, stage.getHeight() / 2);
                     windowNoVillager.setVisible(true);
                 }
             }
@@ -635,7 +636,7 @@ public class GameScreen extends Screens implements Screen {
         packWindow(resourceBarWindow, stage);
         packWindow(exitWindow, stage);
         packWindow(entityWindow, stage);
-        packWindow(windowNoVillager,stage);
+        packWindow(windowNoVillager, stage);
 
         stage.addActor(windowNoVillager);
         stage.addActor(entityWindow);

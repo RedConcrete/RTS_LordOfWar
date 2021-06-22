@@ -110,7 +110,7 @@ public class LobbyScreen extends Screens implements Screen {
         startButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                //Todo server muss wissen das die Lobby gestartet wurde!
+                //Todo server muss wissen das die Lobby gestartet wurde! !!!!!Fertig!!!!!!!!!!!!! ?? wenn ja löschen!!!
                 lobbyScreenEvent.sendGameStartRequest(gameInfoArr[0]);
             }
 
