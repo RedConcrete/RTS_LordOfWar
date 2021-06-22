@@ -42,6 +42,7 @@ public class LobbyCreateScreenEvent extends Events{
         if (arr[1].equals("true")) {
             lobbyID = arr[2];
             isCreated = true;
+            System.out.println(getLobbyID());
         }
     }
 
