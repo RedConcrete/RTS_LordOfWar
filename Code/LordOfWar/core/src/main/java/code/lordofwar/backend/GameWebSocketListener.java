@@ -1,5 +1,6 @@
 package code.lordofwar.backend;
 
+import code.lordofwar.backend.events.GameScreenEvent;
 import code.lordofwar.main.LOW;
 import code.lordofwar.screens.*;
 import okhttp3.Response;
@@ -53,7 +54,7 @@ public class GameWebSocketListener extends WebSocketListener {
 
     private void checkDataDir(String[] strings) {
         //System.out.println(Arrays.toString(strings));
-        for (MessageIdentifier messageIdentifier : MessageIdentifier.values()) {
+        for (MessageIdentifier messageIdentifier : values()) {
             if (strings[0].equals(messageIdentifier.toString())) {
                 if (strings[0].equals(LOGIN_VALID.toString())) {
                     if (game.getScreen() instanceof LoginScreen) {
@@ -86,8 +87,11 @@ public class GameWebSocketListener extends WebSocketListener {
                     if (game.getScreen() instanceof LobbyScreen) {//very important! this can be triggered in the browser or create screen and needs to be discarded inn that case
                         ((LobbyScreen) game.getScreen()).getLobbyScreenEvent().setPlayers(strings);
                     }
-                } else if (strings[0].equals(START_GAME.toString())) {
-                    if (game.getScreen() instanceof LobbyScreen) {
+                    if (game.getScreen() instanceof GameScreenEvent) {//very important! this can be triggered in the browser or create screen and needs to be discarded inn that case
+                        ((GameScreenEvent) game.getScreen()).getGameScreenEvent().getConnectedPlayer(strings);
+                    }
+                }else if (strings[0].equals(START_GAME.toString())){
+                    if (game.getScreen() instanceof LobbyScreen){
                         ((LobbyScreen) game.getScreen()).getLobbyScreenEvent().setGameData(strings);
                     }
                 }
