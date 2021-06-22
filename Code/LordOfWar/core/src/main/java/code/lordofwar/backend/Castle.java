@@ -59,6 +59,7 @@ public class Castle extends Sprite {
             }
         }).start();
 
+
     }
 
     public void setVillager(int villager) {
