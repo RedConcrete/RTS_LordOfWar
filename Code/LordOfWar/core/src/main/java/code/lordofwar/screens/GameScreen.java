@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -47,6 +48,7 @@ public class GameScreen extends Screens implements Screen {
     private LinkedList<PathCell> theKnowenWay;
     private Vector3 posCameraDesired;
     private final TiledMap map;
+    private final int[] mapSizes;
     private OrthogonalTiledMapRenderer renderer;
     private Soldier soldier;
 
@@ -100,7 +102,7 @@ public class GameScreen extends Screens implements Screen {
         pointTimerCounter = 10;
         gameScreenEvent = new GameScreenEvent(game, lobbyID);
         posCameraDesired = new Vector3();
-        cameraDebug = true;
+        cameraDebug = false;
         vectorSpeed = new Vector2();
         posCameraDesired = new Vector3();
         soldierArrayList = new ArrayList<>();
@@ -118,6 +120,16 @@ public class GameScreen extends Screens implements Screen {
 
         String mapPath = "maps/map_1.tmx";
         map = loader.load(mapPath);
+        MapProperties mapProperties = map.getProperties();
+        mapSizes = new int[]{
+                mapProperties.get("width", Integer.class),//tiles
+                mapProperties.get("height", Integer.class),//tiles
+                mapProperties.get("tilewidth", Integer.class),//tile
+                mapProperties.get("tileheight", Integer.class),//tile
+                //tile*tiles
+                mapProperties.get("width", Integer.class) * mapProperties.get("tilewidth", Integer.class),
+                mapProperties.get("height", Integer.class) * mapProperties.get("tileheight", Integer.class)
+        };
         //TODO way to tell maps apart
         float[] castlePosition;
         switch (startingPosition) {
@@ -657,13 +669,36 @@ public class GameScreen extends Screens implements Screen {
 
         //Todo camera movement überarbeiten !!
         processCameraMovement(xClicked, yClicked);
-
         camera.position.lerp(posCameraDesired, 0.1f);
+        keepCameraInBounds();
 
         if (cameraDebug) {
             DrawDebugLine(new Vector2(camera.position.x, camera.position.y)
                     , new Vector2(posCameraDesired.x, posCameraDesired.y)
                     , 3, Color.RED, camera.combined);
+        }
+    }
+
+    /**
+     * Keeps the camera from going out of the tiledmap
+     */
+    private void keepCameraInBounds() {
+        //horizontal
+        if (camera.position.x < camera.viewportWidth / 2) {//height and width /2 because camera goes to right and left by half the width
+            //need to change both actual camera value AND desired camera value to prevent lockup
+            posCameraDesired.x = camera.viewportWidth / 2;
+            camera.position.x = camera.viewportWidth / 2;
+        } else if (camera.position.x > mapSizes[4] - camera.viewportWidth / 2) {
+            posCameraDesired.x = mapSizes[4] - camera.viewportWidth / 2;
+            camera.position.x = mapSizes[4] - camera.viewportWidth / 2;
+        }
+        // Vertical
+        if (camera.position.y < camera.viewportHeight / 2) {
+            posCameraDesired.y = camera.viewportHeight / 2;
+            camera.position.y = camera.viewportHeight / 2;
+        } else if (camera.position.y > mapSizes[5] - camera.viewportHeight / 2) {
+            posCameraDesired.y = mapSizes[5] - camera.viewportHeight / 2;
+            camera.position.y = mapSizes[5] - camera.viewportHeight / 2;
         }
     }
 
