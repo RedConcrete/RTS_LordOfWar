@@ -94,7 +94,7 @@ public class MenuScreen extends Screens implements Screen {
         TextButton yesButton = new TextButton("Yes", skin);
         yesButton.getLabel().setFontScale(2f);
 
-        Label exitLabel = new Label("Do you realy want to Exit?", skin);
+        Label exitLabel = new Label("Do you really want to Exit?", skin);
         exitLabel.setFontScale(3f);
 
         lobbyJoinButton.addListener(new InputListener() {

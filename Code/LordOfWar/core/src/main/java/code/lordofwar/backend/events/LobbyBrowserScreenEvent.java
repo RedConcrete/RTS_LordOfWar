@@ -12,12 +12,12 @@ import static code.lordofwar.backend.MessageIdentifier.JOIN_LOBBY;
 public class LobbyBrowserScreenEvent extends Events{
 
     private String[] lobbyList;
-    private String joined;
+    private String[] lobbyInfo;
 
     public LobbyBrowserScreenEvent(LOW game) {
         super(game);
         lobbyList = new String[0];
-        joined=null;
+        lobbyInfo = null;
     }
 
     public void sendRequestGetLobbys(){
@@ -33,12 +33,12 @@ public class LobbyBrowserScreenEvent extends Events{
 
     public void setJoined(String[] lobbyJoinRequestResponse) {
         if (lobbyJoinRequestResponse[1].equals("true")) {
-            this.joined = lobbyJoinRequestResponse[2];
+            System.arraycopy(lobbyJoinRequestResponse,1,this.lobbyInfo,0,lobbyJoinRequestResponse.length - 1);
         }
     }
 
-    public String getJoined() {
-        return joined;
+    public String[] getLobbyInfo() {
+        return lobbyInfo;
     }
 
     public void setLobbyList(String[] lobbyList) {
