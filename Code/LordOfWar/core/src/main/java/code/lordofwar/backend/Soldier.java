@@ -6,17 +6,23 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.List;
+
 public class Soldier extends Sprite {
 
+    private boolean selected;
     private Vector2 velocity = new Vector2();
-
     private float speed = 60 * 2;
+    private int hp;
+    private List<PathCell> destination;
 
     private TiledMapTileLayer collisionLayer;
 
     public Soldier(Sprite sprite, TiledMapTileLayer collisionLayer) {
         super(sprite);
         this.collisionLayer = collisionLayer;
+        hp = 50;
+        destination = null;
     }
 
     @Override
@@ -27,122 +33,122 @@ public class Soldier extends Sprite {
 
     private void update(float deltaTime) {
         endOfMapCollision();
+        setPosition(getX() + velocity.x * deltaTime,getY()+ velocity.y * deltaTime);
         objectCollision(deltaTime);
     }
 
-    private void endOfMapCollision(){
-        if(getX() <= 0 ){
-            setPosition(1 ,getY());
-        }else if(getX() >= collisionLayer.getWidth()*64-64){
-            setPosition(getX()-1 ,getY());
+    private void endOfMapCollision() {
+        if (getX() <= 0) {
+            setPosition(1, getY());
+        } else if (getX() >= collisionLayer.getWidth() * 64 - 100) {
+            setPosition(getX() - 10, getY());
         }
 
-        if(getY() <= 0 ){
-            setPosition(getX() ,1);
-        }else if (getY() >= collisionLayer.getHeight()*64-100){
-            setPosition(getX() ,getY()-1);
+        if (getY() <= 0) {
+            setPosition(getX(), 1);
+        } else if (getY() >= collisionLayer.getHeight() * 64 - 100) {
+            setPosition(getX(), getY() - 10);
         }
+
     }
 
 
-    private void objectCollision(float deltaTime){
-        //Todo https://youtu.be/DOpqkaX9844 Fix Colloison
-
-        if (velocity.x > speed && velocity.y > speed) {
-            velocity.x = speed;
-            velocity.y = speed;
-        }
-
-        float oldX = getX(), oldY = getY(), tileWidth = collisionLayer.getTileWidth(), tileHeight = collisionLayer.getTileHeight();
-        boolean collisionX= false, collisionY = false;
-
-        setX(getX() + velocity.x * deltaTime);
-
-        if (velocity.x < 0) {
-
-            //Top left
-            collisionX = collisionLayer.getCell((int) (getX() / tileWidth), (int) ((getY() + getHeight()) / tileHeight))
-                    .getTile().getProperties().containsKey("isCastel");
-
-            //Middel left
-            if(!collisionX)
-                collisionX = collisionLayer.getCell((int) (getX() / tileWidth), (int) ((getY() + getHeight() / 2) / tileHeight))
-                        .getTile().getProperties().containsKey("isCastel");
-
-            //Bottem left
-            if(!collisionX)
-                collisionX = collisionLayer.getCell((int) (getX() / tileWidth), (int) (getY() / tileHeight))
-                        .getTile().getProperties().containsKey("isCastel");
-
-        } else if (velocity.x > 0) {
-
-            //rechts mitte
-            collisionX = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) ((getY() + getHeight() / 2) / tileHeight)).getTile().getProperties().containsKey("blocked");
-
-            //Top right
-            collisionX = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) ((getY() + getHeight()) / tileHeight))
-                    .getTile().getProperties().containsKey("isCastel");
-
-            //Middel right
-            if(!collisionX)
-                collisionX = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) ((getY() + getHeight() / 2) / tileHeight))
-                        .getTile().getProperties().containsKey("isCastel");
-
-            //Bottem right
-            if(!collisionX)
-                collisionX = collisionLayer.getCell((int) ((getX() + getWidth())/ tileWidth), (int) (getY() / tileHeight))
-                        .getTile().getProperties().containsKey("isCastel");
-
-        }
-
-        //react to x coll
-        if(collisionX){
-            setX(oldX);
-            velocity.x = 0;
-            System.out.println("collision X");
-        }
-
-        // moving in y
-        setY(getY() + velocity.y * deltaTime);
-
-        if (velocity.y < 0) {
-
-            //bottom left
-            collisionY = collisionLayer.getCell((int) (getX() / tileWidth), (int) (getY()  / tileHeight))
-                    .getTile().getProperties().containsKey("isCastel");
-            //bottom Middel
-            if(!collisionY)
-                collisionY = collisionLayer.getCell((int) ((getX() + getWidth() / 2) / tileWidth ), (int) (getY() / tileHeight))
-                        .getTile().getProperties().containsKey("isCastel");
-            //bottem right
-            if(!collisionY)
-                collisionY = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) (getY() / tileHeight))
-                        .getTile().getProperties().containsKey("isCastel");
+    private void objectCollision(float deltaTime) {
+//
+//        //Todo https://youtu.be/DOpqkaX9844 Fix Colloison
 
 
-        } else if (velocity.y > 0) {
 
-            //Top left
-            collisionY = collisionLayer.getCell((int) (getX()  / tileWidth), (int) ((getY() + getHeight()) / tileHeight))
-                    .getTile().getProperties().containsKey("isCastel");
-            //Top middel
-            if(!collisionY)
-                collisionY = collisionLayer.getCell((int) ((getX() + getWidth() / 2) / tileWidth), (int) ((getY() + getHeight()/2) / tileHeight))
-                        .getTile().getProperties().containsKey("isCastel");
-            //Top right
-            if(!collisionY)
-                collisionY = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) ((getY() + getHeight()) / tileHeight))
-                        .getTile().getProperties().containsKey("isCastel");
+//
+//        float oldX = getX(), oldY = getY(), tileWidth = collisionLayer.getTileWidth(), tileHeight = collisionLayer.getTileHeight();
+//        boolean collisionX= false, collisionY = false;
+//
 
-        }
+//
+//        if (velocity.x < 0) {
+//
+//            //Top left
+//            collisionX = collisionLayer.getCell((int) (getX() / tileWidth), (int) ((getY() + getHeight()) / tileHeight))
+//                    .getTile().getProperties().containsKey("isCastle");
+//
+//            //Middel left
+//            if(!collisionX)
+//                collisionX = collisionLayer.getCell((int) (getX() / tileWidth), (int) ((getY() + getHeight() / 2) / tileHeight))
+//                        .getTile().getProperties().containsKey("isCastle");
+//
+//            //Bottem left
+//            if(!collisionX)
+//                collisionX = collisionLayer.getCell((int) (getX() / tileWidth), (int) (getY() / tileHeight))
+//                        .getTile().getProperties().containsKey("isCastle");
+//
+//        } else if (velocity.x > 0) {
+//
+//            //rechts mitte
+//            collisionX = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) ((getY() + getHeight() / 2) / tileHeight)).getTile().getProperties().containsKey("blocked");
+//
+//            //Top right
+//            collisionX = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) ((getY() + getHeight()) / tileHeight))
+//                    .getTile().getProperties().containsKey("isCastle");
+//
+//            //Middel right
+//            if(!collisionX)
+//                collisionX = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) ((getY() + getHeight() / 2) / tileHeight))
+//                        .getTile().getProperties().containsKey("isCastle");
+//
+//            //Bottem right
+//            if(!collisionX)
+//                collisionX = collisionLayer.getCell((int) ((getX() + getWidth())/ tileWidth), (int) (getY() / tileHeight))
+//                        .getTile().getProperties().containsKey("isCastle");
+//
+//        }
+//
+//        //react to x coll
+//        if(collisionX){
+//            setX(oldX);
+//            velocity.x = 0;
+//        }
+//
+//        // moving in y
 
-        //react to y coll
-        if(collisionY){
-            setY(oldY);
-            velocity.y = 0;
-            System.out.println("collision Y");
-        }
-
+//
+//
+//        if (velocity.y < 0) {
+//
+//            //bottom left
+//            collisionY = collisionLayer.getCell((int) (getX() / tileWidth), (int) (getY()  / tileHeight))
+//                    .getTile().getProperties().containsKey("isCastle");
+//            //bottom Middel
+//            if(!collisionY)
+//                collisionY = collisionLayer.getCell((int) ((getX() + getWidth() / 2) / tileWidth ), (int) (getY() / tileHeight))
+//                        .getTile().getProperties().containsKey("isCastle");
+//            //bottem right
+//            if(!collisionY)
+//                collisionY = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) (getY() / tileHeight))
+//                        .getTile().getProperties().containsKey("isCastle");
+//
+//
+//        } else if (velocity.y > 0) {
+//
+//            //Top left
+//            collisionY = collisionLayer.getCell((int) (getX()  / tileWidth), (int) ((getY() + getHeight()) / tileHeight))
+//                    .getTile().getProperties().containsKey("isCastle");
+//            //Top middel
+//            if(!collisionY)
+//                collisionY = collisionLayer.getCell((int) ((getX() + getWidth() / 2) / tileWidth), (int) ((getY() + getHeight()/2) / tileHeight))
+//                        .getTile().getProperties().containsKey("isCastle");
+//            //Top right
+//            if(!collisionY)
+//                collisionY = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) ((getY() + getHeight()) / tileHeight))
+//                        .getTile().getProperties().containsKey("isCastle");
+//
+//        }
+//
+//        //react to y coll
+//        if(collisionY){
+//            setY(oldY);
+//            velocity.y = 0;
+//        }
+//
     }
 
     public Vector2 getVelocity() {
@@ -168,4 +174,30 @@ public class Soldier extends Sprite {
     public void setCollisionLayer(TiledMapTileLayer collisionLayer) {
         this.collisionLayer = collisionLayer;
     }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public int getHp() {
+        return hp;
+    }
+
+    public void setHp(int hp) {
+        this.hp = hp;
+    }
+
+    public List<PathCell> getDestination() {
+        return destination;
+    }
+
+    public void setDestination(List<PathCell> destination) {
+        this.destination = destination;
+    }
+
+
 }
