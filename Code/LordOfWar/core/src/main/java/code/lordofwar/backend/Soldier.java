@@ -15,15 +15,21 @@ public class Soldier extends Sprite {
     private float speed = 60 * 2;
     private int hp;
     private List<PathCell> destination;
+    private Team team;
+    private Sprite sprite;
 
     private TiledMapTileLayer collisionLayer;
 
-    public Soldier(Sprite sprite, TiledMapTileLayer collisionLayer) {
+    public Soldier(Sprite sprite, TiledMapTileLayer collisionLayer, Team team) {
         super(sprite);
+        this.sprite = sprite;
         this.collisionLayer = collisionLayer;
         hp = 50;
         destination = null;
+        this.team = team;
     }
+
+
 
     @Override
     public void draw(Batch batch) {
@@ -199,5 +205,7 @@ public class Soldier extends Sprite {
         this.destination = destination;
     }
 
+    public Team getTeam() { return team; }
 
+    public Sprite getSprite() { return sprite; }
 }

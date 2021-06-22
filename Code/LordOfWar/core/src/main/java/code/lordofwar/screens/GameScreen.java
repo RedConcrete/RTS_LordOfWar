@@ -90,7 +90,7 @@ public class GameScreen extends Screens implements Screen {
     Image castleImage;
     Image soldierImage;
 
-    public GameScreen(LOW aGame, Skin aSkin, String lobbyID, int startingPosition) {
+    public GameScreen(LOW aGame, Skin aSkin, String lobbyID, int startingPosition, String[] connectedPlayers) {
         super(aGame, aSkin);
         mapDebug = false;
         isLeftPressed = false;
@@ -114,9 +114,10 @@ public class GameScreen extends Screens implements Screen {
         rectangleStart = null;//null bc rectangle was started
         rectangleEnd = null;
         rectangleBounds = new float[4];//0=originX1=originY2=width3=height
-        soldierSprite = new Sprite(unitAtlas.findRegion("Character_Green_B"));
+        soldierSprite = new Sprite(unitAtlas.findRegion("Character_Green"));
         loader = new TmxMapLoader();
 
+        gameScreenEvent.getConnectedPlayer(connectedPlayers);
         String mapPath = "maps/map_1.tmx";
         map = loader.load(mapPath);
         //TODO way to tell maps apart
@@ -341,7 +342,7 @@ public class GameScreen extends Screens implements Screen {
                 //todo braucht seine eigene forEach !!
                 entityName.setText("Soldier");
                 Sprite s = new Sprite(uiAtlas.findRegion("button-normal"));
-                s.setColor(Color.RED);
+                s.setColor(soldier.getTeam().getColor());
                 s.setSize(soldier.getHp(), 10);
                 s.setPosition(soldier.getX() + 5, soldier.getY() + 60);
                 s.draw(renderer.getBatch());
@@ -466,7 +467,7 @@ public class GameScreen extends Screens implements Screen {
         Window windowNoVillager = new Window("NoVillager", skin, "border");
         windowNoVillager.setVisible(false);
         windowNoVillager.setMovable(false);
-        windowNoVillager.add(new Label("not enough Villlager",skin)).row();
+        windowNoVillager.add(new Label("not enough Villager",skin)).row();//todo add listener
         windowNoVillager.add(exitButton);
 
         windowExit.setMovable(false);
@@ -476,7 +477,7 @@ public class GameScreen extends Screens implements Screen {
         exitGameButton.getLabel().setFontScale(3f);
 
         TextButton addGoldButton = new TextButton("AddGold", skin);
-        TextButton tackGoldButton = new TextButton("TackGold", skin);
+        TextButton takeGoldButton = new TextButton("TakeGold", skin);
 
         TextButton noButton = new TextButton("No", skin);
         TextButton yesButton = new TextButton("Yes", skin);
@@ -513,7 +514,7 @@ public class GameScreen extends Screens implements Screen {
                 return true;
             }
         });
-        tackGoldButton.addListener(new InputListener() {
+        takeGoldButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 goldLabel.setText(goldAmount = goldAmount - 100);
@@ -607,7 +608,8 @@ public class GameScreen extends Screens implements Screen {
                 System.out.println("Villiger rekrut");
                 if(myCastle.getVillager() != 0){
                     myCastle.setVillager(myCastle.getVillager() - 1);
-                    Soldier soldier = new Soldier(soldierSprite,collisionUnitLayer);
+                    soldierSprite.setColor(gameScreenEvent.getTeamHashMap().get("Username").getColor());// todo username richtig abfragen
+                    Soldier soldier = new Soldier(soldierSprite,collisionUnitLayer,gameScreenEvent.getTeamHashMap().get("Username"));// todo username richtig abfragen
                     soldierArrayList.add(soldier);
                 }
                 else {

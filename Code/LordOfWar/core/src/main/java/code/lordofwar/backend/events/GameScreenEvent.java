@@ -1,9 +1,13 @@
 package code.lordofwar.backend.events;
 
 import code.lordofwar.backend.DataPacker;
+import code.lordofwar.backend.Team;
 import code.lordofwar.main.LOW;
+import code.lordofwar.screens.GameScreen;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 import static code.lordofwar.backend.MessageIdentifier.GET_GAME_POINTS;
 import static code.lordofwar.backend.MessageIdentifier.LEAVE_LOBBY;
@@ -11,11 +15,16 @@ import static code.lordofwar.backend.MessageIdentifier.LEAVE_LOBBY;
 public class GameScreenEvent extends Events {
     private int points;
     private final String lobbyID;
+    private GameScreenEvent gameScreenEvent;
+    private ArrayList conPlayers;
+    private HashMap<String,Team> teamHashMap = new HashMap<String,Team>();
+
 
     public GameScreenEvent(LOW aGame, String lobbyID) {
         super(aGame);
         points = 0;
         this.lobbyID = lobbyID;
+
     }
 
     public void sendPointRequest() {
@@ -40,5 +49,29 @@ public class GameScreenEvent extends Events {
         leaveData.add(game.getSessionID());
         leaveData.add(lobbyID);
         webSocket.send(DataPacker.packData(LEAVE_LOBBY, DataPacker.stringCombiner(leaveData)));
+    }
+
+    public void createTeams(){
+        for (int i = 0; i < conPlayers.size(); i++) {
+            Team team= new Team(i);
+            teamHashMap.put((String) conPlayers.get(i),team);
+        }
+    }
+
+    public GameScreenEvent getGameScreenEvent() {
+
+        return gameScreenEvent;
+    }
+
+    public void getConnectedPlayer(String[] conPlayers){
+        this.conPlayers = new ArrayList<String>();
+        for(int i = 0; i<conPlayers.length; i++) {
+            this.conPlayers.add(conPlayers[i]);
+        }
+        createTeams();
+    }
+
+    public HashMap<String,Team> getTeamHashMap() {
+        return teamHashMap;
     }
 }

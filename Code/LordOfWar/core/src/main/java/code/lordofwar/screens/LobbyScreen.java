@@ -43,10 +43,11 @@ public class LobbyScreen extends Screens implements Screen {
 
     @Override
     public void render(float delta) {
+
         if (lobbyScreenEvent.isStartedGame()) {
             String[] gameData = lobbyScreenEvent.getGameData();
             //[1]=lobbyname[2]=gamemode[3]=map
-            game.setScreen(new GameScreen(game, skin, gameData[0], Integer.parseInt(gameData[gameData.length - 1])));//todo insert data here via lobbyScreenEvent.getData
+            game.setScreen(new GameScreen(game, skin, gameData[0], Integer.parseInt(gameData[gameData.length - 1]),lobbyScreenEvent.getPlayers()));//todo insert data here via lobbyScreenEvent.getData
         }
 
         if (!lobbyScreenEvent.isRecievedData()) {//later data requests (map etc) also go here
