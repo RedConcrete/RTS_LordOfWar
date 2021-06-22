@@ -90,8 +90,6 @@ public class GameWebSocketHandler {
                     joinLobby(data);
                 } else if (data[0].equals(LEAVE_LOBBY.toString())) {
                     leaveLobby(data);
-                } else if (data[0].equals(GET_LOBBY_INFO.toString())) {
-                    sendLobbyDataToClient(data);
                 } else if (data[0].equals(LOBBY_PLAYERS.toString())) {
                     sendPlayerListUpdate(data);
                 } else if (data[0].equals(START_GAME.toString())) {
@@ -223,10 +221,6 @@ public class GameWebSocketHandler {
                 userSessions.put(id, user);
             }
         }
-    }
-
-    private void sendLobbyDataToClient(String[] args) {
-
     }
 
     public Map<String, Session> getSessions() {
