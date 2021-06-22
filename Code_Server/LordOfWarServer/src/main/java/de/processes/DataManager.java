@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 
 //see https://howtodoinjava.com/jaxb/write-object-to-xml/
 public class DataManager {
-    public final static String directory = "src/main/resources/data/";
+    public final static String directory = "P:\\IntelliJ Projects\\aib_labswp_2021_ss_rtsgame\\Code_Server\\LordOfWarServer\\src\\main\\resources\\data\\";
     public final static String extension = ".txt";
     public final static Path userIDPath = Paths.get(DataManager.directory + "userID.txt");
 
