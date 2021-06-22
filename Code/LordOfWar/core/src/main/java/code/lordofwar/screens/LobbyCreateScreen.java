@@ -137,7 +137,7 @@ public class LobbyCreateScreen extends Screens implements Screen {
                                     @Override
                                     public void run() {
                                         if (lobbyCreateScreenEvent.isCreated()) {
-                                            game.setScreen(new LobbyScreen(game, skin, lobbyCreateScreenEvent.getLobbyID()));
+                                            game.setScreen(new LobbyScreen(game, skin, new String[]{lobbyName.getText(), mapSelctBox.getSelected(), String.valueOf(playerAmountSelectBox.getSelected()), gameModeSelectBox.getSelected()}));
 
                                         } else {
 

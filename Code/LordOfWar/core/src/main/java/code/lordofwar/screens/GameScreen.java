@@ -115,7 +115,7 @@ public class GameScreen extends Screens implements Screen {
         rectangleStart = null;//null bc rectangle was started
         rectangleEnd = null;
         rectangleBounds = new float[4];//0=originX1=originY2=width3=height
-        soldierSprite = new Sprite(unitAtlas.findRegion("Character_Green_B"));
+        soldierSprite = new Sprite(unitAtlas.findRegion("Character_Green"));
         loader = new TmxMapLoader();
 
         String mapPath = "maps/map_1.tmx";
@@ -618,9 +618,11 @@ public class GameScreen extends Screens implements Screen {
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("Villiger rekrut");
                 if (myCastle.getVillager() != 0) {
-                    myCastle.setVillager(myCastle.getVillager() - 1);
-                    Soldier soldier = new Soldier(soldierSprite, collisionUnitLayer);
-                    soldierArrayList.add(soldier);
+                    if (soldierArrayList.size() <= myCastle.getMaxUnits()) {
+                        myCastle.setVillager(myCastle.getVillager() - 1);
+                        Soldier soldier = new Soldier(soldierSprite, collisionUnitLayer);
+                        soldierArrayList.add(soldier);
+                    }
                 } else {
                     windowNoVillager.setPosition(stage.getWidth() / 2, stage.getHeight() / 2);
                     windowNoVillager.setVisible(true);
@@ -705,9 +707,13 @@ public class GameScreen extends Screens implements Screen {
      *
      * @author Robin Hefner
      */
+
     private void processCameraMovement(float xClicked, float yClicked) {
 
+        //todo so lassen ?? größe anpassen
+
         //oben links
+        /*
         if (xClicked <= camera.viewportWidth * 2 / 32 && yClicked <= camera.viewportHeight * 1 / 18) {
             posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
             posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
@@ -720,19 +726,10 @@ public class GameScreen extends Screens implements Screen {
 
             camera.update();
         }
-        //mitte links
-        else if (xClicked <= camera.viewportWidth * 2 / 32 && yClicked >= camera.viewportHeight * 1 / 18 && yClicked <= camera.viewportHeight * 17 / 18) {
-            posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
+        */
 
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(0, camera.viewportHeight - camera.viewportHeight * 17 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 16 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
-        }
         //unten links
+        /*
         else if (xClicked <= camera.viewportWidth * 2 / 32 && yClicked >= camera.viewportHeight * 17 / 18 && yClicked <= camera.viewportHeight) {
             posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
             posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
@@ -745,8 +742,10 @@ public class GameScreen extends Screens implements Screen {
 
             camera.update();
         }
+        */
 
         //oben rechts
+        /*
         else if (xClicked >= camera.viewportWidth * 30 / 32 && yClicked <= camera.viewportHeight * 1 / 18) {
             posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
             posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
@@ -759,19 +758,10 @@ public class GameScreen extends Screens implements Screen {
 
             camera.update();
         }
-        //mitte rechts
-        else if (xClicked >= camera.viewportWidth * 30 / 32 && yClicked >= camera.viewportHeight * 1 / 18 && yClicked <= camera.viewportHeight * 17 / 18) {
-            posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
+        */
 
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 2 / 32, camera.viewportHeight - camera.viewportHeight * 17 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 16 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
-        }
         //unten rechts
+        /*
         else if (xClicked >= camera.viewportWidth * 30 / 32 && yClicked >= camera.viewportHeight * 17 / 18) {
             posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
             posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
@@ -784,26 +774,55 @@ public class GameScreen extends Screens implements Screen {
 
             camera.update();
         }
+        */
 
-        //mitte oben
-        else if (xClicked >= camera.viewportWidth * 2 / 32 && xClicked <= camera.viewportWidth * 30 / 32 && yClicked <= camera.viewportHeight * 1 / 18) {
-            posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
+
+        //mitte links
+        if (xClicked <= 5 && yClicked >= camera.viewportHeight * 1 / 18 && yClicked <= camera.viewportHeight * 17 / 18) {
+            posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
 
             if (cameraDebug) {
                 debugMovement.begin();
-                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 30 / 32, camera.viewportHeight - camera.viewportHeight * 1 / 18, camera.viewportWidth * 28 / 32, camera.viewportHeight * 1 / 18);
+                debugMovement.rect(0, 5, 1, camera.viewportHeight * 16 / 18);
                 debugMovement.end();
             }
 
             camera.update();
         }
+
+        //mitte rechts
+        else if (xClicked >= camera.viewportWidth - 5 && yClicked >= camera.viewportHeight * 1 / 18 && yClicked <= camera.viewportHeight * 17 / 18) {
+            posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
+
+            if (cameraDebug) {
+                debugMovement.begin();
+                debugMovement.rect(camera.viewportWidth - 2, camera.viewportHeight - camera.viewportHeight * 17 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 16 / 18);
+                debugMovement.end();
+            }
+
+            camera.update();
+        }
+
+        //mitte oben
+        else if (xClicked >= camera.viewportWidth * 2 / 32 && xClicked <= camera.viewportWidth * 30 / 32 && yClicked <= 5) {
+            posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
+
+            if (cameraDebug) {
+                debugMovement.begin();
+                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 30 / 32, camera.viewportHeight - 5, camera.viewportWidth * 28 / 32, camera.viewportHeight * 1 / 30);
+                debugMovement.end();
+            }
+
+            camera.update();
+        }
+
         //mitte unten
-        else if (xClicked >= camera.viewportWidth * 2 / 32 && xClicked <= camera.viewportWidth * 30 / 32 && yClicked >= camera.viewportHeight * 17 / 18) {
+        else if (xClicked >= camera.viewportWidth * 2 / 32 && xClicked <= camera.viewportWidth * 30 / 32 && yClicked >= camera.viewportHeight - 5) {
             posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
 
             if (cameraDebug) {
                 debugMovement.begin();
-                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 30 / 32, 0, camera.viewportWidth * 28 / 32, camera.viewportHeight * 1 / 18);
+                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 30 / 32, 0, camera.viewportWidth * 28 / 32, 5);
                 debugMovement.end();
             }
 
