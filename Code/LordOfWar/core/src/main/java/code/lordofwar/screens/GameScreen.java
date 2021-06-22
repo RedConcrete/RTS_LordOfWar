@@ -804,7 +804,7 @@ public class GameScreen extends Screens implements Screen {
 
         float[] coords = translateXYCoordinatesFromScreen(Gdx.input.getX(), Gdx.input.getY());
         for (Soldier soldier : soldierArrayList) {
-            float[] checkCoordsRect = new float[]{soldier.getX() - villager.getWidth(),
+            float[] checkCoordsRect = new float[]{soldier.getX() - soldier.getWidth(),
                     soldier.getY() - soldier.getHeight(),
                     soldier.getX() + soldier.getWidth(),
                     soldier.getY() + soldier.getHeight()};
