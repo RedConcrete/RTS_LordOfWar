@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -47,6 +48,7 @@ public class GameScreen extends Screens implements Screen {
     private LinkedList<PathCell> theKnowenWay;
     private Vector3 posCameraDesired;
     private final TiledMap map;
+    private final int[] mapSizes;
     private OrthogonalTiledMapRenderer renderer;
     private Soldier soldier;
 
@@ -100,7 +102,7 @@ public class GameScreen extends Screens implements Screen {
         pointTimerCounter = 10;
         gameScreenEvent = new GameScreenEvent(game, lobbyID);
         posCameraDesired = new Vector3();
-        cameraDebug = true;
+        cameraDebug = false;
         vectorSpeed = new Vector2();
         posCameraDesired = new Vector3();
         soldierArrayList = new ArrayList<>();
@@ -118,6 +120,16 @@ public class GameScreen extends Screens implements Screen {
 
         String mapPath = "maps/map_1.tmx";
         map = loader.load(mapPath);
+        MapProperties mapProperties = map.getProperties();
+        mapSizes = new int[]{
+                mapProperties.get("width", Integer.class),//tiles
+                mapProperties.get("height", Integer.class),//tiles
+                mapProperties.get("tilewidth", Integer.class),//tile
+                mapProperties.get("tileheight", Integer.class),//tile
+                //tile*tiles
+                mapProperties.get("width", Integer.class) * mapProperties.get("tilewidth", Integer.class),
+                mapProperties.get("height", Integer.class) * mapProperties.get("tileheight", Integer.class)
+        };
         //TODO way to tell maps apart
         float[] castlePosition;
         switch (startingPosition) {
@@ -268,7 +280,7 @@ public class GameScreen extends Screens implements Screen {
                 Sprite s = new Sprite(uiAtlas.findRegion("button-normal"));
                 s.setColor(Color.RED);
                 s.setSize(c.getHp(), 10);
-                s.setPosition(c.getX() + c.getSprite().getWidth() / 2/3, c.getY() + c.getSprite().getHeight() - 50);
+                s.setPosition(c.getX() + c.getSprite().getWidth() / 2 / 3, c.getY() + c.getSprite().getHeight() - 50);
                 s.draw(renderer.getBatch());
 
             }
@@ -465,7 +477,7 @@ public class GameScreen extends Screens implements Screen {
         Window windowNoVillager = new Window("NoVillager", skin, "border");
         windowNoVillager.setVisible(false);
         windowNoVillager.setMovable(false);
-        windowNoVillager.add(new Label("not enough Villlager",skin)).row();
+        windowNoVillager.add(new Label("not enough Villlager", skin)).row();
         windowNoVillager.add(exitButton);
 
         windowExit.setMovable(false);
@@ -599,19 +611,18 @@ public class GameScreen extends Screens implements Screen {
         Label atkLabel = new Label("ATK", skin);
         Label defLabel = new Label("DEF", skin);
 
-        buttonRekrut = new TextButton("Rekrutieren",skin);
+        buttonRekrut = new TextButton("Rekrutieren", skin);
 
         buttonRekrut.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("Villiger rekrut");
-                if(myCastle.getVillager() != 0){
+                if (myCastle.getVillager() != 0) {
                     myCastle.setVillager(myCastle.getVillager() - 1);
-                    Soldier soldier = new Soldier(soldierSprite,collisionUnitLayer);
+                    Soldier soldier = new Soldier(soldierSprite, collisionUnitLayer);
                     soldierArrayList.add(soldier);
-                }
-                else {
-                    windowNoVillager.setPosition(stage.getWidth() / 2,stage.getHeight() / 2);
+                } else {
+                    windowNoVillager.setPosition(stage.getWidth() / 2, stage.getHeight() / 2);
                     windowNoVillager.setVisible(true);
                 }
             }
@@ -635,7 +646,7 @@ public class GameScreen extends Screens implements Screen {
         packWindow(resourceBarWindow, stage);
         packWindow(exitWindow, stage);
         packWindow(entityWindow, stage);
-        packWindow(windowNoVillager,stage);
+        packWindow(windowNoVillager, stage);
 
         stage.addActor(windowNoVillager);
         stage.addActor(entityWindow);
@@ -656,13 +667,36 @@ public class GameScreen extends Screens implements Screen {
 
         //Todo camera movement überarbeiten !!
         processCameraMovement(xClicked, yClicked);
-
         camera.position.lerp(posCameraDesired, 0.1f);
+        keepCameraInBounds();
 
         if (cameraDebug) {
             DrawDebugLine(new Vector2(camera.position.x, camera.position.y)
                     , new Vector2(posCameraDesired.x, posCameraDesired.y)
                     , 3, Color.RED, camera.combined);
+        }
+    }
+
+    /**
+     * Keeps the camera from going out of the tiledmap
+     */
+    private void keepCameraInBounds() {
+        //horizontal
+        if (camera.position.x < camera.viewportWidth / 2) {//height and width /2 because camera goes to right and left by half the width
+            //need to change both actual camera value AND desired camera value to prevent lockup
+            posCameraDesired.x = camera.viewportWidth / 2;
+            camera.position.x = camera.viewportWidth / 2;
+        } else if (camera.position.x > mapSizes[4] - camera.viewportWidth / 2) {
+            posCameraDesired.x = mapSizes[4] - camera.viewportWidth / 2;
+            camera.position.x = mapSizes[4] - camera.viewportWidth / 2;
+        }
+        // Vertical
+        if (camera.position.y < camera.viewportHeight / 2) {
+            posCameraDesired.y = camera.viewportHeight / 2;
+            camera.position.y = camera.viewportHeight / 2;
+        } else if (camera.position.y > mapSizes[5] - camera.viewportHeight / 2) {
+            posCameraDesired.y = mapSizes[5] - camera.viewportHeight / 2;
+            camera.position.y = mapSizes[5] - camera.viewportHeight / 2;
         }
     }
 
