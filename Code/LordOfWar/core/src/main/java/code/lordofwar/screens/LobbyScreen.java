@@ -18,16 +18,14 @@ public class LobbyScreen extends Screens implements Screen {
 
     private String[] playerNameArr;
     public String[] gameInfoArr;
-    private final String lobbyID;
     private List<String> playerList;
     private LobbyScreenEvent lobbyScreenEvent;
 
-    public LobbyScreen(LOW aGame, Skin aSkin, String lobbyID) {
+    public LobbyScreen(LOW aGame, Skin aSkin, String[] lobbyInfo) {
         super(aGame, aSkin);
-        this.lobbyID = lobbyID;
+        this.gameInfoArr = lobbyInfo;
+        playerNameArr = new String[]{""}; // todo alle verbundenen spieler
 
-        playerNameArr = new String[]{"Username1"};
-        gameInfoArr = new String[]{"map \n" + "gamemode\n" + "...\n"};
         lobbyScreenEvent = new LobbyScreenEvent(game);
 
         createBackground(stage);
@@ -50,7 +48,7 @@ public class LobbyScreen extends Screens implements Screen {
         }
 
         if (!lobbyScreenEvent.isRecievedData()) {//later data requests (map etc) also go here
-            lobbyScreenEvent.sendPlayerRequest(lobbyID);//possible to move this to the end of setupUi()?
+            lobbyScreenEvent.sendPlayerRequest(gameInfoArr[0]);//possible to move this to the end of setupUi()?
         }
 
         Gdx.graphics.getGL20().glClearColor(0, 0, 0, 1);
@@ -112,8 +110,8 @@ public class LobbyScreen extends Screens implements Screen {
         startButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                //Todo server muss wissen das die Lobby gestartet wurde!
-                lobbyScreenEvent.sendGameStartRequest(lobbyID);
+                //Todo server muss wissen das die Lobby gestartet wurde! !!!!!Fertig!!!!!!!!!!!!! ?? wenn ja löschen!!!
+                lobbyScreenEvent.sendGameStartRequest(gameInfoArr[0]);
             }
 
             @Override
@@ -141,7 +139,7 @@ public class LobbyScreen extends Screens implements Screen {
         backButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                lobbyScreenEvent.sendLeaveLobbyNotice(LobbyScreen.this.lobbyID);
+                lobbyScreenEvent.sendLeaveLobbyNotice(LobbyScreen.this.gameInfoArr[0]);
                 game.setScreen(new MenuScreen(game, skin));
                 stage.dispose();
 

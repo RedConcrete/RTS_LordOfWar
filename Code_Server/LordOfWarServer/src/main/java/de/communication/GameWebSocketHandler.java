@@ -84,7 +84,6 @@ public class GameWebSocketHandler {
                     }
                 } else if (data[0].equals(CREATE_LOBBY.toString())) {
                     createLobby(data);
-
                 } else if (data[0].equals(GET_LOBBYS.toString())) {
                     sendLobbysToClient(data[1]);
                 } else if (data[0].equals(JOIN_LOBBY.toString())) {
@@ -100,7 +99,6 @@ public class GameWebSocketHandler {
         }
     }
 
-
     private void startGame(String[] data) {
         ServerLobby lobby = lobbys.get(data[2]);
         if (lobby.getGame() == null) {
@@ -110,10 +108,10 @@ public class GameWebSocketHandler {
                 gameData.add(lobby.getGamemode());
                 gameData.add(lobby.getLobbyMap());
                 lobby.setGame(new ServerGame(lobby.getPlayers()));//TODO add rest of data
-                int i=1;
+                int i = 1;
                 String stringRep;
                 for (User player : lobby.getPlayers()) {
-                    stringRep=String.valueOf(i);
+                    stringRep = String.valueOf(i);
                     gameData.add(stringRep);//give startingposition
                     player.getuSession().getAsyncRemote().sendObject(DataPacker.packData(START_GAME, DataPacker.stringCombiner(gameData)));
                     gameData.remove(stringRep);//remove startingposition for next loop
@@ -177,6 +175,10 @@ public class GameWebSocketHandler {
                     ArrayList<String> lobbyDataToSend = new ArrayList<>();
                     lobbyDataToSend.add("true");
                     lobbyDataToSend.add(lobby.getLobbyName());
+                    lobbyDataToSend.add(lobby.getLobbyMap());
+                    lobbyDataToSend.add(String.valueOf(lobby.getPlayerAmount()));
+                    lobbyDataToSend.add(lobby.getGamemode());
+
                     sessions.get(data[1]).getAsyncRemote().sendObject(DataPacker.packData(JOIN_LOBBY, DataPacker.stringCombiner(lobbyDataToSend)));
                 }
             }

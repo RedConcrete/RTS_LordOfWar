@@ -10,6 +10,7 @@ public class Castle extends Sprite {
     private boolean selected;
     private int villager;
     private int hp;
+    private int maxUnits;
     private TiledMapTileLayer collisionLayer;
     private Sprite sprite;
 
@@ -19,6 +20,7 @@ public class Castle extends Sprite {
         this.sprite = sprite;
         villager = 0;
         hp = 100;
+        maxUnits = 50;
         increaseVilligerPerMinute();
     }
 
@@ -77,4 +79,11 @@ public class Castle extends Sprite {
         return sprite;
     }
 
+    public int getMaxUnits() {
+        return maxUnits;
+    }
+
+    public void setMaxUnits(int maxUnits) {
+        this.maxUnits = maxUnits;
+    }
 }

@@ -74,7 +74,7 @@ public class LOW extends Game {
 				.build();
 
 		HttpUrl httpUrl = HttpUrl.parse("http://localhost:8080/api/v1/ws");
-		//HttpUrl httpUrl = HttpUrl.parse("http://93.221.8.85:25565/api/v1/ws");
+		//HttpUrl httpUrl = HttpUrl.parse("http://redconcrete.sytes.net:25591/api/v1/ws");
 
 		Request request = new Request.Builder()
 				.url(httpUrl)
