@@ -75,6 +75,7 @@ public class GameScreen extends Screens implements Screen {
     private Castle myCastle;
 
     private Label soldierLabel;
+    private Label goldLabel;
 
     private final TmxMapLoader loader;
     private Label scoreLabel;
@@ -109,6 +110,7 @@ public class GameScreen extends Screens implements Screen {
         castleArrayList = new ArrayList<>();
 
         soldierLabel = new Label("", skin);
+        goldLabel = new Label("",skin);
         entityHp = new Label("", skin);
 
         rectangleRenderer = new ShapeRenderer();
@@ -255,6 +257,7 @@ public class GameScreen extends Screens implements Screen {
         scoreLabel.setText(gameScreenEvent.getPoints());
 
         soldierLabel.setText(myCastle.getVillager());
+        goldLabel.setText(myCastle.getGold());
 
         for (Castle c : castleArrayList) {
             c.draw(renderer.getBatch());
@@ -503,8 +506,7 @@ public class GameScreen extends Screens implements Screen {
         scoreLabel = new Label("", skin);
 
 
-        Label goldLabel = new Label("0", skin);
-        goldLabel.setText(goldAmount);
+
 
         Image goldImage = new Image(new Sprite(new Texture("ui/gold_treasure_icons_16x16/gold.png")));
 

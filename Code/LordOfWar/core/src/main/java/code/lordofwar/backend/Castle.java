@@ -9,6 +9,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 public class Castle extends Sprite {
     private boolean selected;
     private int villager;
+    private int gold;
     private int hp;
     private int maxUnits;
     private TiledMapTileLayer collisionLayer;
@@ -19,9 +20,11 @@ public class Castle extends Sprite {
         this.collisionLayer = collisionLayer;
         this.sprite = sprite;
         villager = 0;
+        gold = 99;
         hp = 100;
         maxUnits = 50;
         increaseVilligerPerMinute();
+        increaseGoldEveryTenSeconds();
     }
 
     @Override
@@ -47,6 +50,20 @@ public class Castle extends Sprite {
 
     }
 
+    private void increaseGoldEveryTenSeconds() {
+        new Thread(() -> {
+            try {
+                gold = gold + 1;
+                Thread.sleep(10000);
+                increaseGoldEveryTenSeconds();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+
+    }
+
     public void setVillager(int villager) {
         this.villager = villager;
     }
@@ -54,6 +71,10 @@ public class Castle extends Sprite {
     public int getVillager() {
         return villager;
     }
+
+    public void setGold(int gold) { this.gold = gold; }
+
+    public int getGold() { return gold; }
 
     public boolean isSelected() {
         return selected;
