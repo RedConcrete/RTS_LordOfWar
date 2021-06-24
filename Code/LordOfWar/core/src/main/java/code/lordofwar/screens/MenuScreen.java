@@ -78,6 +78,9 @@ public class MenuScreen extends Screens implements Screen {
         TextButton optionButton = new TextButton("Options", skin);
         optionButton.getLabel().setFontScale(3f);
 
+        TextButton creditsButton = new TextButton("Credits",skin);
+        creditsButton.getLabel().setFontScale(3f);
+
         TextButton exitButton = new TextButton("Exit", skin);
         exitButton.getLabel().setFontScale(3f);
 
@@ -136,6 +139,19 @@ public class MenuScreen extends Screens implements Screen {
             }
         });
 
+        creditsButton.addListener(new InputListener(){
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                game.setScreen(new CreditScreen(game,skin));
+            }
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+        });
+
+
+
         exitButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
@@ -185,6 +201,7 @@ public class MenuScreen extends Screens implements Screen {
         windowMenu.add(lobbyCreateButton).row();
         windowMenu.add(lobbyJoinButton).row();
         windowMenu.add(optionButton).row();
+        windowMenu.add(creditsButton).row();
         windowMenu.add(exitButton).row();
         windowMenu.pack();
 
