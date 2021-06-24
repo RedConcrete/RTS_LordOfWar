@@ -104,7 +104,7 @@ public class GameScreen extends Screens implements Screen {
         pointTimerCounter = 10;
         gameScreenEvent = new GameScreenEvent(game, lobbyID);
         posCameraDesired = new Vector3();
-        cameraDebug = false;
+        cameraDebug = true;
         vectorSpeed = new Vector2();
         posCameraDesired = new Vector3();
         soldierArrayList = new ArrayList<>();
@@ -250,11 +250,9 @@ public class GameScreen extends Screens implements Screen {
         debugRenderer.begin();
         renderer.getBatch().begin();
 
-        pointTimerCounter += delta;
-        if (pointTimerCounter > 1) { //1 second update
-            gameScreenEvent.sendPointRequest();//TODO move this to server???
-            pointTimerCounter = 0;
-        }
+        gameScreenEvent.CameraKeyEvents(camera,CAMERASPEED,posCameraDesired);
+
+        countPoints(delta);
 
         scoreLabel.setText(gameScreenEvent.getPoints());
 
@@ -269,7 +267,6 @@ public class GameScreen extends Screens implements Screen {
                 entityHp.setText(c.getHp());
                 buttonRecruit.setVisible(true);
 
-
                 //todo braucht seine eigene forEach !!
                 if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
                     if (!isRightPressed) {
@@ -280,6 +277,7 @@ public class GameScreen extends Screens implements Screen {
                         }
                     }
                 }
+
                 //todo Progresbar benutzen
                 entityName.setText("Castle");
                 Sprite s = new Sprite(uiAtlas.findRegion("button-normal"));
@@ -289,7 +287,6 @@ public class GameScreen extends Screens implements Screen {
                 s.draw(renderer.getBatch());
 
             }
-
         }
 
 
@@ -403,9 +400,6 @@ public class GameScreen extends Screens implements Screen {
             entityName.setText("Castle");
         }
 
-        debugRenderer.end();
-        renderer.getBatch().end();
-
         mouseOnEdgeofCamera();
 
         stage.act();
@@ -469,9 +463,7 @@ public class GameScreen extends Screens implements Screen {
         TextButton backButton = new TextButton("Back", skin);
         TextButton backButton2 = new TextButton("Back", skin);
 
-
-
-         TextButton exitButton = new TextButton("Back", skin);
+        TextButton exitButton = new TextButton("Back", skin);
         Window windowNoVillager = new Window("NoVillager", skin, "border");
         windowNoVillager.setVisible(false);
         windowNoVillager.setMovable(false);
@@ -518,7 +510,7 @@ public class GameScreen extends Screens implements Screen {
         windowExit.setMovable(false);
         windowExit.defaults().pad(20f);
 
-        TextButton exitGameButton = new TextButton("Surrender", skin);
+        TextButton exitGameButton = new TextButton("Exit", skin);
         exitGameButton.getLabel().setFontScale(3f);
 
         TextButton addGoldButton = new TextButton("AddGold", skin);
@@ -721,6 +713,8 @@ public class GameScreen extends Screens implements Screen {
         packWindow(windowNoVillager, stage);
         packWindow(windowNoGold,stage);
 
+        gameScreenEvent.StageKeyEvents(windowExit,yesButton,noButton,stage);
+
         stage.addActor(windowNoVillager);
         stage.addActor(entityWindow);
         stage.addActor(resourceBarWindow);
@@ -740,7 +734,7 @@ public class GameScreen extends Screens implements Screen {
         yClicked = Gdx.input.getY();
 
         //Todo camera movement überarbeiten !!
-        processCameraMovement(xClicked, yClicked);
+        gameScreenEvent.processCameraMovement(xClicked, yClicked,camera,CAMERASPEED,debugMovement,cameraDebug,posCameraDesired);
         camera.position.lerp(posCameraDesired, 0.1f);
         keepCameraInBounds();
 
@@ -772,137 +766,6 @@ public class GameScreen extends Screens implements Screen {
             posCameraDesired.y = mapSizes[5] - camera.viewportHeight / 2;
             camera.position.y = mapSizes[5] - camera.viewportHeight / 2;
         }
-    }
-
-    /**
-     * The Method processCameraMovement moves the Camera in the direction the mouse is pointing at.
-     *
-     * @author Robin Hefner
-     */
-
-    private void processCameraMovement(float xClicked, float yClicked) {
-
-        //todo so lassen ?? größe anpassen
-
-        //oben links
-        /*
-        if (xClicked <= camera.viewportWidth * 2 / 32 && yClicked <= camera.viewportHeight * 1 / 18) {
-            posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
-            posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
-
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(0, camera.viewportHeight - camera.viewportHeight * 1 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 1 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
-        }
-        */
-
-        //unten links
-        /*
-        else if (xClicked <= camera.viewportWidth * 2 / 32 && yClicked >= camera.viewportHeight * 17 / 18 && yClicked <= camera.viewportHeight) {
-            posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
-            posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
-
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(0, 0, camera.viewportWidth * 2 / 32, camera.viewportHeight * 1 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
-        }
-        */
-
-        //oben rechts
-        /*
-        else if (xClicked >= camera.viewportWidth * 30 / 32 && yClicked <= camera.viewportHeight * 1 / 18) {
-            posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
-            posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
-
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 2 / 32, camera.viewportHeight - camera.viewportHeight * 1 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 1 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
-        }
-        */
-
-        //unten rechts
-        /*
-        else if (xClicked >= camera.viewportWidth * 30 / 32 && yClicked >= camera.viewportHeight * 17 / 18) {
-            posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
-            posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
-
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 2 / 32, 0, camera.viewportWidth * 2 / 32, camera.viewportHeight * 1 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
-        }
-        */
-
-
-        //mitte links
-        if (xClicked <= 5 && yClicked >= camera.viewportHeight * 1 / 18 && yClicked <= camera.viewportHeight * 17 / 18) {
-            posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
-
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(0, 5, 1, camera.viewportHeight * 16 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
-        }
-
-        //mitte rechts
-        else if (xClicked >= camera.viewportWidth - 5 && yClicked >= camera.viewportHeight * 1 / 18 && yClicked <= camera.viewportHeight * 17 / 18) {
-            posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
-
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(camera.viewportWidth - 2, camera.viewportHeight - camera.viewportHeight * 17 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 16 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
-        }
-
-        //mitte oben
-        else if (xClicked >= camera.viewportWidth * 2 / 32 && xClicked <= camera.viewportWidth * 30 / 32 && yClicked <= 5) {
-            posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
-
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 30 / 32, camera.viewportHeight - 5, camera.viewportWidth * 28 / 32, camera.viewportHeight * 1 / 30);
-                debugMovement.end();
-            }
-
-            camera.update();
-        }
-
-        //mitte unten
-        else if (xClicked >= camera.viewportWidth * 2 / 32 && xClicked <= camera.viewportWidth * 30 / 32 && yClicked >= camera.viewportHeight - 5) {
-            posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
-
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 30 / 32, 0, camera.viewportWidth * 28 / 32, 5);
-                debugMovement.end();
-            }
-
-            camera.update();
-        } else {
-            camera.update();
-        }
-
     }
 
     public static void DrawDebugLine(Vector2 start, Vector2 end, int lineWidth, Color color, Matrix4
@@ -1010,6 +873,14 @@ public class GameScreen extends Screens implements Screen {
 
         //end=start
 
+    }
+
+    public void countPoints(float delta){
+        pointTimerCounter += delta;
+        if (pointTimerCounter > 1) { //1 second update
+            gameScreenEvent.sendPointRequest();//TODO move this to server???
+            pointTimerCounter = 0;
+        }
     }
 
 }
