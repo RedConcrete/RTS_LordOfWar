@@ -18,6 +18,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -25,10 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
+import java.util.*;
 
 public class GameScreen extends Screens implements Screen {
 
@@ -52,7 +50,6 @@ public class GameScreen extends Screens implements Screen {
     private final TiledMap map;
     private final int[] mapSizes;
     private OrthogonalTiledMapRenderer renderer;
-    private Soldier soldier;
 
     private Label entityHp;
     private Label entityATK;
@@ -88,7 +85,8 @@ public class GameScreen extends Screens implements Screen {
     private float pointTimerCounter;
     private Point2D.Float rectangleStart; //used to check where the select rectangle was started
     private Point2D.Float rectangleEnd;
-    private float[] rectangleBounds;
+    private final float[] rectangleBounds;
+    private HashMap<Integer, Rectangle> hitboxes;//yeah sorry couldnt come up with a better way to dynamically check than just checking rectangles
     private ArrayList<String> connectedPlayers;
 
     Image castleImage;
@@ -98,6 +96,7 @@ public class GameScreen extends Screens implements Screen {
         super(aGame, aSkin);
         this.connectedPlayers = ArrayToArraylist(connectedPlayersArray);
         mapDebug = false;
+        hitboxes = new HashMap<>();
         isLeftPressed = false;
         isRightPressed = false;
         entityName = new Label("", skin);
@@ -164,6 +163,16 @@ public class GameScreen extends Screens implements Screen {
         posCameraDesired.y = castlePosition[1];
         collisionUnitLayer = (TiledMapTileLayer) map.getLayers().get(1);
         myCastle = new Castle(castleSprite, collisionUnitLayer);
+        //TODO add castles to HB map
+        for (int i = 0; i < startingCastle; i++) {
+            //todo Castle neu ändern!! (objekte erzeugen und dann in das Array)
+            castleArrayList.add(myCastle);
+            myCastle.setPosition(Constants.MAP1CC1[0], Constants.MAP1CC1[1]);
+        }
+        Rectangle myCastleHB=new Rectangle(myCastle.getBoundingRectangle());
+        myCastleHB.setWidth(myCastleHB.getWidth());
+        myCastleHB.setHeight(myCastleHB.getHeight()-64);
+        hitboxes.put(myCastle.hashCode(),myCastleHB);
         setupUI();
 
     }
@@ -227,13 +236,18 @@ public class GameScreen extends Screens implements Screen {
                 }
         );
         renderer = new OrthogonalTiledMapRenderer(map);
-
-        for (int i = 0; i < startingCastle; i++) {
-            //todo Castle neu ändern!! (objekte erzeugen und dann in das Array)
-            castleArrayList.add(myCastle);
-            myCastle.setPosition(Constants.MAP1CC1[0], Constants.MAP1CC1[1]);
-        }
     }
+
+    private boolean isColliding(Sprite sprite) {
+        for (Map.Entry<Integer, Rectangle> hitbox : hitboxes.entrySet()) {
+            if (hitbox.getKey() != sprite.hashCode() && sprite.getBoundingRectangle().overlaps(hitbox.getValue())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    ;
 
     @Override
     public void render(float delta) {
@@ -292,14 +306,13 @@ public class GameScreen extends Screens implements Screen {
 
         for (Soldier soldier : soldierArrayList) {
             soldier.draw(renderer.getBatch());
-
             if (soldier.getDestination() != null) {
                 if (soldier.getDestination().isEmpty()) {
                     soldier.setDestination(null);
                 } else {
 
-                    int vX = (int) (soldier.getX() / 64);
-                    int vY = (int) (soldier.getY() / 64);
+                    int vX = (int) ((soldier.getX() + 32) / 64);
+                    int vY = (int) ((soldier.getY() + 32) / 64);
 //                    System.out.println(soldier.getX());
 //                    System.out.println(soldier.getY());
 //                    System.out.println(vX);
@@ -334,17 +347,50 @@ public class GameScreen extends Screens implements Screen {
                         //v.translateY(v.getDestination().get(0).coords.y - vY);
 
                         */
+                        /*better code probably but inconsistent speed sometimes
                         soldier.translateX(soldier.getDestination().get(0).coords.x - vX);
                         soldier.translateY(soldier.getDestination().get(0).coords.y - vY);
+                        soldier.translate(soldier.getDestination().get(0).coords.x - vX, soldier.getDestination().get(0).coords.y - vY);
+                         */
+                        if (soldier.getDestination().get(0).coords.x < vX) {
+                            soldier.translateX(-1);
+                        } else if (soldier.getDestination().get(0).coords.x > vX) {
+                            soldier.translateX(1);
+                        }
+                        if (soldier.getDestination().get(0).coords.y < vY) {
+                            soldier.translateY(-1);
+                        } else if (soldier.getDestination().get(0).coords.y > vY) {
+                            soldier.translateY(1);
+                        }
 
+                        //TODO maybe do a isColliding method in soldier? idk discuss
+                        if (isColliding(soldier)) {
+                            //reverse direction
+                            if (soldier.getDestination().get(0).coords.x < vX) {
+                                soldier.setX(soldier.getX()+soldier.getWidth()/2);
+                            } else if (soldier.getDestination().get(0).coords.x > vX) {
+                                soldier.setX(soldier.getX()-soldier.getWidth()/2);
+                            }
+                            if (soldier.getDestination().get(0).coords.y < vY) {
+                                soldier.setY(soldier.getY()-soldier.getHeight()/2);
+
+                            } else if (soldier.getDestination().get(0).coords.y > vY) {
+                                soldier.setY(soldier.getY()-soldier.getHeight()/2);
+                            }
+                            getPathFinding(soldier,(int)soldier.getDestination().get(soldier.getDestination().size()-1).coords.x* collisionUnitLayer.getTileWidth(), (int) (soldier.getDestination().get(soldier.getDestination().size()-1).coords.y*collisionUnitLayer.getTileHeight()));
+                        }
 
                     } else if (vX == soldier.getDestination().get(0).coords.x && vY == soldier.getDestination().get(0).coords.y) {
                         if (soldier.getDestination().size() >= 1) {
+                            System.out.println(soldier.getDestination().get(0).coords.x + " " + soldier.getDestination().get(0).coords.y + " reached");
                             soldier.getDestination().remove(0);
+                            hitboxes.put(soldier.hashCode(), soldier.getBoundingRectangle());//set hitbox when having reached a tile
                         }
                     }
 
                 }
+            } else {
+                hitboxes.put(soldier.hashCode(), soldier.getBoundingRectangle());//set hitbox when having stopped moving
             }
 
             if (soldier.isSelected()) {
@@ -369,8 +415,8 @@ public class GameScreen extends Screens implements Screen {
             lineH.setSize(1, collisionUnitLayer.getHeight() * 64);
 
             for (int i = 1; i < 76; i++) {
-                lineV.setPosition(0, (i * 64));
-                lineH.setPosition((i * 64), 0);
+                lineV.setPosition(0, (i * 64) + 32);
+                lineH.setPosition((i * 64) + 32, 0);
                 lineV.draw(renderer.getBatch());
                 lineH.draw(renderer.getBatch());
             }
@@ -394,7 +440,6 @@ public class GameScreen extends Screens implements Screen {
             rectangleRenderer.end();
             //draw rectangle here
         }
-
         if (myCastle.isSelected()) {
             entityName.setText("Castle");
         }
@@ -461,6 +506,7 @@ public class GameScreen extends Screens implements Screen {
         TextButton backButton = new TextButton("Back", skin);
         TextButton backButton2 = new TextButton("Back", skin);
 
+
         TextButton exitButton = new TextButton("Back", skin);
         Window windowNoVillager = new Window("NoVillager", skin, "border");
         windowNoVillager.setVisible(false);
@@ -501,6 +547,7 @@ public class GameScreen extends Screens implements Screen {
 
 
         });
+
 
         Window windowExit = new Window("Surrender?", skin, "border");
         windowExit.setMovable(false);
@@ -673,6 +720,8 @@ public class GameScreen extends Screens implements Screen {
                     windowNoGold.setPosition(stage.getWidth() / 2, stage.getHeight() / 2);
                     windowNoGold.setVisible(true);
                 }
+
+
             }
 
             @Override
@@ -691,7 +740,6 @@ public class GameScreen extends Screens implements Screen {
         entityWindow.add(buttonRecruit).padRight(30f).row();
         entityWindow.add(defLabel);
         entityWindow.add(buttonIncreaseMaxUnits).padRight(30f).row();
-        ;
         entityWindow.add(entityDEF);
         entityWindow.setPosition(stage.getWidth() / 2 - 300, 0);
 
@@ -823,11 +871,18 @@ public class GameScreen extends Screens implements Screen {
 
     public void getPathFinding(Soldier v) {
         //todo pathfinding programmieren
-        Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-        camera.unproject(mousePos);
+        float[] mousePos = translateXYCoordinatesFromScreen(Gdx.input.getX(), Gdx.input.getY());
+        int x = (int) mousePos[0], y = (int) mousePos[1];
+        getPathFinding(v, x, y);
+    }
 
-        int x = (int) mousePos.x, y = (int) mousePos.y;
-        PathCell p = new Pathfinding(x, y, (int) v.getX() + 32, (int) v.getY() + 32, collisionUnitLayer).algorithm();
+    public void getPathFinding(Soldier v, int xTile, int yTile) {
+        //todo pathfinding programmieren
+        TiledMapTileLayer pathingCollisionMap = collisionUnitLayer;
+        //pathingCollisionMap.getCell((int) (v.getX()+32)/64, (int) (v.getY()+32)/64).getTile().getProperties().clear();
+        HashMap<Integer, Rectangle> tempHitboxes = hitboxes;
+        tempHitboxes.remove(v.hashCode());
+        PathCell p = new Pathfinding(xTile, yTile, (int) v.getX() + 32, (int) v.getY() + 32, pathingCollisionMap, tempHitboxes).algorithm();
         LinkedList<PathCell> cellList = new LinkedList<>();
 
         while (p != null) {
@@ -849,13 +904,11 @@ public class GameScreen extends Screens implements Screen {
                 // cellList.addFirst(pNew);
             }
         }
-
-
         Collections.reverse(cellList);
         v.setDestination(cellList);
         theKnowenWay = cellList;
         for (PathCell t : cellList) {
-            //System.out.println(t.coords);
+            System.out.println(t.coords);
 
         }
 
@@ -878,4 +931,3 @@ public class GameScreen extends Screens implements Screen {
     }
 
 }
-

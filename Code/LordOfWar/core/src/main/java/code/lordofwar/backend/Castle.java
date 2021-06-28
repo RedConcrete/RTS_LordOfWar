@@ -19,11 +19,11 @@ public class Castle extends Sprite {
         super(sprite);
         this.collisionLayer = collisionLayer;
         this.sprite = sprite;
-        villager = 0;
+        villager = 1;
         gold = 99;
         hp = 100;
         maxUnits = 50;
-        increaseVilligerPerMinute();
+        increaseVillagerPerMinute();
         increaseGoldEveryTenSeconds();
     }
 
@@ -37,12 +37,12 @@ public class Castle extends Sprite {
         setPosition(getX() ,getY());
     }
 
-    private void increaseVilligerPerMinute() {
+    private void increaseVillagerPerMinute() {
         new Thread(() -> {
             try {
                 villager = villager + 1;
                 Thread.sleep(60000);
-                increaseVilligerPerMinute();
+                increaseVillagerPerMinute();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -63,6 +63,7 @@ public class Castle extends Sprite {
 
 
     }
+
 
     public void setVillager(int villager) {
         this.villager = villager;

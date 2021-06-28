@@ -8,7 +8,7 @@ public class Constants {
     public static final int WORLD_HEIGHT_PIXEL = 1080;
     public static final float CAMERASPEED = 500f;
     public static final String STRINGSEPERATOR = "///";
-
+    public static final String BLOCK_TILE_PROPERTY="blocked";
     //GAME STATICS
     //TODO FILL THESE ARRAYS with actual coords
     public static final float[] MAP1CC1=new float[]{400,300};//insert coords here
