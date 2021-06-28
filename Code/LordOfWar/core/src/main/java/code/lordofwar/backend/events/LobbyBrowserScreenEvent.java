@@ -25,7 +25,7 @@ public class LobbyBrowserScreenEvent extends Events{
     }
 
     public void sendRequestJoinLobby(String lobbyName){
-        ArrayList<String> data=new ArrayList<>();
+        ArrayList<String> data = new ArrayList<>();
         data.add(game.getSessionID());
         data.add(lobbyName);
         webSocket.send(DataPacker.packData(JOIN_LOBBY, DataPacker.stringCombiner(data)));
@@ -33,7 +33,9 @@ public class LobbyBrowserScreenEvent extends Events{
 
     public void setJoined(String[] lobbyJoinRequestResponse) {
         if (lobbyJoinRequestResponse[1].equals("true")) {
-            System.arraycopy(lobbyJoinRequestResponse,1,this.lobbyInfo,0,lobbyJoinRequestResponse.length - 1);
+            lobbyInfo = new String[lobbyJoinRequestResponse.length - 2];
+            System.arraycopy(lobbyJoinRequestResponse,2,this.lobbyInfo,0,lobbyJoinRequestResponse.length - 2);
+            System.out.println(lobbyInfo);
         }
     }
 

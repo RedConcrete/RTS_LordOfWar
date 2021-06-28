@@ -10,6 +10,8 @@ import okio.ByteString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+
 import static code.lordofwar.backend.Constants.STRINGSEPERATOR;
 import static code.lordofwar.backend.MessageIdentifier.*;
 
@@ -75,20 +77,17 @@ public class GameWebSocketListener extends WebSocketListener {
                         ((LobbyCreateScreen) game.getScreen()).getLobbyCreateScreenEvent().setLobbyID(strings);
                     }
                 } else if (strings[0].equals(GET_LOBBYS.toString())) {
-
                     if (game.getScreen() instanceof LobbyBrowserScreen) {
                         ((LobbyBrowserScreen) game.getScreen()).getLobbyBrowserScreenEvent().setLobbyList(strings);
                     }
                 } else if (strings[0].equals(JOIN_LOBBY.toString())) {
                     if (game.getScreen() instanceof LobbyBrowserScreen) {
+                        System.out.println(Arrays.toString(strings));
                         ((LobbyBrowserScreen) game.getScreen()).getLobbyBrowserScreenEvent().setJoined(strings);
                     }
                 } else if (strings[0].equals(LOBBY_PLAYERS.toString())) {
                     if (game.getScreen() instanceof LobbyScreen) {//very important! this can be triggered in the browser or create screen and needs to be discarded inn that case
                         ((LobbyScreen) game.getScreen()).getLobbyScreenEvent().setPlayers(strings);
-                    }
-                    if (game.getScreen() instanceof GameScreenEvent) {//very important! this can be triggered in the browser or create screen and needs to be discarded inn that case
-                        ((GameScreenEvent) game.getScreen()).getGameScreenEvent().getConnectedPlayer(strings);
                     }
                 }else if (strings[0].equals(START_GAME.toString())){
                     if (game.getScreen() instanceof LobbyScreen){

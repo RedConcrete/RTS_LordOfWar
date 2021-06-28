@@ -147,41 +147,35 @@ public class LoginScreen extends Screens implements Screen {
                         e.printStackTrace();
                     }
                     Gdx.app.postRunnable(
-                            new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (loginScreenEvent.isLoginAnswer()) {
-                                        game.setScreen(new MenuScreen(game, skin));
-                                        stage.dispose();
+                            () -> {
+                                if (loginScreenEvent.isLoginAnswer()) {
+                                    game.setScreen(new MenuScreen(game, skin));
+                                    stage.dispose();
+                                } else {
+                                    Rumble.rumble(1f, .2f);
 
-                                    } else {
-                                        Rumble.rumble(1f, .2f);
+                                    errorWindow.setVisible(true);
+                                    windowLogin.setVisible(false);
+                                    errorLabel.setFontScale(3f);
 
-                                        errorWindow.setVisible(true);
-                                        windowLogin.setVisible(false);
-                                        errorLabel.setFontScale(3f);
+                                    okButton.addListener(new InputListener() {
 
+                                        @Override
+                                        public void touchUp(InputEvent event1, float x1, float y1, int pointer1, int button1) {
+                                            errorWindow.setVisible(false);
+                                            windowLogin.setVisible(true);
+                                        }
 
-                                        okButton.addListener(new InputListener() {
-
-                                            @Override
-                                            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                                                errorWindow.setVisible(false);
-                                                windowLogin.setVisible(true);
-                                            }
-
-                                            @Override
-                                            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                                                return true;
-                                            }
-                                        });
-                                        errorWindow.pack();
-                                        stage.addActor(errorWindow);
-                                    }
+                                        @Override
+                                        public boolean touchDown(InputEvent event1, float x1, float y1, int pointer1, int button1) {
+                                            return true;
+                                        }
+                                    });
+                                    errorWindow.pack();
+                                    stage.addActor(errorWindow);
                                 }
                             }
                     );
-
                 }).start();
 
             }

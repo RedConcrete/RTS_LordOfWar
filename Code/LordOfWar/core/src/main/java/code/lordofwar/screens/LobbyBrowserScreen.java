@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 public class LobbyBrowserScreen extends Screens implements Screen {
@@ -24,6 +25,7 @@ public class LobbyBrowserScreen extends Screens implements Screen {
         lobbyBrowserScreenEvent = new LobbyBrowserScreenEvent(game);
 
         createBackground(stage);
+        lobbyBrowserScreenEvent.sendRequestGetLobbys();
 
     }
 
@@ -46,17 +48,14 @@ public class LobbyBrowserScreen extends Screens implements Screen {
 
     @Override
     public void resize(int width, int height) {
-
     }
 
     @Override
     public void pause() {
-
     }
 
     @Override
     public void resume() {
-
     }
 
     @Override
@@ -69,9 +68,7 @@ public class LobbyBrowserScreen extends Screens implements Screen {
         stage.dispose();
     }
 
-
     private void setupUI() {
-        lobbyBrowserScreenEvent.sendRequestGetLobbys();
 
         Window windowLobbyBrowser = new Window("", skin, "border");
         windowLobbyBrowser.defaults().pad(20f);
@@ -82,90 +79,93 @@ public class LobbyBrowserScreen extends Screens implements Screen {
 
         TextButton okButton = new TextButton("OK", skin);
 
-
         new Thread(() -> {
             try {
-                Thread.sleep(game.getConstants().STANDARD_TIME_WAIT);//2 sec
-
+                Thread.sleep(STANDARD_TIME_WAIT);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             Gdx.app.postRunnable(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            String[] strings = lobbyBrowserScreenEvent.getLobbyList();
-                            for (int i = 4; i < strings.length; i += 4) {
-                                TextButton textButton = new TextButton("join", skin);
-                                Label l = new Label(strings[i - 3] + "  " + strings[i - 2] + "  " + strings[i - 1] + "  " + strings[i], skin);
-                                textButton.setName(strings[i - 3]);
-                                textButton.addListener(new InputListener() {
-                                    @Override
-                                    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                                        lobbyBrowserScreenEvent.sendRequestJoinLobby(textButton.getName());
+                    () -> {
+                        String[] strings = lobbyBrowserScreenEvent.getLobbyList();
+                        for (int i = 4; i < strings.length; i += 4) {
+                            TextButton joinButton = new TextButton("join", skin);
+                            Label l = new Label(strings[i - 3] + "  " + strings[i - 2] + "  " + strings[i - 1] + "  " + strings[i], skin);
+                            joinButton.setName(strings[i - 3]);
+                            joinButton.padLeft(20f).padRight(100f);
+
+                            joinButton.addListener(new InputListener() {
+                                @Override
+                                public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                                    lobbyBrowserScreenEvent.sendRequestJoinLobby(joinButton.getName());
+                                    new Thread(() -> {
                                         try {
-                                            TimeUnit.SECONDS.sleep(2); // TODO mit Thread realisieren
+                                            Thread.sleep(STANDARD_TIME_WAIT);
                                         } catch (InterruptedException e) {
                                             e.printStackTrace();
                                         }
+                                        Gdx.app.postRunnable(
+                                                () -> {
+                                                    if (lobbyBrowserScreenEvent.getLobbyInfo() != null) {
+                                                        game.setScreen(new LobbyScreen(game, skin, lobbyBrowserScreenEvent.getLobbyInfo()));
+                                                        stage.dispose();
 
-                                        if (lobbyBrowserScreenEvent.getLobbyInfo() != null) {
-                                            game.setScreen(new LobbyScreen(game, skin, lobbyBrowserScreenEvent.getLobbyInfo()));//TODO does this work?
-                                            stage.dispose();
+                                                    } else {
+                                                        Rumble.rumble(1f, .2f);
 
-                                        } else {
-                                            Rumble.rumble(1f, .2f);
+                                                        errorWindow.setVisible(true);
+                                                        windowLobbyBrowser.setVisible(false);
 
-                                            errorWindow.setVisible(true);
-                                            windowLobbyBrowser.setVisible(false);
+                                                        Label errorLabel = new Label("Can´t join lobby", skin);
+                                                        errorLabel.setFontScale(3f);
 
-                                            Label errorLabel = new Label("Can´t join lobby", skin);
-                                            errorLabel.setFontScale(3f);
+                                                        okButton.addListener(new InputListener() {
 
+                                                            @Override
+                                                            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                                                                errorWindow.setVisible(false);
+                                                                windowLobbyBrowser.setVisible(true);
+                                                            }
 
-                                            okButton.addListener(new InputListener() {
+                                                            @Override
+                                                            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                                                                return true;
+                                                            }
+                                                        });
 
-                                                @Override
-                                                public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                                                    errorWindow.setVisible(false);
-                                                    windowLobbyBrowser.setVisible(true);
-                                                }
+                                                        errorWindow.add(errorLabel);
+                                                        errorWindow.add(okButton);
+                                                        errorWindow.setPosition(stage.getWidth() * 1 / 4, stage.getHeight() * 1 / 3);
+                                                        errorWindow.pack();
 
-                                                @Override
-                                                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                                                    return true;
-                                                }
-                                            });
+                                                        stage.addActor(errorWindow);
 
-                                            errorWindow.add(errorLabel);
-                                            errorWindow.add(okButton);
-                                            errorWindow.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
-                                            errorWindow.pack();
+                                                    }
+                                                });
+                                    }).start();
+                                }
 
-                                            stage.addActor(errorWindow);
-
-                                        }
-                                    }
-
-                                    @Override
-                                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
-                                        return true;
-                                    }
-                                });
-                                l.setFontScale(2f);
-                                windowLobbyBrowser.add(l);
-                                windowLobbyBrowser.add(textButton).row();
-                            }
+                                @Override
+                                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                                    return true;
+                                }
+                            });
+                            l.setFontScale(2f);
+                            windowLobbyBrowser.add(l);
+                            windowLobbyBrowser.add(joinButton).row();
                         }
                     });
-        });
+        }).start();
 
-
+        windowLobbyBrowser.setSize(1000, 600);
+        windowLobbyBrowser.setMovable(false);
+        windowLobbyBrowser.setPosition(stage.getWidth() * 1 / 4, stage.getHeight() * 1 / 3);
         backButton(stage, skin, game, windowLobbyBrowser);
-        packAndSetWindow(windowLobbyBrowser, stage);
+        //packAndSetWindow(windowLobbyBrowser, stage);
         stage.addActor(windowLobbyBrowser);
         stage.setDebugAll(false);
     }
+
 
     public LobbyBrowserScreenEvent getLobbyBrowserScreenEvent() {
         return lobbyBrowserScreenEvent;

@@ -6,14 +6,12 @@ import code.lordofwar.main.LOW;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -24,7 +22,7 @@ public class GameScreenEvent extends Events {
     private int points;
     private final String lobbyID;
     private GameScreenEvent gameScreenEvent;
-    private ArrayList conPlayers;
+    private ArrayList connectedPlayers;
     private HashMap<String,Team> teamHashMap = new HashMap<String,Team>();
 
 
@@ -56,9 +54,10 @@ public class GameScreenEvent extends Events {
     }
 
     public void createTeams(){
-        for (int i = 0; i < conPlayers.size(); i++) {
-            Team team= new Team(i);
-            teamHashMap.put((String) conPlayers.get(i),team);
+        for (int i = 0; i < connectedPlayers.size(); i++) {
+            Team team = new Team(i);
+            teamHashMap.put((String) connectedPlayers.get(i),team);
+            team.setStartingPos(i);
         }
     }
 
@@ -267,9 +266,7 @@ public class GameScreenEvent extends Events {
         }
 
         if(Gdx.input.isKeyPressed(Input.Keys.UP)){
-
             System.out.println("sdfadssa");
-
         }
 
     }
@@ -279,11 +276,8 @@ public class GameScreenEvent extends Events {
         return gameScreenEvent;
     }
 
-    public void getConnectedPlayer(String[] conPlayers){
-        this.conPlayers = new ArrayList<String>();
-        for(int i = 0; i<conPlayers.length; i++) {
-            this.conPlayers.add(conPlayers[i]);
-        }
+    public void getConnectedPlayer(ArrayList<String> conPlayers){
+        this.connectedPlayers = conPlayers;
         createTeams();
     }
 
@@ -294,4 +288,6 @@ public class GameScreenEvent extends Events {
     public int getPoints() {
         return points;
     }
+
+
 }
