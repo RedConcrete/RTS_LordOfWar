@@ -25,13 +25,11 @@ import static de.constants.MessageIdentifier.*;
 @ServerEndpoint("/api/v1/ws")
 @ApplicationScoped
 
-
 public class GameWebSocketHandler {
 
     Map<String, Session> sessions = new ConcurrentHashMap<>();
     Map<String, User> userSessions = new ConcurrentHashMap<>();
     Map<String, ServerLobby> lobbys = new ConcurrentHashMap<>();
-
 
     @OnOpen
     public void onOpen(Session session) {
@@ -44,18 +42,15 @@ public class GameWebSocketHandler {
 
     @OnClose
     public void onClose() {
-
     }
 
     @OnError
     public void onError(Throwable throwable) {
         System.err.println(throwable.getMessage());
-
     }
 
     @OnMessage
-    public void onMessage(String message) throws IOException {
-
+    public void onMessage(String message) {
         String[] dataArray = depackData(message);
         checkDataDir(dataArray);
     }
@@ -77,37 +72,32 @@ public class GameWebSocketHandler {
                     Login login = new Login();
                     User newUser = login.isLoginValid(data, sessions.get(data[1]));
                     loginUser(newUser);
-                    System.out.println("Done 4");
                 } else if (data[0].equals(REGISTER.toString())) {
                     Register register = new Register();
                     register.isRegisterValid(data, sessions.get(data[1]));
-                    System.out.println("Done 5");
                 } else if (data[0].equals(GET_GAME_POINTS.toString())) {
                     ServerLobby serverLobby = findLobby(data);
                     if (serverLobby != null) {
                         sessions.get(data[1]).getAsyncRemote().sendObject(DataPacker.packData(GET_GAME_POINTS, String.valueOf(serverLobby.getGame().getPoints(data[1]))));
                     }
-                    System.out.println("Done 6");
                 } else if (data[0].equals(CREATE_LOBBY.toString())) {
                     createLobby(data);
-                    System.out.println("Done 7");
+                } else if (data[0].equals(GAME_START.toString())) {
+                    startGame(data);
                 } else if (data[0].equals(GET_LOBBYS.toString())) {
                     sendLobbysToClient(data[1]);
-                    System.out.println("Done 8");
                 } else if (data[0].equals(JOIN_LOBBY.toString())) {
                     joinLobby(data);
-
-                    System.out.println("Done 9");
                 } else if (data[0].equals(LEAVE_LOBBY.toString())) {
                     leaveLobby(data);
-                    System.out.println("Done 3");
                 } else if (data[0].equals(LOBBY_PLAYERS.toString())) {
                     sendPlayerListUpdate(data);
-                    System.out.println("Done");
-                } else if (data[0].equals(START_GAME.toString())) {
-                    startGame(data);
-                    System.out.println("Done 2");
+                } else if (data[0].equals(UPDATE_POS.toString())) {
+                    // data = [0] = s.getX() [1] = s.getY() [2] = c.getX() [3] = c.getY()
+                    System.out.println(Arrays.toString(data));
+                    updatePos(data);
                 }
+
             }
         }
     }
@@ -126,7 +116,7 @@ public class GameWebSocketHandler {
                 for (User player : lobby.getPlayers()) {
                     stringRep = String.valueOf(i);
                     gameData.add(stringRep);//give startingposition
-                    player.getuSession().getAsyncRemote().sendObject(DataPacker.packData(START_GAME, DataPacker.stringCombiner(gameData)));
+                    player.getuSession().getAsyncRemote().sendObject(DataPacker.packData(GAME_START, DataPacker.stringCombiner(gameData)));
                     gameData.remove(stringRep);//remove startingposition for next loop
                     i++;
                 }
@@ -245,7 +235,11 @@ public class GameWebSocketHandler {
         }
     }
 
-    public Map<String, Session> getSessions() {
+    private void updatePos(String[] data){
+
+    }
+
+    private Map<String, Session> getSessions() {
         return sessions;
     }
 

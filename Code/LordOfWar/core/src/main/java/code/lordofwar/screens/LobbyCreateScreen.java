@@ -134,6 +134,7 @@ public class LobbyCreateScreen extends Screens implements Screen {
                                 () -> {
                                     if (lobbyCreateScreenEvent.isCreated()) {
                                         game.setScreen(new LobbyScreen(game, skin, new String[]{lobbyName.getText(), mapSelctBox.getSelected(), String.valueOf(playerAmountSelectBox.getSelected()), gameModeSelectBox.getSelected()}));
+                                        stage.dispose();
                                     } else {
                                         Rumble.rumble(1f, .2f);
                                         printErrorWindow(windowLobbyCreate, "Can´t create Lobby");

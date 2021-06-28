@@ -89,7 +89,7 @@ public class GameWebSocketListener extends WebSocketListener {
                     if (game.getScreen() instanceof LobbyScreen) {//very important! this can be triggered in the browser or create screen and needs to be discarded inn that case
                         ((LobbyScreen) game.getScreen()).getLobbyScreenEvent().setPlayers(strings);
                     }
-                }else if (strings[0].equals(START_GAME.toString())){
+                }else if (strings[0].equals(GAME_START.toString())){
                     if (game.getScreen() instanceof LobbyScreen){
                         ((LobbyScreen) game.getScreen()).getLobbyScreenEvent().setGameData(strings);
                     }

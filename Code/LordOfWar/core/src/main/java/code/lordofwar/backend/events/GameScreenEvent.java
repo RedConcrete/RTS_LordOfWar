@@ -1,6 +1,8 @@
 package code.lordofwar.backend.events;
 
+import code.lordofwar.backend.Castle;
 import code.lordofwar.backend.DataPacker;
+import code.lordofwar.backend.Soldier;
 import code.lordofwar.backend.Team;
 import code.lordofwar.main.LOW;
 import com.badlogic.gdx.Gdx;
@@ -15,8 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static code.lordofwar.backend.MessageIdentifier.GET_GAME_POINTS;
-import static code.lordofwar.backend.MessageIdentifier.LEAVE_LOBBY;
+import static code.lordofwar.backend.MessageIdentifier.*;
 
 public class GameScreenEvent extends Events {
     private int points;
@@ -53,11 +54,11 @@ public class GameScreenEvent extends Events {
         webSocket.send(DataPacker.packData(LEAVE_LOBBY, DataPacker.stringCombiner(leaveData)));
     }
 
-    public void createTeams(){
+    public void createTeams(int startingPosition){
         for (int i = 0; i < connectedPlayers.size(); i++) {
             Team team = new Team(i);
             teamHashMap.put((String) connectedPlayers.get(i),team);
-            team.setStartingPos(i);
+            team.setStartingPos(startingPosition);
         }
     }
 
@@ -276,9 +277,9 @@ public class GameScreenEvent extends Events {
         return gameScreenEvent;
     }
 
-    public void getConnectedPlayer(ArrayList<String> conPlayers){
+    public void getConnectedPlayer(ArrayList<String> conPlayers,int startingPosition){
         this.connectedPlayers = conPlayers;
-        createTeams();
+        createTeams(startingPosition);
     }
 
     public HashMap<String,Team> getTeamHashMap() {
@@ -289,5 +290,12 @@ public class GameScreenEvent extends Events {
         return points;
     }
 
+    public void updatePos(Soldier s){
+        ArrayList<String> a = new ArrayList<>();
+        a.add(String.valueOf(s.getX()));
+        a.add(String.valueOf(s.getY()));
+
+        webSocket.send(DataPacker.packData(UPDATE_POS, DataPacker.stringCombiner(a)));
+    }
 
 }

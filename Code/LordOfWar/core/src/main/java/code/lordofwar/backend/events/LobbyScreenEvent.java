@@ -45,7 +45,7 @@ public class LobbyScreenEvent extends Events {
         if (players.length - 2 >= 0) {
             recievedData = true;//todo move later
             System.arraycopy(players, 1, this.players, 0, players.length - 2);
-            position = Integer.parseInt(players[players.length - 2]);//set starting position here
+            position = Integer.parseInt(players[players.length - 1]);//set starting position here
         }
     }
 
@@ -69,8 +69,7 @@ public class LobbyScreenEvent extends Events {
         ArrayList<String> startRequest = new ArrayList<>();
         startRequest.add(game.getSessionID());
         startRequest.add(lobbyID);
-        System.out.println(startRequest);
-        webSocket.send(DataPacker.packData(START_GAME, DataPacker.stringCombiner(startRequest)));
+        webSocket.send(DataPacker.packData(GAME_START, DataPacker.stringCombiner(startRequest)));
     }
 
     public boolean isRecievedData() {

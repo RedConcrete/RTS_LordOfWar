@@ -35,7 +35,6 @@ public class GameScreen extends Screens implements Screen {
 
     private ShapeRenderer rectangleRenderer;
 
-    private final Vector2 vectorSpeed;
     private final TiledMapTileLayer collisionUnitLayer;
     private final OrthographicCamera camera;
     private final boolean cameraDebug;
@@ -69,7 +68,7 @@ public class GameScreen extends Screens implements Screen {
 
     private boolean isLeftPressed;
     private boolean isRightPressed;
-    private Castle myCastle;
+    private Castle castle;
 
     private Label soldierLabel;
     private Label goldLabel;
@@ -104,9 +103,7 @@ public class GameScreen extends Screens implements Screen {
         pointTimerCounter = 10;
         gameScreenEvent = new GameScreenEvent(game, lobbyID);
         posCameraDesired = new Vector3();
-        cameraDebug = true;
-        vectorSpeed = new Vector2();
-        posCameraDesired = new Vector3();
+        cameraDebug = false;
         soldierArrayList = new ArrayList<>();
         castleArrayList = new ArrayList<>();
 
@@ -120,10 +117,11 @@ public class GameScreen extends Screens implements Screen {
         rectangleBounds = new float[4];//0=originX1=originY2=width3=height
         soldierSprite = new Sprite(unitAtlas.findRegion("Character_Green"));
         loader = new TmxMapLoader();
+        camera = new OrthographicCamera();
 
         //todo zeigt alle verbunden players
         //System.out.println(Arrays.toString(connectedPlayers));
-        gameScreenEvent.getConnectedPlayer(connectedPlayers);
+        gameScreenEvent.getConnectedPlayer(connectedPlayers, startingPosition);
 
 
         String mapPath = "maps/map_1.tmx";
@@ -140,6 +138,7 @@ public class GameScreen extends Screens implements Screen {
         };
         //TODO way to tell maps apart
         float[] castlePosition = {};
+        System.out.println(startingPosition);
         switch (startingPosition) {
             case 0:
                 castlePosition = Constants.MAP1CC1;
@@ -158,21 +157,23 @@ public class GameScreen extends Screens implements Screen {
                 System.err.println("Unexpected value: " + startingPosition);//max of 4 players; thus error
         }
 
-        camera = new OrthographicCamera();
+        collisionUnitLayer = (TiledMapTileLayer) map.getLayers().get(1);
+
         posCameraDesired.x = castlePosition[0];
         posCameraDesired.y = castlePosition[1];
-        collisionUnitLayer = (TiledMapTileLayer) map.getLayers().get(1);
-        myCastle = new Castle(castleSprite, collisionUnitLayer);
+        castle = new Castle(castleSprite, collisionUnitLayer, new Team(startingPosition));
+        castle.setPosition(castlePosition[0], castlePosition[1]);
+
         //TODO add castles to HB map
         for (int i = 0; i < startingCastle; i++) {
             //todo Castle neu ändern!! (objekte erzeugen und dann in das Array)
-            castleArrayList.add(myCastle);
-            myCastle.setPosition(Constants.MAP1CC1[0], Constants.MAP1CC1[1]);
+            castleArrayList.add(castle);
+            castle.setPosition(castlePosition[0], castlePosition[1]);
         }
-        Rectangle myCastleHB=new Rectangle(myCastle.getBoundingRectangle());
+        Rectangle myCastleHB = new Rectangle(castle.getBoundingRectangle());
         myCastleHB.setWidth(myCastleHB.getWidth());
-        myCastleHB.setHeight(myCastleHB.getHeight()-64);
-        hitboxes.put(myCastle.hashCode(),myCastleHB);
+        myCastleHB.setHeight(myCastleHB.getHeight() - 64);
+        hitboxes.put(castle.hashCode(), myCastleHB);
         setupUI();
 
     }
@@ -228,7 +229,6 @@ public class GameScreen extends Screens implements Screen {
                                 break;
                         }
 
-
                         //rectange should be reset no matter what
                         rectangleEnd = null;
                         rectangleStart = null;
@@ -246,8 +246,6 @@ public class GameScreen extends Screens implements Screen {
         }
         return false;
     }
-
-    ;
 
     @Override
     public void render(float delta) {
@@ -270,8 +268,8 @@ public class GameScreen extends Screens implements Screen {
 
         scoreLabel.setText(gameScreenEvent.getPoints());
 
-        soldierLabel.setText(myCastle.getVillager());
-        goldLabel.setText(myCastle.getGold());
+        soldierLabel.setText(castle.getVillager());
+        goldLabel.setText(castle.getGold());
 
         for (Castle c : castleArrayList) {
             c.draw(renderer.getBatch());
@@ -303,16 +301,18 @@ public class GameScreen extends Screens implements Screen {
             }
         }
 
+        for (Soldier s : soldierArrayList) {
+            s.draw(renderer.getBatch());
 
-        for (Soldier soldier : soldierArrayList) {
-            soldier.draw(renderer.getBatch());
-            if (soldier.getDestination() != null) {
-                if (soldier.getDestination().isEmpty()) {
-                    soldier.setDestination(null);
+            gameScreenEvent.updatePos(s);
+
+            if (s.getDestination() != null) {
+                if (s.getDestination().isEmpty()) {
+                    s.setDestination(null);
                 } else {
 
-                    int vX = (int) ((soldier.getX() + 32) / 64);
-                    int vY = (int) ((soldier.getY() + 32) / 64);
+                    int vX = (int) ((s.getX() + 32) / 64);
+                    int vY = (int) ((s.getY() + 32) / 64);
 //                    System.out.println(soldier.getX());
 //                    System.out.println(soldier.getY());
 //                    System.out.println(vX);
@@ -330,7 +330,7 @@ public class GameScreen extends Screens implements Screen {
 //                        }
 //                    }
 
-                    if (vX != soldier.getDestination().get(0).coords.x || vY != soldier.getDestination().get(0).coords.y) {
+                    if (vX != s.getDestination().get(0).coords.x || vY != s.getDestination().get(0).coords.y) {
                         /*
                              if (vX != v.getDestination().get(0).coords.x || vY != v.getDestination().get(0).coords.y) {
                         if (v.getDestination().get(0).coords.x>vX){
@@ -352,58 +352,58 @@ public class GameScreen extends Screens implements Screen {
                         soldier.translateY(soldier.getDestination().get(0).coords.y - vY);
                         soldier.translate(soldier.getDestination().get(0).coords.x - vX, soldier.getDestination().get(0).coords.y - vY);
                          */
-                        if (soldier.getDestination().get(0).coords.x < vX) {
-                            soldier.translateX(-1);
-                        } else if (soldier.getDestination().get(0).coords.x > vX) {
-                            soldier.translateX(1);
+                        if (s.getDestination().get(0).coords.x < vX) {
+                            s.translateX(-1);
+                        } else if (s.getDestination().get(0).coords.x > vX) {
+                            s.translateX(1);
                         }
-                        if (soldier.getDestination().get(0).coords.y < vY) {
-                            soldier.translateY(-1);
-                        } else if (soldier.getDestination().get(0).coords.y > vY) {
-                            soldier.translateY(1);
+                        if (s.getDestination().get(0).coords.y < vY) {
+                            s.translateY(-1);
+                        } else if (s.getDestination().get(0).coords.y > vY) {
+                            s.translateY(1);
                         }
 
                         //TODO maybe do a isColliding method in soldier? idk discuss
-                        if (isColliding(soldier)) {
+                        if (isColliding(s)) {
                             //reverse direction
-                            if (soldier.getDestination().get(0).coords.x < vX) {
-                                soldier.setX(soldier.getX()+soldier.getWidth()/2);
-                            } else if (soldier.getDestination().get(0).coords.x > vX) {
-                                soldier.setX(soldier.getX()-soldier.getWidth()/2);
+                            if (s.getDestination().get(0).coords.x < vX) {
+                                s.setX(s.getX() + s.getWidth() / 2);
+                            } else if (s.getDestination().get(0).coords.x > vX) {
+                                s.setX(s.getX() - s.getWidth() / 2);
                             }
-                            if (soldier.getDestination().get(0).coords.y < vY) {
-                                soldier.setY(soldier.getY()-soldier.getHeight()/2);
+                            if (s.getDestination().get(0).coords.y < vY) {
+                                s.setY(s.getY() - s.getHeight() / 2);
 
-                            } else if (soldier.getDestination().get(0).coords.y > vY) {
-                                soldier.setY(soldier.getY()-soldier.getHeight()/2);
+                            } else if (s.getDestination().get(0).coords.y > vY) {
+                                s.setY(s.getY() - s.getHeight() / 2);
                             }
-                            getPathFinding(soldier,(int)soldier.getDestination().get(soldier.getDestination().size()-1).coords.x* collisionUnitLayer.getTileWidth(), (int) (soldier.getDestination().get(soldier.getDestination().size()-1).coords.y*collisionUnitLayer.getTileHeight()));
+                            getPathFinding(s, (int) s.getDestination().get(s.getDestination().size() - 1).coords.x * collisionUnitLayer.getTileWidth(), (int) (s.getDestination().get(s.getDestination().size() - 1).coords.y * collisionUnitLayer.getTileHeight()));
                         }
 
-                    } else if (vX == soldier.getDestination().get(0).coords.x && vY == soldier.getDestination().get(0).coords.y) {
-                        if (soldier.getDestination().size() >= 1) {
-                            System.out.println(soldier.getDestination().get(0).coords.x + " " + soldier.getDestination().get(0).coords.y + " reached");
-                            soldier.getDestination().remove(0);
-                            hitboxes.put(soldier.hashCode(), soldier.getBoundingRectangle());//set hitbox when having reached a tile
+                    } else if (vX == s.getDestination().get(0).coords.x && vY == s.getDestination().get(0).coords.y) {
+                        if (s.getDestination().size() >= 1) {
+                            System.out.println(s.getDestination().get(0).coords.x + " " + s.getDestination().get(0).coords.y + " reached");
+                            s.getDestination().remove(0);
+                            hitboxes.put(s.hashCode(), s.getBoundingRectangle());//set hitbox when having reached a tile
                         }
                     }
 
                 }
             } else {
-                hitboxes.put(soldier.hashCode(), soldier.getBoundingRectangle());//set hitbox when having stopped moving
+                hitboxes.put(s.hashCode(), s.getBoundingRectangle());//set hitbox when having stopped moving
             }
 
-            if (soldier.isSelected()) {
-                entityHp.setText(soldier.getHp());
+            if (s.isSelected()) {
+                entityHp.setText(s.getHp());
                 buttonRecruit.setVisible(false);
 
                 //todo braucht seine eigene forEach !!
                 entityName.setText("Soldier");
-                Sprite s = new Sprite(uiAtlas.findRegion("button-normal"));
-                s.setColor(soldier.getTeam().getColor());
-                s.setSize(soldier.getHp(), 10);
-                s.setPosition(soldier.getX() + 5, soldier.getY() + 60);
-                s.draw(renderer.getBatch());
+                Sprite sprite = new Sprite(uiAtlas.findRegion("button-normal"));
+                sprite.setColor(s.getTeam().getColor());
+                sprite.setSize(s.getHp(), 10);
+                sprite.setPosition(sprite.getX() + 5, sprite.getY() + 60);
+                sprite.draw(renderer.getBatch());
             }
         }
         if (mapDebug) {
@@ -440,7 +440,7 @@ public class GameScreen extends Screens implements Screen {
             rectangleRenderer.end();
             //draw rectangle here
         }
-        if (myCastle.isSelected()) {
+        if (castle.isSelected()) {
             entityName.setText("Castle");
         }
 
@@ -452,7 +452,6 @@ public class GameScreen extends Screens implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        camera.position.set(stage.getWidth() / 2f, stage.getHeight() / 2f, 0);
         camera.viewportWidth = width;
         camera.viewportHeight = height;
         camera.update();
@@ -478,7 +477,6 @@ public class GameScreen extends Screens implements Screen {
         stage.dispose();
         map.dispose();
         renderer.dispose();
-
     }
 
     private void setupUI() {
@@ -506,7 +504,6 @@ public class GameScreen extends Screens implements Screen {
         TextButton backButton = new TextButton("Back", skin);
         TextButton backButton2 = new TextButton("Back", skin);
 
-
         TextButton exitButton = new TextButton("Back", skin);
         Window windowNoVillager = new Window("NoVillager", skin, "border");
         windowNoVillager.setVisible(false);
@@ -524,8 +521,6 @@ public class GameScreen extends Screens implements Screen {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
-
-
         });
 
         Window windowNoGold = new Window("", skin, "border");
@@ -544,10 +539,7 @@ public class GameScreen extends Screens implements Screen {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
-
-
         });
-
 
         Window windowExit = new Window("Surrender?", skin, "border");
         windowExit.setMovable(false);
@@ -684,15 +676,15 @@ public class GameScreen extends Screens implements Screen {
         buttonRecruit.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                if (myCastle.getVillager() != 0 && myCastle.getGold() - 10 >= 0) {
-                    if (soldierArrayList.size() <= myCastle.getMaxUnits()) {
-                        myCastle.setVillager(myCastle.getVillager() - 1);
-                        myCastle.setGold(myCastle.getGold() - 10); //todo Gold wert nicht hartCoded!!
-                        for (int i = 0; i < connectedPlayers.size(); i++) {
-                            soldierSprite.setColor(gameScreenEvent.getTeamHashMap().get(connectedPlayers.get(i)).getColor());// todo username richtig abfragen
-                            Soldier soldier = new Soldier(soldierSprite, collisionUnitLayer, gameScreenEvent.getTeamHashMap().get(connectedPlayers.get(i)));// todo username richtig abfragen
-                            soldierArrayList.add(soldier);
-                        }
+                if (castle.getVillager() != 0 && castle.getGold() - 10 >= 0) {
+                    if (soldierArrayList.size() <= castle.getMaxUnits()) {
+                        castle.setVillager(castle.getVillager() - 1);
+                        castle.setGold(castle.getGold() - 10); //todo Gold wert nicht hartCoded!!
+
+                        soldierSprite.setColor(castle.getTeam().getColor());
+                        Soldier soldier = new Soldier(soldierSprite, collisionUnitLayer, castle.getTeam());
+                        soldierArrayList.add(soldier);
+
                     }
                 } else {
                     windowNoVillager.setPosition(stage.getWidth() / 2, stage.getHeight() / 2);
@@ -713,9 +705,9 @@ public class GameScreen extends Screens implements Screen {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
 
-                if (myCastle.getGold() - myCastle.getMaxUnits() >= 0) {
-                    myCastle.setGold(myCastle.getGold() - myCastle.getMaxUnits());
-                    myCastle.setMaxUnits(myCastle.getMaxUnits() + 10);
+                if (castle.getGold() - castle.getMaxUnits() >= 0) {
+                    castle.setGold(castle.getGold() - castle.getMaxUnits());
+                    castle.setMaxUnits(castle.getMaxUnits() + 10);
                 } else {
                     windowNoGold.setPosition(stage.getWidth() / 2, stage.getHeight() / 2);
                     windowNoGold.setVisible(true);
