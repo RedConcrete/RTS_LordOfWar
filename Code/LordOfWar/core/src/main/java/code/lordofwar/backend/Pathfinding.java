@@ -4,6 +4,7 @@ package code.lordofwar.backend;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.HashMap;
@@ -26,19 +27,21 @@ public class Pathfinding {
     private Vector2 cache;
 
     private TiledMapTileLayer collisionLayer;
+    private HashMap<Integer, Rectangle> hitboxes;
 
-    public Pathfinding(int xClicked, int yClicked, int xPosUnit, int yPosUnit, TiledMapTileLayer collisionLayer) {
+    public Pathfinding(int xClicked, int yClicked, int xPosUnit, int yPosUnit, TiledMapTileLayer collisionLayer, HashMap<Integer, Rectangle> hitboxes) {
         this.collisionLayer = collisionLayer;
+        this.hitboxes = hitboxes;
         getStartAndEndCell(xPosUnit, yPosUnit, xClicked, yClicked);
-        if (!checkPossible(xClicked, yClicked)) {
+        //if (!checkPossible(xClicked, yClicked)) {
 
-            cache = new Vector2(xStartCell, yStartCell);
-        } else {
+        cache = new Vector2(xStartCell, yStartCell);
+        //} else {
 
-            System.out.println("impossible");
-        }
+        //System.out.println("impossible");
+        //}
     }
-
+/*
     private boolean checkPossible(int x, int y) {
         double dest = 0;
         double org = getCellDistancesToStart(x, y);
@@ -46,6 +49,7 @@ public class Pathfinding {
 
         return traversable(new PathCell(new Vector2(x, y), new double[]{sum, org, dest}, null));
     }
+*/
 
     /**
      * Starts the pathfinding algorithm.
@@ -63,16 +67,16 @@ public class Pathfinding {
         HashMap<Vector2, PathCell> open = new HashMap<>();
         //HashSet<PathCell> open = new HashSet<>();
 
-        System.out.println(xEndCell + " " + yEndCell);
+        //System.out.println(xEndCell + " " + yEndCell);
         while (current != null) {
-            System.out.println(current.coords);
+            //System.out.println(current.coords);
             if (!(current.coords.x == xEndCell && current.coords.y == yEndCell)) {
                 open.remove(current.coords);
                 closed.put(current.coords, current);
                 for (Map.Entry<Vector2, double[]> entry : getSurrounding(current.coords).entrySet()) {
                     //TODO current is not goal
                     PathCell newCell = new PathCell(entry.getKey(), entry.getValue(), current);
-                    if (traversable(newCell)) {//TODO CHECK IF TRAVERSABLE BEFORE THIS
+                    if (traversable(newCell)) {
                         if (closed.containsKey(newCell.coords)) {//should return smthing since equals same vector works also
                             PathCell oldCell = closed.get(newCell.coords);
                             if (newCell.distances[0] < oldCell.distances[0] || newCell.distances[2] < oldCell.distances[2]) {
@@ -125,33 +129,80 @@ public class Pathfinding {
                 TiledMapTile tile = cell.getTile();
                 if (tile != null) {
                     MapProperties properties = tile.getProperties();
-                    if (!properties.containsKey("isCastle")) {//todo change this to generic blocked
+                    if (!properties.containsKey(Constants.BLOCK_TILE_PROPERTY)) {//todo change this to generic blocked
+                        for (Rectangle hitbox : hitboxes.values()) {
+                            if (hitbox.overlaps(//check wether hitbox overlaps with tile
+                                    new Rectangle(((int) pathCell.coords.x) * collisionLayer.getTileWidth()-2, ((int) pathCell.coords.y) * collisionLayer.getTileHeight()-2,
+                                            collisionLayer.getTileWidth() - 2, collisionLayer.getTileHeight() - 2))) {//todo put this offset into a variable?
+
+                                System.out.println(pathCell.coords.x + " " + pathCell.coords.y + " BLOCKED");
+                                return false;
+                            }
+                        }
+
                         return true;
                     }
                 }
             }
         }
+        System.out.println(pathCell.coords.x + " " + pathCell.coords.y + " BLOCKED");
         return false;
     }
 
     private HashMap<Vector2, double[]> getSurrounding(Vector2 current) {
         HashMap<Vector2, double[]> returnMap = new HashMap<>();
+
         if (current.x != xEndCell || current.y != yEndCell) {
-            Vector2[] surrounding = new Vector2[]{
-                    new Vector2(current.x + 1, current.y + 1),//rechtsOben
-                    new Vector2(current.x + 1, current.y),      //rechtsMitte
-                    new Vector2(current.x + 1, current.y - 1), //rechtsUnten
-                    new Vector2(current.x - 1, current.y + 1),//linksOben
-                    new Vector2(current.x - 1, current.y),        //linksMitte
-                    new Vector2(current.x - 1, current.y - 1), //linkesUnten
-                    new Vector2(current.x, current.y + 1),      //obenMitte
-                    new Vector2(current.x, current.y - 1)      //untenMitte
-            };
+            //alright need to edit this to disallow diagonal movement cause it doesnt look right
+            Vector2[] surrounding = new Vector2[8];
+            boolean up = false;
+            boolean down = false;
+            boolean right = false;
+            boolean left = false;
+            surrounding[0]=new Vector2(current.x, current.y + 1);
+            PathCell tempPathCell=new PathCell(surrounding[0],null,null);
+            if (traversable(tempPathCell)) {
+                up=true;
+            }
+            surrounding[1]=new Vector2(current.x, current.y - 1);
+            tempPathCell.coords=surrounding[1];
+            if (traversable(tempPathCell)){
+                down=true;
+            }
+            surrounding[2]=new Vector2(current.x + 1, current.y);
+            tempPathCell.coords=surrounding[2];
+            if (traversable(tempPathCell)){
+                right=true;
+            }
+            surrounding[3]=new Vector2(current.x - 1, current.y);
+            tempPathCell.coords=surrounding[3];
+            if (traversable(tempPathCell)){
+                left=true;
+            }
+
+           if (up){
+               if (right){
+                   surrounding[4]=new Vector2(current.x + 1, current.y + 1);
+               }
+               if (left){
+                   surrounding[5]=new Vector2(current.x - 1, current.y + 1);
+               }
+           }
+           if (down){
+               if (right){
+                   surrounding[6]=new Vector2(current.x + 1, current.y - 1);
+               }
+               if (left){
+                   surrounding[7]=new Vector2(current.x - 1, current.y - 1);
+               }
+           }
             for (Vector2 vector : surrounding) {
-                double dest = getCellDistancesToEnd(vector.x, vector.y);
-                double org = getCellDistancesToStart(vector.x, vector.y);
-                double sum = dest + org;
-                returnMap.put(vector, new double[]{sum, org, dest});
+                if (vector != null) {//check to filter null objects
+                    double dest = getCellDistancesToEnd(vector.x, vector.y);
+                    double org = getCellDistancesToStart(vector.x, vector.y);
+                    double sum = dest + org;
+                    returnMap.put(vector, new double[]{sum, org, dest});
+                }
             }
         }
         return returnMap;

@@ -18,6 +18,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -25,9 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
+import java.util.*;
 
 public class GameScreen extends Screens implements Screen {
 
@@ -51,7 +50,6 @@ public class GameScreen extends Screens implements Screen {
     private final TiledMap map;
     private final int[] mapSizes;
     private OrthogonalTiledMapRenderer renderer;
-    private Soldier soldier;
 
     private Label entityHp;
     private Label entityATK;
@@ -61,7 +59,6 @@ public class GameScreen extends Screens implements Screen {
     private final ArrayList<Soldier> soldierArrayList;
     private final ArrayList<Castle> castleArrayList;
     private ArrayList<Object> entityArrayList;
-
     private Sprite soldierSprite;
     private Sprite castleSprite;
 
@@ -89,14 +86,17 @@ public class GameScreen extends Screens implements Screen {
     private float pointTimerCounter;
     private Point2D.Float rectangleStart;//used to check where the select rectangle was started
     private Point2D.Float rectangleEnd;
-    private float[] rectangleBounds;
+    private final float[] rectangleBounds;
+
+    private HashMap<Integer, Rectangle> hitboxes;//yeah sorry couldnt come up with a better way to dynamically check than just checking rectangles
 
     Image castleImage;
     Image soldierImage;
 
     public GameScreen(LOW aGame, Skin aSkin, String lobbyID, int startingPosition, String[] connectedPlayers) {
         super(aGame, aSkin);
-        mapDebug = false;
+        hitboxes = new HashMap<>();
+        mapDebug = true;
         isLeftPressed = false;
         isRightPressed = false;
         entityName = new Label("", skin);
@@ -111,7 +111,7 @@ public class GameScreen extends Screens implements Screen {
         castleArrayList = new ArrayList<>();
 
         soldierLabel = new Label("", skin);
-        goldLabel = new Label("",skin);
+        goldLabel = new Label("", skin);
         entityHp = new Label("", skin);
 
         rectangleRenderer = new ShapeRenderer();
@@ -160,10 +160,21 @@ public class GameScreen extends Screens implements Screen {
         }
         camera = new OrthographicCamera();
         //TODO why doesnt this work
+        //TODO add castle hitbox
         posCameraDesired.x = castlePosition[0];
         posCameraDesired.y = castlePosition[1];
         collisionUnitLayer = (TiledMapTileLayer) map.getLayers().get(1);
         myCastle = new Castle(castleSprite, collisionUnitLayer);
+        //TODO add castles to HB map
+        for (int i = 0; i < startingCastle; i++) {
+            //todo Castle neu ändern!! (objekte erzeugen und dann in das Array)
+            castleArrayList.add(myCastle);
+            myCastle.setPosition(Constants.MAP1CC1[0], Constants.MAP1CC1[1]);
+        }
+        Rectangle myCastleHB=new Rectangle(myCastle.getBoundingRectangle());
+        myCastleHB.setWidth(myCastleHB.getWidth());
+        myCastleHB.setHeight(myCastleHB.getHeight()-64);
+        hitboxes.put(myCastle.hashCode(),myCastleHB);
         setupUI();
 
     }
@@ -227,13 +238,18 @@ public class GameScreen extends Screens implements Screen {
                 }
         );
         renderer = new OrthogonalTiledMapRenderer(map);
-
-        for (int i = 0; i < startingCastle; i++) {
-            //todo Castle neu ändern!! (objekte erzeugen und dann in das Array)
-            castleArrayList.add(myCastle);
-            myCastle.setPosition(Constants.MAP1CC1[0], Constants.MAP1CC1[1]);
-        }
     }
+
+    private boolean isColliding(Sprite sprite) {
+        for (Map.Entry<Integer, Rectangle> hitbox : hitboxes.entrySet()) {
+            if (hitbox.getKey() != sprite.hashCode() && sprite.getBoundingRectangle().overlaps(hitbox.getValue())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    ;
 
     @Override
     public void render(float delta) {
@@ -295,21 +311,20 @@ public class GameScreen extends Screens implements Screen {
 
         for (Soldier soldier : soldierArrayList) {
             soldier.draw(renderer.getBatch());
-
             if (soldier.getDestination() != null) {
                 if (soldier.getDestination().isEmpty()) {
                     soldier.setDestination(null);
                 } else {
 
-                    int vX = (int) (soldier.getX() / 64);
-                    int vY = (int) (soldier.getY() / 64);
-                    System.out.println(soldier.getX());
-                    System.out.println(soldier.getY());
-                    System.out.println(vX);
-                    System.out.println(vY);
-                    System.out.println(soldier.getDestination().get(0).coords.x);
-                    System.out.println(soldier.getDestination().get(0).coords.y);
-                    System.out.println();
+                    int vX = (int) ((soldier.getX() + 32) / 64);
+                    int vY = (int) ((soldier.getY() + 32) / 64);
+//                    System.out.println(soldier.getX());
+//                    System.out.println(soldier.getY());
+//                    System.out.println(vX);
+//                    System.out.println(vY);
+//                    System.out.println(soldier.getDestination().get(0).coords.x);
+//                    System.out.println(soldier.getDestination().get(0).coords.y);
+//                    System.out.println();
                     // System.out.println(vX + " | " + vY + " | " + v.getDestination().get(0).coords.x + " | " + v.getDestination().get(0).coords.y);
 
 //                    if(v.getDestination().size() == 1){
@@ -337,17 +352,50 @@ public class GameScreen extends Screens implements Screen {
                         //v.translateY(v.getDestination().get(0).coords.y - vY);
 
                         */
+                        /*better code probably but inconsistent speed sometimes
                         soldier.translateX(soldier.getDestination().get(0).coords.x - vX);
                         soldier.translateY(soldier.getDestination().get(0).coords.y - vY);
+                        soldier.translate(soldier.getDestination().get(0).coords.x - vX, soldier.getDestination().get(0).coords.y - vY);
+                         */
+                        if (soldier.getDestination().get(0).coords.x < vX) {
+                            soldier.translateX(-1);
+                        } else if (soldier.getDestination().get(0).coords.x > vX) {
+                            soldier.translateX(1);
+                        }
+                        if (soldier.getDestination().get(0).coords.y < vY) {
+                            soldier.translateY(-1);
+                        } else if (soldier.getDestination().get(0).coords.y > vY) {
+                            soldier.translateY(1);
+                        }
 
+                        //TODO maybe do a isColliding method in soldier? idk discuss
+                        if (isColliding(soldier)) {
+                            //reverse direction
+                            if (soldier.getDestination().get(0).coords.x < vX) {
+                                soldier.setX(soldier.getX()+soldier.getWidth()/2);
+                            } else if (soldier.getDestination().get(0).coords.x > vX) {
+                                soldier.setX(soldier.getX()-soldier.getWidth()/2);
+                            }
+                            if (soldier.getDestination().get(0).coords.y < vY) {
+                                soldier.setY(soldier.getY()-soldier.getHeight()/2);
+
+                            } else if (soldier.getDestination().get(0).coords.y > vY) {
+                                soldier.setY(soldier.getY()-soldier.getHeight()/2);
+                            }
+                            getPathFinding(soldier,(int)soldier.getDestination().get(soldier.getDestination().size()-1).coords.x* collisionUnitLayer.getTileWidth(), (int) (soldier.getDestination().get(soldier.getDestination().size()-1).coords.y*collisionUnitLayer.getTileHeight()));
+                        }
 
                     } else if (vX == soldier.getDestination().get(0).coords.x && vY == soldier.getDestination().get(0).coords.y) {
                         if (soldier.getDestination().size() >= 1) {
+                            System.out.println(soldier.getDestination().get(0).coords.x + " " + soldier.getDestination().get(0).coords.y + " reached");
                             soldier.getDestination().remove(0);
+                            hitboxes.put(soldier.hashCode(), soldier.getBoundingRectangle());//set hitbox when having reached a tile
                         }
                     }
 
                 }
+            } else {
+                hitboxes.put(soldier.hashCode(), soldier.getBoundingRectangle());//set hitbox when having stopped moving
             }
 
             if (soldier.isSelected()) {
@@ -372,8 +420,8 @@ public class GameScreen extends Screens implements Screen {
             lineH.setSize(1, collisionUnitLayer.getHeight() * 64);
 
             for (int i = 1; i < 76; i++) {
-                lineV.setPosition(0, (i * 64));
-                lineH.setPosition((i * 64), 0);
+                lineV.setPosition(0, (i * 64) + 32);
+                lineH.setPosition((i * 64) + 32, 0);
                 lineV.draw(renderer.getBatch());
                 lineH.draw(renderer.getBatch());
             }
@@ -398,13 +446,9 @@ public class GameScreen extends Screens implements Screen {
             rectangleRenderer.end();
             //draw rectangle here
         }
-
         if (myCastle.isSelected()) {
             entityName.setText("Castle");
         }
-
-        debugRenderer.end();
-        renderer.getBatch().end();
 
         mouseOnEdgeofCamera();
 
@@ -470,19 +514,19 @@ public class GameScreen extends Screens implements Screen {
         TextButton backButton2 = new TextButton("Back", skin);
 
 
-
-         TextButton exitButton = new TextButton("Back", skin);
+        TextButton exitButton = new TextButton("Back", skin);
         Window windowNoVillager = new Window("NoVillager", skin, "border");
         windowNoVillager.setVisible(false);
         windowNoVillager.setMovable(false);
-        windowNoVillager.add(new Label("You have not enough Villager to recruit a Soldier",skin)).padTop(20f).padRight(10f).padLeft(10f).row();
+        windowNoVillager.add(new Label("You have not enough Villager to recruit a Soldier", skin)).padTop(20f).padRight(10f).padLeft(10f).row();
         windowNoVillager.add(backButton);
 
-        backButton.addListener(new InputListener(){
+        backButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 windowNoVillager.setVisible(false);
             }
+
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
@@ -495,14 +539,15 @@ public class GameScreen extends Screens implements Screen {
         Window windowNoGold = new Window("", skin, "border");
         windowNoGold.setVisible(false);
         windowNoGold.setMovable(false);
-        windowNoGold.add(new Label("You have not enough Gold",skin)).padTop(20f).padRight(10f).padLeft(10f).row();
+        windowNoGold.add(new Label("You have not enough Gold", skin)).padTop(20f).padRight(10f).padLeft(10f).row();
         windowNoGold.add(backButton2);
 
-        backButton2.addListener(new InputListener(){
+        backButton2.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 windowNoGold.setVisible(false);
             }
+
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
@@ -510,8 +555,6 @@ public class GameScreen extends Screens implements Screen {
 
 
         });
-
-
 
 
         Window windowExit = new Window("Surrender?", skin, "border");
@@ -532,8 +575,6 @@ public class GameScreen extends Screens implements Screen {
 
         Label scoreTextLabel = new Label(" Your Score:", skin);
         scoreLabel = new Label("", skin);
-
-
 
 
         Image goldImage = new Image(new Sprite(new Texture("ui/gold_treasure_icons_16x16/gold.png")));
@@ -652,20 +693,20 @@ public class GameScreen extends Screens implements Screen {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("Recruit Villager");
-                if(myCastle.getVillager() != 0 && myCastle.getGold()-10 >= 0){
-                    if(soldierArrayList.size() <= myCastle.getMaxUnits()) {
+                if (myCastle.getVillager() != 0 && myCastle.getGold() - 10 >= 0) {
+                    if (soldierArrayList.size() <= myCastle.getMaxUnits()) {
                         myCastle.setVillager(myCastle.getVillager() - 1);
                         myCastle.setGold(myCastle.getGold() - 10);
                         soldierSprite.setColor(gameScreenEvent.getTeamHashMap().get("Username").getColor());// todo username richtig abfragen
                         Soldier soldier = new Soldier(soldierSprite, collisionUnitLayer, gameScreenEvent.getTeamHashMap().get("Username"));// todo username richtig abfragen
                         soldierArrayList.add(soldier);
                     }
-                }
-                else {
-                    windowNoVillager.setPosition(stage.getWidth() / 2,stage.getHeight() / 2);
+                } else {
+                    windowNoVillager.setPosition(stage.getWidth() / 2, stage.getHeight() / 2);
                     windowNoVillager.setVisible(true);
                 }
             }
+
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
@@ -674,23 +715,18 @@ public class GameScreen extends Screens implements Screen {
         });
 
 
-        buttonIncreaseMaxUnits.addListener(new InputListener(){
+        buttonIncreaseMaxUnits.addListener(new InputListener() {
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
 
-                if(myCastle.getGold() - myCastle.getMaxUnits() >= 0){
+                if (myCastle.getGold() - myCastle.getMaxUnits() >= 0) {
                     myCastle.setGold(myCastle.getGold() - myCastle.getMaxUnits());
                     myCastle.setMaxUnits(myCastle.getMaxUnits() + 10);
-                }
-                else{
-                    windowNoGold.setPosition(stage.getWidth() / 2,stage.getHeight() / 2);
+                } else {
+                    windowNoGold.setPosition(stage.getWidth() / 2, stage.getHeight() / 2);
                     windowNoGold.setVisible(true);
                 }
-
-
-
-
 
 
             }
@@ -710,7 +746,8 @@ public class GameScreen extends Screens implements Screen {
         entityWindow.add(entityATK);
         entityWindow.add(buttonRecruit).padRight(30f).row();
         entityWindow.add(defLabel);
-        entityWindow.add(buttonIncreaseMaxUnits).padRight(30f).row();;
+        entityWindow.add(buttonIncreaseMaxUnits).padRight(30f).row();
+        ;
         entityWindow.add(entityDEF);
         entityWindow.setPosition(stage.getWidth() / 2 - 300, 0);
 
@@ -719,7 +756,7 @@ public class GameScreen extends Screens implements Screen {
         packWindow(exitWindow, stage);
         packWindow(entityWindow, stage);
         packWindow(windowNoVillager, stage);
-        packWindow(windowNoGold,stage);
+        packWindow(windowNoGold, stage);
 
         stage.addActor(windowNoVillager);
         stage.addActor(entityWindow);
@@ -774,18 +811,15 @@ public class GameScreen extends Screens implements Screen {
         }
     }
 
+
     /**
      * The Method processCameraMovement moves the Camera in the direction the mouse is pointing at.
      *
      * @author Robin Hefner
      */
-
     private void processCameraMovement(float xClicked, float yClicked) {
 
-        //todo so lassen ?? größe anpassen
-
         //oben links
-        /*
         if (xClicked <= camera.viewportWidth * 2 / 32 && yClicked <= camera.viewportHeight * 1 / 18) {
             posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
             posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
@@ -798,10 +832,19 @@ public class GameScreen extends Screens implements Screen {
 
             camera.update();
         }
-        */
+        //mitte links
+        else if (xClicked <= camera.viewportWidth * 2 / 32 && yClicked >= camera.viewportHeight * 1 / 18 && yClicked <= camera.viewportHeight * 17 / 18) {
+            posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
 
+            if (cameraDebug) {
+                debugMovement.begin();
+                debugMovement.rect(0, camera.viewportHeight - camera.viewportHeight * 17 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 16 / 18);
+                debugMovement.end();
+            }
+
+            camera.update();
+        }
         //unten links
-        /*
         else if (xClicked <= camera.viewportWidth * 2 / 32 && yClicked >= camera.viewportHeight * 17 / 18 && yClicked <= camera.viewportHeight) {
             posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
             posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
@@ -814,10 +857,8 @@ public class GameScreen extends Screens implements Screen {
 
             camera.update();
         }
-        */
 
         //oben rechts
-        /*
         else if (xClicked >= camera.viewportWidth * 30 / 32 && yClicked <= camera.viewportHeight * 1 / 18) {
             posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
             posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
@@ -830,10 +871,19 @@ public class GameScreen extends Screens implements Screen {
 
             camera.update();
         }
-        */
+        //mitte rechts
+        else if (xClicked >= camera.viewportWidth * 30 / 32 && yClicked >= camera.viewportHeight * 1 / 18 && yClicked <= camera.viewportHeight * 17 / 18) {
+            posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
 
+            if (cameraDebug) {
+                debugMovement.begin();
+                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 2 / 32, camera.viewportHeight - camera.viewportHeight * 17 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 16 / 18);
+                debugMovement.end();
+            }
+
+            camera.update();
+        }
         //unten rechts
-        /*
         else if (xClicked >= camera.viewportWidth * 30 / 32 && yClicked >= camera.viewportHeight * 17 / 18) {
             posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
             posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
@@ -846,55 +896,26 @@ public class GameScreen extends Screens implements Screen {
 
             camera.update();
         }
-        */
-
-
-        //mitte links
-        if (xClicked <= 5 && yClicked >= camera.viewportHeight * 1 / 18 && yClicked <= camera.viewportHeight * 17 / 18) {
-            posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
-
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(0, 5, 1, camera.viewportHeight * 16 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
-        }
-
-        //mitte rechts
-        else if (xClicked >= camera.viewportWidth - 5 && yClicked >= camera.viewportHeight * 1 / 18 && yClicked <= camera.viewportHeight * 17 / 18) {
-            posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
-
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(camera.viewportWidth - 2, camera.viewportHeight - camera.viewportHeight * 17 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 16 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
-        }
 
         //mitte oben
-        else if (xClicked >= camera.viewportWidth * 2 / 32 && xClicked <= camera.viewportWidth * 30 / 32 && yClicked <= 5) {
+        else if (xClicked >= camera.viewportWidth * 2 / 32 && xClicked <= camera.viewportWidth * 30 / 32 && yClicked <= camera.viewportHeight * 1 / 18) {
             posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
 
             if (cameraDebug) {
                 debugMovement.begin();
-                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 30 / 32, camera.viewportHeight - 5, camera.viewportWidth * 28 / 32, camera.viewportHeight * 1 / 30);
+                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 30 / 32, camera.viewportHeight - camera.viewportHeight * 1 / 18, camera.viewportWidth * 28 / 32, camera.viewportHeight * 1 / 18);
                 debugMovement.end();
             }
 
             camera.update();
         }
-
         //mitte unten
-        else if (xClicked >= camera.viewportWidth * 2 / 32 && xClicked <= camera.viewportWidth * 30 / 32 && yClicked >= camera.viewportHeight - 5) {
+        else if (xClicked >= camera.viewportWidth * 2 / 32 && xClicked <= camera.viewportWidth * 30 / 32 && yClicked >= camera.viewportHeight * 17 / 18) {
             posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
 
             if (cameraDebug) {
                 debugMovement.begin();
-                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 30 / 32, 0, camera.viewportWidth * 28 / 32, 5);
+                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 30 / 32, 0, camera.viewportWidth * 28 / 32, camera.viewportHeight * 1 / 18);
                 debugMovement.end();
             }
 
@@ -972,11 +993,18 @@ public class GameScreen extends Screens implements Screen {
 
     public void getPathFinding(Soldier v) {
         //todo pathfinding programmieren
-        Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-        camera.unproject(mousePos);
+        float[] mousePos = translateXYCoordinatesFromScreen(Gdx.input.getX(), Gdx.input.getY());
+        int x = (int) mousePos[0], y = (int) mousePos[1];
+        getPathFinding(v, x, y);
+    }
 
-        int x = (int) mousePos.x, y = (int) mousePos.y;
-        PathCell p = new Pathfinding(x, y, (int) v.getX() + 32, (int) v.getY() + 32, collisionUnitLayer).algorithm();
+    public void getPathFinding(Soldier v, int xTile, int yTile) {
+        //todo pathfinding programmieren
+        TiledMapTileLayer pathingCollisionMap = collisionUnitLayer;
+        //pathingCollisionMap.getCell((int) (v.getX()+32)/64, (int) (v.getY()+32)/64).getTile().getProperties().clear();
+        HashMap<Integer, Rectangle> tempHitboxes = hitboxes;
+        tempHitboxes.remove(v.hashCode());
+        PathCell p = new Pathfinding(xTile, yTile, (int) v.getX() + 32, (int) v.getY() + 32, pathingCollisionMap, tempHitboxes).algorithm();
         LinkedList<PathCell> cellList = new LinkedList<>();
 
         while (p != null) {
@@ -998,8 +1026,6 @@ public class GameScreen extends Screens implements Screen {
                 // cellList.addFirst(pNew);
             }
         }
-
-
         Collections.reverse(cellList);
         v.setDestination(cellList);
         theKnowenWay = cellList;
@@ -1013,4 +1039,3 @@ public class GameScreen extends Screens implements Screen {
     }
 
 }
-

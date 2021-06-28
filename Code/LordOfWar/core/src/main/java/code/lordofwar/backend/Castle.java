@@ -19,7 +19,7 @@ public class Castle extends Sprite {
         super(sprite);
         this.collisionLayer = collisionLayer;
         this.sprite = sprite;
-        villager = 0;
+        villager = 1;
         gold = 99;
         hp = 100;
         maxUnits = 50;
