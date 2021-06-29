@@ -5,6 +5,7 @@ import de.constants.MessageIdentifier;
 import de.model.ServerGame;
 import de.model.ServerLobby;
 import de.model.User;
+import de.processes.DataManager;
 import de.processes.Login;
 import de.processes.Register;
 
@@ -12,7 +13,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,10 +25,10 @@ import static de.constants.MessageIdentifier.*;
 
 public class GameWebSocketHandler {
 
-    Map<String, Session> sessions = new ConcurrentHashMap<>();
-    Map<String, User> userSessions = new ConcurrentHashMap<>();
-    Map<String, ServerLobby> lobbys = new ConcurrentHashMap<>();
-
+    private Map<String, Session> sessions = new ConcurrentHashMap<>();
+    private Map<String, User> userSessions = new ConcurrentHashMap<>();
+    private Map<String, ServerLobby> lobbys = new ConcurrentHashMap<>();
+private DataManager dataManager=new DataManager();
 
     @OnOpen
     public void onOpen(Session session) {
@@ -71,11 +71,10 @@ public class GameWebSocketHandler {
         for (MessageIdentifier messageIdentifier : MessageIdentifier.values()) {
             if (data[0].equals(messageIdentifier.toString())) {
                 if (data[0].equals(LOGIN.toString())) {
-                    Login login = new Login();
-                    User newUser = login.isLoginValid(data, sessions.get(data[1]));
+                    User newUser = new Login(dataManager).isLoginValid(data, sessions.get(data[1]));
                     loginUser(newUser);
                 } else if (data[0].equals(REGISTER.toString())) {
-                    Register register = new Register();
+                    Register register = new Register(dataManager);
                     register.isRegisterValid(data, sessions.get(data[1]));
                 } else if (data[0].equals(GET_GAME_POINTS.toString())) {
                     ServerLobby serverLobby = findLobby(data);
@@ -148,9 +147,11 @@ public class GameWebSocketHandler {
         }
     }
 
+    //ENUM,LOBBYID,Usersession
     public void sendPlayerListUpdate(String[] data) {//this should get triggered once the game is over (incase anyone left during the game); maybe public later
         ServerLobby lobby = lobbys.get(data[2]);
         if (lobby.getGame() == null) {
+            //ist das der Sender?
             sessions.get(data[1]).getAsyncRemote().sendObject(DataPacker.packData(LOBBY_PLAYERS, DataPacker.stringCombiner(lobby.getPlayerNames())));
             System.out.println(lobby.getPlayerNames());
         }
