@@ -10,10 +10,11 @@ public class Team {
 
     public Team(int color) {
         this.color = color;
+        startingPos = color;
     }
 
     public Color getColor() {
-        Color defineColor= new Color();
+        Color defineColor = new Color();
         switch (color) {
             case 0:
                 defineColor.set(Color.RED);

@@ -1,10 +1,11 @@
 package code.lordofwar.backend.events;
 
-import code.lordofwar.backend.Castle;
 import code.lordofwar.backend.DataPacker;
 import code.lordofwar.backend.Soldier;
 import code.lordofwar.backend.Team;
 import code.lordofwar.main.LOW;
+import code.lordofwar.screens.GameScreen;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Camera;
@@ -15,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import static code.lordofwar.backend.MessageIdentifier.*;
@@ -24,13 +26,17 @@ public class GameScreenEvent extends Events {
     private final String lobbyID;
     private GameScreenEvent gameScreenEvent;
     private ArrayList connectedPlayers;
-    private HashMap<String,Team> teamHashMap = new HashMap<String,Team>();
+    private HashMap<String, Team> teamHashMap = new HashMap<String, Team>();
+    private GameScreen gameScreen;
+    private ArrayList<String> enemyUnits;
 
 
-    public GameScreenEvent(LOW aGame, String lobbyID) {
+    public GameScreenEvent(LOW aGame, String lobbyID, GameScreen gameScreen) {
         super(aGame);
         points = 0;
         this.lobbyID = lobbyID;
+        this.gameScreen = gameScreen;
+        enemyUnits = new ArrayList<>();
 
     }
 
@@ -54,10 +60,10 @@ public class GameScreenEvent extends Events {
         webSocket.send(DataPacker.packData(LEAVE_LOBBY, DataPacker.stringCombiner(leaveData)));
     }
 
-    public void createTeams(int startingPosition){
+    public void createTeams(int startingPosition) {
         for (int i = 0; i < connectedPlayers.size(); i++) {
             Team team = new Team(i);
-            teamHashMap.put((String) connectedPlayers.get(i),team);
+            teamHashMap.put((String) connectedPlayers.get(i), team);
             team.setStartingPos(startingPosition);
         }
     }
@@ -107,8 +113,7 @@ public class GameScreenEvent extends Events {
             }
 
             camera.update();
-        }
-        else if (xClicked <= 5 && yClicked >= camera.viewportHeight - 50) {
+        } else if (xClicked <= 5 && yClicked >= camera.viewportHeight - 50) {
             posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
             posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
 
@@ -135,8 +140,7 @@ public class GameScreenEvent extends Events {
             }
 
             camera.update();
-        }
-        else if (xClicked >= camera.viewportWidth - 5 && yClicked <= 50) {
+        } else if (xClicked >= camera.viewportWidth - 5 && yClicked <= 50) {
             posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
             posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
 
@@ -163,8 +167,7 @@ public class GameScreenEvent extends Events {
             }
 
             camera.update();
-        }
-        else if (xClicked >= camera.viewportWidth - 5 && yClicked >= camera.viewportHeight - 50) {
+        } else if (xClicked >= camera.viewportWidth - 5 && yClicked >= camera.viewportHeight - 50) {
             posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
             posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
 
@@ -199,7 +202,7 @@ public class GameScreenEvent extends Events {
 
             if (cameraDebug) {
                 debugMovement.begin();
-                debugMovement.rect(camera.viewportWidth - 5, 50,5, camera.viewportHeight - 50);
+                debugMovement.rect(camera.viewportWidth - 5, 50, 5, camera.viewportHeight - 50);
                 debugMovement.end();
             }
 
@@ -212,7 +215,7 @@ public class GameScreenEvent extends Events {
 
             if (cameraDebug) {
                 debugMovement.begin();
-                debugMovement.rect(50,  camera.viewportHeight - 5, camera.viewportWidth - 100, 5);
+                debugMovement.rect(50, camera.viewportHeight - 5, camera.viewportWidth - 100, 5);
                 debugMovement.end();
             }
 
@@ -225,7 +228,7 @@ public class GameScreenEvent extends Events {
 
             if (cameraDebug) {
                 debugMovement.begin();
-                debugMovement.rect(50,  0, camera.viewportWidth - 100, 5);
+                debugMovement.rect(50, 0, camera.viewportWidth - 100, 5);
                 debugMovement.end();
             }
 
@@ -236,28 +239,28 @@ public class GameScreenEvent extends Events {
 
     }
 
-    public void CameraKeyEvents(Camera camera, float CAMERASPEED, Vector3 posCameraDesired){
-        if(Gdx.input.isKeyPressed(Input.Keys.LEFT)){
+    public void CameraKeyEvents(Camera camera, float CAMERASPEED, Vector3 posCameraDesired) {
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
             camera.update();
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
             camera.update();
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.UP)){
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
             camera.update();
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.DOWN)){
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
             camera.update();
         }
     }
 
-    public void StageKeyEvents(Window windowExit, TextButton yesButton, TextButton noButton, Stage stage){
+    public void StageKeyEvents(Window windowExit, TextButton yesButton, TextButton noButton, Stage stage) {
 
-        if(Gdx.input.isKeyPressed(Input.Keys.F10)){
+        if (Gdx.input.isKeyPressed(Input.Keys.F10)) {
 
             windowExit.setVisible(true);
             yesButton.getLabel().setFontScale(2f);
@@ -266,7 +269,7 @@ public class GameScreenEvent extends Events {
 
         }
 
-        if(Gdx.input.isKeyPressed(Input.Keys.UP)){
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             System.out.println("sdfadssa");
         }
 
@@ -277,12 +280,12 @@ public class GameScreenEvent extends Events {
         return gameScreenEvent;
     }
 
-    public void getConnectedPlayer(ArrayList<String> conPlayers,int startingPosition){
+    public void getConnectedPlayer(ArrayList<String> conPlayers, int startingPosition) {
         this.connectedPlayers = conPlayers;
         createTeams(startingPosition);
     }
 
-    public HashMap<String,Team> getTeamHashMap() {
+    public HashMap<String, Team> getTeamHashMap() {
         return teamHashMap;
     }
 
@@ -290,12 +293,27 @@ public class GameScreenEvent extends Events {
         return points;
     }
 
-    public void updatePos(Soldier s){
-        ArrayList<String> a = new ArrayList<>();
-        a.add(String.valueOf(s.getX()));
-        a.add(String.valueOf(s.getY()));
-
-        webSocket.send(DataPacker.packData(UPDATE_POS, DataPacker.stringCombiner(a)));
+    public void updateSoldierPos(ArrayList<String> a) {
+        System.out.println("Sending " + Arrays.toString(a.toArray()));
+        webSocket.send(DataPacker.packData(UPDATE_SOLDIER_POS, DataPacker.stringCombiner(a)));
     }
 
+    public String getLobbyID() {
+        return lobbyID;
+    }
+
+    public void processSoilders(String[] data) {
+
+        // data [0] = MessageID / data [1] = startigPos / data[2] = x Pos,y Pos / data[3] = SoldatenHash
+        String[] enemyArray = new String[data.length-1];
+        System.arraycopy(data, 1, enemyArray, 0, data.length - 1);
+        this.enemyUnits.addAll(Arrays.asList(enemyArray));
+        //System.out.println(Arrays.toString(enemyArray));
+        gameScreen.createSoldiers(enemyUnits);
+
+    }
+
+    public ArrayList<String> getEnemyUnits() {
+        return enemyUnits;
+    }
 }

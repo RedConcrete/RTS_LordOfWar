@@ -107,7 +107,7 @@ public class Pathfinding {
                 }
                 current = newCurrent;
             } else {
-                System.out.println("TEST SUCCESS");
+                //System.out.println("TEST SUCCESS");
                 return current;//TODO CURRENT IS GOAL
             }
         }
@@ -135,7 +135,7 @@ public class Pathfinding {
                                     new Rectangle(((int) pathCell.coords.x) * collisionLayer.getTileWidth()-2, ((int) pathCell.coords.y) * collisionLayer.getTileHeight()-2,
                                             collisionLayer.getTileWidth() - 2, collisionLayer.getTileHeight() - 2))) {//todo put this offset into a variable?
 
-                                System.out.println(pathCell.coords.x + " " + pathCell.coords.y + " BLOCKED");
+                                //System.out.println(pathCell.coords.x + " " + pathCell.coords.y + " BLOCKED");
                                 return false;
                             }
                         }
@@ -145,7 +145,7 @@ public class Pathfinding {
                 }
             }
         }
-        System.out.println(pathCell.coords.x + " " + pathCell.coords.y + " BLOCKED");
+        //System.out.println(pathCell.coords.x + " " + pathCell.coords.y + " BLOCKED");
         return false;
     }
 

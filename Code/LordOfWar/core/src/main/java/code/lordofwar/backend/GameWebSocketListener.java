@@ -30,6 +30,7 @@ public class GameWebSocketListener extends WebSocketListener {
     @Override
     public void onClosed(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
         super.onClosed(webSocket, code, reason);
+        System.out.println("closing " + reason);
     }
 
     @Override
@@ -44,20 +45,16 @@ public class GameWebSocketListener extends WebSocketListener {
 
     @Override
     public void onMessage(@NotNull WebSocket webSocket, @NotNull String message) {
-
+        System.out.println(message);
         String[] dataArray = depackData(message);
         checkDataDir(dataArray);
     }
 
     private String[] depackData(String message) {
-
         return message.split(STRINGSEPERATOR);
     }
 
     private void checkDataDir(String[] strings) {
-        //System.out.println(Arrays.toString(strings));
-        for (MessageIdentifier messageIdentifier : values()) {
-            if (strings[0].equals(messageIdentifier.toString())) {
                 if (strings[0].equals(LOGIN_VALID.toString())) {
                     if (game.getScreen() instanceof LoginScreen) {
                         ((LoginScreen) game.getScreen()).getLoginScreenEvent().setLoginAnswer(strings);
@@ -82,27 +79,23 @@ public class GameWebSocketListener extends WebSocketListener {
                     }
                 } else if (strings[0].equals(JOIN_LOBBY.toString())) {
                     if (game.getScreen() instanceof LobbyBrowserScreen) {
-                        System.out.println(Arrays.toString(strings));
                         ((LobbyBrowserScreen) game.getScreen()).getLobbyBrowserScreenEvent().setJoined(strings);
                     }
                 } else if (strings[0].equals(LOBBY_PLAYERS.toString())) {
                     if (game.getScreen() instanceof LobbyScreen) {//very important! this can be triggered in the browser or create screen and needs to be discarded inn that case
                         ((LobbyScreen) game.getScreen()).getLobbyScreenEvent().setPlayers(strings);
                     }
-                }else if (strings[0].equals(GAME_START.toString())){
-                    if (game.getScreen() instanceof LobbyScreen){
+                } else if (strings[0].equals(GAME_START.toString())) {
+                    if (game.getScreen() instanceof LobbyScreen) {
                         ((LobbyScreen) game.getScreen()).getLobbyScreenEvent().setGameData(strings);
                     }
+                } else if (strings[0].equals(UPDATE_SOLDIER_POS.toString())) {
+                    if (game.getScreen() instanceof GameScreen) {
+                        System.out.println(Arrays.toString(strings));
+                        ((GameScreen) game.getScreen()).getGameScreenEvent().processSoilders(strings);
+                    }
                 }
-            }
-        }
     }
-
-    @Override
-    public void onMessage(@NotNull WebSocket webSocket, @NotNull ByteString bytes) {
-        super.onMessage(webSocket, bytes);
-    }
-
 
     @Override
     public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
@@ -113,9 +106,5 @@ public class GameWebSocketListener extends WebSocketListener {
 
     public void setWebSocket(WebSocket websocket) {
         gameWebSocket = websocket;
-    }
-
-    public void sendMessage(String message) {
-        gameWebSocket.send(message);
     }
 }

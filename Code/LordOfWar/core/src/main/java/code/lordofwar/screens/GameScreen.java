@@ -28,6 +28,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import java.awt.geom.Point2D;
 import java.util.*;
 
+import static code.lordofwar.backend.MessageIdentifier.UPDATE_SOLDIER_POS;
+import static java.lang.Enum.valueOf;
+
 public class GameScreen extends Screens implements Screen {
 
     private static final ShapeRenderer debugRenderer = new ShapeRenderer();
@@ -54,10 +57,19 @@ public class GameScreen extends Screens implements Screen {
     private Label entityATK;
     private Label entityDEF;
 
-    private final ArrayList<Soldier> soldierArrayList;
-    private final ArrayList<Castle> castleArrayList;
+    private final ArrayList<Soldier> ownSoldierArrayList;
+
+    private final ArrayList<Soldier> enemySoldierArrayList;
+    private final ArrayList<Soldier> redSoldierArrayList;
+    private final ArrayList<Soldier> blueSoldierArrayList;
+    private final ArrayList<Soldier> greenSoldierArrayList;
+    private final ArrayList<Soldier> yellowSoldierArrayList;
+
+    HashMap<String, Soldier> hashSoldierMap = new HashMap<>();
+    private final ArrayList<Castle> enemyCastleArrayList;
 
     private Sprite soldierSprite;
+    private Sprite enemySprite;
     private Sprite castleSprite;
 
     private Label entityName;
@@ -88,8 +100,11 @@ public class GameScreen extends Screens implements Screen {
     private HashMap<Integer, Rectangle> hitboxes;//yeah sorry couldnt come up with a better way to dynamically check than just checking rectangles
     private ArrayList<String> connectedPlayers;
 
+
+    private float sendTimer;
     Image castleImage;
     Image soldierImage;
+    Image enemySoldierImage;
 
     public GameScreen(LOW aGame, Skin aSkin, String lobbyID, Integer startingPosition, String[] connectedPlayersArray) {
         super(aGame, aSkin);
@@ -101,11 +116,18 @@ public class GameScreen extends Screens implements Screen {
         entityName = new Label("", skin);
         castleSprite = new Sprite(mapAtlas.findRegion("Castle"));
         pointTimerCounter = 10;
-        gameScreenEvent = new GameScreenEvent(game, lobbyID);
+        gameScreenEvent = new GameScreenEvent(game, lobbyID, this);
         posCameraDesired = new Vector3();
         cameraDebug = false;
-        soldierArrayList = new ArrayList<>();
-        castleArrayList = new ArrayList<>();
+
+        ownSoldierArrayList = new ArrayList<>();
+        enemySoldierArrayList = new ArrayList<>();
+        redSoldierArrayList = new ArrayList<>();
+        blueSoldierArrayList = new ArrayList<>();
+        greenSoldierArrayList = new ArrayList<>();
+        yellowSoldierArrayList = new ArrayList<>();
+
+        enemyCastleArrayList = new ArrayList<>();
 
         soldierLabel = new Label("", skin);
         goldLabel = new Label("", skin);
@@ -167,13 +189,16 @@ public class GameScreen extends Screens implements Screen {
         //TODO add castles to HB map
         for (int i = 0; i < startingCastle; i++) {
             //todo Castle neu ändern!! (objekte erzeugen und dann in das Array)
-            castleArrayList.add(castle);
+            enemyCastleArrayList.add(castle);
             castle.setPosition(castlePosition[0], castlePosition[1]);
         }
         Rectangle myCastleHB = new Rectangle(castle.getBoundingRectangle());
         myCastleHB.setWidth(myCastleHB.getWidth());
         myCastleHB.setHeight(myCastleHB.getHeight() - 64);
         hitboxes.put(castle.hashCode(), myCastleHB);
+
+        sendTimer=0;
+
         setupUI();
 
     }
@@ -203,7 +228,7 @@ public class GameScreen extends Screens implements Screen {
                     public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                         switch (event.getButton()) {
                             case Input.Buttons.RIGHT:
-                                for (Soldier s : soldierArrayList) {
+                                for (Soldier s : ownSoldierArrayList) {
                                     if (s.isSelected()) {
                                         getPathFinding(s);
                                     }
@@ -215,7 +240,7 @@ public class GameScreen extends Screens implements Screen {
                                 } else {
                                     float[] recCoords = new float[]{rectangleBounds[0], rectangleBounds[1]};
                                     float[] vilCoords;
-                                    for (Soldier soldier : soldierArrayList) {
+                                    for (Soldier soldier : ownSoldierArrayList) {
                                         vilCoords = translateXYCoordinatesToScreen(soldier.getX() + soldier.getWidth() / 2, soldier.getY() + soldier.getHeight() / 2);
                                         if (vilCoords[0] >= recCoords[0] && vilCoords[1] >= recCoords[1]) {
                                             if (vilCoords[0] <= recCoords[0] + rectangleBounds[2] && vilCoords[1] <= recCoords[1] + rectangleBounds[3]) {
@@ -271,7 +296,7 @@ public class GameScreen extends Screens implements Screen {
         soldierLabel.setText(castle.getVillager());
         goldLabel.setText(castle.getGold());
 
-        for (Castle c : castleArrayList) {
+        for (Castle c : enemyCastleArrayList) {
             c.draw(renderer.getBatch());
 
             if (c.isSelected()) {
@@ -300,11 +325,19 @@ public class GameScreen extends Screens implements Screen {
 
             }
         }
+        ArrayList<String> a = new ArrayList<>();
+        a.add(game.getSessionID());
+        a.add(gameScreenEvent.getLobbyID());
+        a.add(String.valueOf(castle.getTeam().getStartingPos()));
+        for (Soldier s : enemySoldierArrayList) {
+            s.draw(renderer.getBatch());
+        }
 
-        for (Soldier s : soldierArrayList) {
+        for (Soldier s : ownSoldierArrayList) {
             s.draw(renderer.getBatch());
 
-            gameScreenEvent.updatePos(s);
+            a.add(s.toString());
+            a.add(String.valueOf(s.hashCode()));
 
             if (s.getDestination() != null) {
                 if (s.getDestination().isEmpty()) {
@@ -313,45 +346,9 @@ public class GameScreen extends Screens implements Screen {
 
                     int vX = (int) ((s.getX() + 32) / 64);
                     int vY = (int) ((s.getY() + 32) / 64);
-//                    System.out.println(soldier.getX());
-//                    System.out.println(soldier.getY());
-//                    System.out.println(vX);
-//                    System.out.println(vY);
-//                    System.out.println(soldier.getDestination().get(0).coords.x);
-//                    System.out.println(soldier.getDestination().get(0).coords.y);
-//                    System.out.println();
-                    // System.out.println(vX + " | " + vY + " | " + v.getDestination().get(0).coords.x + " | " + v.getDestination().get(0).coords.y);
-
-//                    if(v.getDestination().size() == 1){
-//                        if(vX > v.getDestination().get(0).coords.x ){
-//                            v.getDestination().get(0).coords.x -= 1;
-//                        }else if(vY > v.getDestination().get(0).coords.y){
-//                            v.getDestination().get(0).coords.y -= 1;
-//                        }
-//                    }
 
                     if (vX != s.getDestination().get(0).coords.x || vY != s.getDestination().get(0).coords.y) {
-                        /*
-                             if (vX != v.getDestination().get(0).coords.x || vY != v.getDestination().get(0).coords.y) {
-                        if (v.getDestination().get(0).coords.x>vX){
-                            v.translateX(1);
-                        }else if (v.getDestination().get(0).coords.x<vX){
-                            v.translateX(-1);
-                        }
-                        if (v.getDestination().get(0).coords.y>vY){
-                            v.translateY(1);
-                        }else if (v.getDestination().get(0).coords.y<vY){
-                            v.translateY(-1);
-                        }
-                          //  v.translateX(v.getDestination().get(0).coords.x - vX);
-                        //v.translateY(v.getDestination().get(0).coords.y - vY);
 
-                        */
-                        /*better code probably but inconsistent speed sometimes
-                        soldier.translateX(soldier.getDestination().get(0).coords.x - vX);
-                        soldier.translateY(soldier.getDestination().get(0).coords.y - vY);
-                        soldier.translate(soldier.getDestination().get(0).coords.x - vX, soldier.getDestination().get(0).coords.y - vY);
-                         */
                         if (s.getDestination().get(0).coords.x < vX) {
                             s.translateX(-1);
                         } else if (s.getDestination().get(0).coords.x > vX) {
@@ -387,7 +384,6 @@ public class GameScreen extends Screens implements Screen {
                             hitboxes.put(s.hashCode(), s.getBoundingRectangle());//set hitbox when having reached a tile
                         }
                     }
-
                 }
             } else {
                 hitboxes.put(s.hashCode(), s.getBoundingRectangle());//set hitbox when having stopped moving
@@ -406,6 +402,14 @@ public class GameScreen extends Screens implements Screen {
                 sprite.draw(renderer.getBatch());
             }
         }
+
+        sendTimer+=delta;
+        if (sendTimer>=1) {
+            gameScreenEvent.updateSoldierPos(a);
+            sendTimer=0;
+        }
+
+        //send a here
         if (mapDebug) {
             Sprite lineH = new Sprite(uiAtlas.findRegion("line-h"));
             Sprite lineV = new Sprite(uiAtlas.findRegion("line-v"));
@@ -487,6 +491,7 @@ public class GameScreen extends Screens implements Screen {
 
         castleImage = new Image(castleSprite);
         soldierImage = new Image(soldierSprite);
+        enemySoldierImage = new Image(soldierSprite);
 
         Window resourceBarWindow = new Window("", skin);
         resourceBarWindow.setMovable(false);
@@ -677,13 +682,13 @@ public class GameScreen extends Screens implements Screen {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 if (castle.getVillager() != 0 && castle.getGold() - 10 >= 0) {
-                    if (soldierArrayList.size() <= castle.getMaxUnits()) {
+                    if (ownSoldierArrayList.size() <= castle.getMaxUnits()) {
                         castle.setVillager(castle.getVillager() - 1);
                         castle.setGold(castle.getGold() - 10); //todo Gold wert nicht hartCoded!!
 
                         soldierSprite.setColor(castle.getTeam().getColor());
                         Soldier soldier = new Soldier(soldierSprite, collisionUnitLayer, castle.getTeam());
-                        soldierArrayList.add(soldier);
+                        ownSoldierArrayList.add(soldier);
 
                     }
                 } else {
@@ -814,7 +819,7 @@ public class GameScreen extends Screens implements Screen {
     public void getClickedOnEntity() {
 
         float[] coords = translateXYCoordinatesFromScreen(Gdx.input.getX(), Gdx.input.getY());
-        for (Soldier soldier : soldierArrayList) {
+        for (Soldier soldier : ownSoldierArrayList) {
             float[] checkCoordsRect = new float[]{soldier.getX() - soldier.getWidth(),
                     soldier.getY() - soldier.getHeight(),
                     soldier.getX() + soldier.getWidth(),
@@ -825,7 +830,7 @@ public class GameScreen extends Screens implements Screen {
                 soldier.setSelected(false);
             }
         }
-        for (Castle c : castleArrayList) {
+        for (Castle c : enemyCastleArrayList) {
 
             if (c.getX() < (int) coords[0] && c.getY() < (int) coords[1]) {
                 if (c.getX() + c.getWidth() >= (int) coords[0] && c.getY() + c.getHeight() >= (int) coords[1]) {
@@ -910,7 +915,7 @@ public class GameScreen extends Screens implements Screen {
 
     public void countPoints(float delta) {
         pointTimerCounter += delta;
-        if (pointTimerCounter > 1) { //1 second update
+        if (pointTimerCounter >= 1) { //1 second update
             gameScreenEvent.sendPointRequest();//TODO move this to server???
             pointTimerCounter = 0;
         }
@@ -920,6 +925,59 @@ public class GameScreen extends Screens implements Screen {
         ArrayList<String> arrayList = new ArrayList<>();
         arrayList.addAll(Arrays.asList(strings));
         return arrayList;
+    }
+
+    public void createSoldiers(ArrayList<String> enemyArrList) {
+
+        int startPos = Integer.parseInt(enemyArrList.get(0));
+
+        if (enemySoldierArrayList != null) {
+            for (int i = 1; i < enemyArrList.size(); i += 2) {
+                System.out.println(enemySoldierArrayList);//todo löschen wenn es geht
+                String[] pos = enemyArrList.get(i).split(",");//x and y pos
+                if (!hashSoldierMap.containsKey(enemyArrList.get(i + 1))) {
+                    //POsition [x anzahl von koordinaten und hashcodes]
+                    Team team = new Team(startPos);
+                    enemySprite.setColor(team.getColor());
+                    Soldier soldier = new Soldier(enemySprite, collisionUnitLayer, team);
+                    soldier.setPosition(Float.parseFloat(pos[0]), Float.parseFloat(pos[1]));
+                    hashSoldierMap.put(enemyArrList.get(i + 1), soldier);
+
+                    switch (startPos) {
+                        case 0:
+                            redSoldierArrayList.add(soldier);
+                            break;
+                        case 1:
+                            blueSoldierArrayList.add(soldier);
+                            break;
+                        case 2:
+                            greenSoldierArrayList.add(soldier);
+                            break;
+                        case 3:
+                            yellowSoldierArrayList.add(soldier);
+                            break;
+                        default:
+                            //THIS SHOULD NEVER HAPPEN
+                            System.err.println("Unexpected value: " + startPos);//max of 4 players; thus error
+                    }
+                } else {
+                    hashSoldierMap.get(enemyArrList.get(i + 1)).setPosition(Float.parseFloat(pos[0]), Float.parseFloat(pos[1]));
+                }
+            }
+            enemySoldierArrayList.removeAll(redSoldierArrayList);
+            enemySoldierArrayList.addAll(redSoldierArrayList);
+            enemySoldierArrayList.removeAll(blueSoldierArrayList);
+            enemySoldierArrayList.addAll(blueSoldierArrayList);
+            enemySoldierArrayList.removeAll(greenSoldierArrayList);
+            enemySoldierArrayList.addAll(greenSoldierArrayList);
+            enemySoldierArrayList.removeAll(yellowSoldierArrayList);
+            enemySoldierArrayList.addAll(yellowSoldierArrayList);
+        }
+        //hashmap to check if soldier already exists
+        //every time a team (starting position) sends data: drop/update the old list
+        //Hashmap<Integer,Soldier> Hashcode=key erstellter Soldier=value
+        //in Render eine for each methode machen die durch das Mapset iteriert und alles zeichnet
+
     }
 
 }
