@@ -11,7 +11,7 @@ public class DBStatementManager {
 
     public static void main(String[] args) throws Exception {
         //TODO config db
-        //DBCreator.createDB();
+        DBCreator.createDB();
         //DBStatementManager db=new DBStatementManager();
         //db.createUser("AlphA","TesT");
        // db.updateUserScore(10,"AlphA");
@@ -34,11 +34,11 @@ public class DBStatementManager {
         } catch (SQLException e) {
             throw new SQLException("Connection Failure");//TODO better error handling/returning
         }
-        try {
-            getUser = connection.prepareStatement("SELECT * FROM public.player WHERE username=?");//get user by name
-            deleteUser = connection.prepareStatement("DELETE FROM public.player WHERE username=?");//delete user by name
-            updateUserScore = connection.prepareStatement("UPDATE public.player SET score=? WHERE username=?");//set userscore
-            createUser = connection.prepareStatement("INSERT INTO public.player(username,password,score,userid) Values(?,?,0,nextval('idGenerator')) RETURNING userid");
+        try {//removed public from dbs
+            getUser = connection.prepareStatement("SELECT * FROM player WHERE username=?");//get user by name
+            deleteUser = connection.prepareStatement("DELETE FROM player WHERE username=?");//delete user by name
+            updateUserScore = connection.prepareStatement("UPDATE player SET score=? WHERE username=?");//set userscore
+            createUser = connection.prepareStatement("INSERT INTO player(username,password,score,userid) Values(?,?,0,nextval('idGenerator')) RETURNING userid");
         } catch (SQLException e) {
             throw new SQLException("Statement Failure");//TODO better error handling/returning
         }
