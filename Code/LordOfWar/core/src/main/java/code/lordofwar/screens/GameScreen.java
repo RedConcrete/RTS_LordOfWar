@@ -171,10 +171,10 @@ public class GameScreen extends Screens implements Screen {
             castleArrayList.add(myCastle);
             myCastle.setPosition(Constants.MAP1CC1[0], Constants.MAP1CC1[1]);
         }
-        Rectangle myCastleHB=new Rectangle(myCastle.getBoundingRectangle());
+        Rectangle myCastleHB = new Rectangle(myCastle.getBoundingRectangle());
         myCastleHB.setWidth(myCastleHB.getWidth());
-        myCastleHB.setHeight(myCastleHB.getHeight()-64);
-        hitboxes.put(myCastle.hashCode(),myCastleHB);
+        myCastleHB.setHeight(myCastleHB.getHeight() - 64);
+        hitboxes.put(myCastle.hashCode(), myCastleHB);
         setupUI();
 
     }
@@ -214,15 +214,13 @@ public class GameScreen extends Screens implements Screen {
                                 if (rectangleStart == null && rectangleEnd == null) {
                                     getClickedOnEntity();
                                 } else {
-                                    float[] recCoords = new float[]{rectangleBounds[0], rectangleBounds[1]};
-                                    float[] vilCoords;
+                                    Rectangle selectRect = new Rectangle(rectangleBounds[0], rectangleBounds[1], rectangleBounds[2], rectangleBounds[3]);
                                     for (Soldier soldier : soldierArrayList) {
-                                        vilCoords = translateXYCoordinatesToScreen(soldier.getX() + soldier.getWidth() / 2, soldier.getY() + soldier.getHeight() / 2);
-                                        if (vilCoords[0] >= recCoords[0] && vilCoords[1] >= recCoords[1]) {
-                                            if (vilCoords[0] <= recCoords[0] + rectangleBounds[2] && vilCoords[1] <= recCoords[1] + rectangleBounds[3]) {
-                                                soldier.setSelected(true);
-                                            }
-                                        }
+                                        soldier.setSelected(hitboxCheckRect(hitboxes.get(soldier.hashCode()), selectRect));
+                                    }
+                                    for (Castle castle : castleArrayList) {
+                                        castle.setSelected(hitboxCheckRect(hitboxes.get(castle.hashCode()), selectRect));
+                                        System.out.println(castle.isSelected());
                                     }
                                 }
                                 break;
@@ -285,17 +283,6 @@ public class GameScreen extends Screens implements Screen {
                 entityHp.setText(c.getHp());
                 buttonRecruit.setVisible(true);
 
-
-                //todo braucht seine eigene forEach !!
-                if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
-                    if (!isRightPressed) {
-                        isRightPressed = true;
-                    } else {
-                        if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
-                            isRightPressed = false;
-                        }
-                    }
-                }
                 //todo Progresbar benutzen
                 entityName.setText("Castle");
                 Sprite s = new Sprite(uiAtlas.findRegion("button-normal"));
@@ -372,17 +359,17 @@ public class GameScreen extends Screens implements Screen {
                         if (isColliding(soldier)) {
                             //reverse direction
                             if (soldier.getDestination().get(0).coords.x < vX) {
-                                soldier.setX(soldier.getX()+soldier.getWidth()/2);
+                                soldier.setX(soldier.getX() + soldier.getWidth() / 2);
                             } else if (soldier.getDestination().get(0).coords.x > vX) {
-                                soldier.setX(soldier.getX()-soldier.getWidth()/2);
+                                soldier.setX(soldier.getX() - soldier.getWidth() / 2);
                             }
                             if (soldier.getDestination().get(0).coords.y < vY) {
-                                soldier.setY(soldier.getY()-soldier.getHeight()/2);
+                                soldier.setY(soldier.getY() - soldier.getHeight() / 2);
 
                             } else if (soldier.getDestination().get(0).coords.y > vY) {
-                                soldier.setY(soldier.getY()-soldier.getHeight()/2);
+                                soldier.setY(soldier.getY() - soldier.getHeight() / 2);
                             }
-                            getPathFinding(soldier,(int)soldier.getDestination().get(soldier.getDestination().size()-1).coords.x* collisionUnitLayer.getTileWidth(), (int) (soldier.getDestination().get(soldier.getDestination().size()-1).coords.y*collisionUnitLayer.getTileHeight()));
+                            getPathFinding(soldier, (int) soldier.getDestination().get(soldier.getDestination().size() - 1).coords.x * collisionUnitLayer.getTileWidth(), (int) (soldier.getDestination().get(soldier.getDestination().size() - 1).coords.y * collisionUnitLayer.getTileHeight()));
                         }
 
                     } else if (vX == soldier.getDestination().get(0).coords.x && vY == soldier.getDestination().get(0).coords.y) {
@@ -941,28 +928,47 @@ public class GameScreen extends Screens implements Screen {
         return gameScreenEvent;
     }
 
+    /**
+     * Checks whether two Hitboxes overlap.
+     * @param hitbox the first hitbox
+     * @param hitbox2 the second hitbox
+     * @return {@code true} if they overlap.
+     */
+    private boolean hitboxCheckRect(Rectangle hitbox, Rectangle hitbox2) {//did this to reduce copying a bit appreciated advice on how to further reduce
+        return hitbox.overlaps(hitbox2);
+    }
+
+    /**
+     * Checks whether a point is within a hitbox
+     * @param hitbox the hitbox
+     * @param coords a float array where index 0 are the x coordinates and index 1 are the y coordinates
+     * @return {@code true} if the hitbox contains the given coordinates.
+     *///NOTICE: DO not use Rectangle#contains it doesnt work correctly.
+    private boolean hitboxCheckXY(Rectangle hitbox, float[] coords) {//did this to reduce copying a bit appreciated advice on how to further reduce
+        if (hitbox != null) {//should never happen but better be sure
+            return hitbox.getX() <= coords[0] && hitbox.getX() + hitbox.getWidth() >= coords[0] && hitbox.getY() <= coords[1] && hitbox.getY() + hitbox.getHeight() >= coords[1];
+        }
+        return false;
+    }
+
     public void getClickedOnEntity() {
 
         float[] coords = translateXYCoordinatesFromScreen(Gdx.input.getX(), Gdx.input.getY());
+        Rectangle hitbox;
         for (Soldier soldier : soldierArrayList) {
-            float[] checkCoordsRect = new float[]{soldier.getX() - soldier.getWidth(),
-                    soldier.getY() - soldier.getHeight(),
-                    soldier.getX() + soldier.getWidth(),
-                    soldier.getY() + soldier.getHeight()};
-            if ((coords[0] >= checkCoordsRect[0] && coords[1] >= checkCoordsRect[1]) && (coords[0] <= checkCoordsRect[2] && coords[1] <= checkCoordsRect[3])) {
+            hitbox = hitboxes.get(soldier.hashCode());
+            if (hitboxCheckXY(hitbox, coords)) {//should never happen but better be sure
                 soldier.setSelected(!soldier.isSelected());
             } else {
                 soldier.setSelected(false);
             }
         }
         for (Castle c : castleArrayList) {
-
-            if (c.getX() < (int) coords[0] && c.getY() < (int) coords[1]) {
-                if (c.getX() + c.getWidth() >= (int) coords[0] && c.getY() + c.getHeight() >= (int) coords[1]) {
-                    c.setSelected(!c.isSelected());
-                } else {
-                    c.setSelected(false);
-                }
+            hitbox = hitboxes.get(c.hashCode());
+            if (hitboxCheckXY(hitbox, coords)) {//should never happen but better be sure
+                c.setSelected(!c.isSelected());
+            } else {
+                c.setSelected(false);
             }
         }
 
