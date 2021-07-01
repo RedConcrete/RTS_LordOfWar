@@ -73,7 +73,8 @@ public class LOW extends Game {
 				.readTimeout(0, TimeUnit.MILLISECONDS)
 				.build();
 
-		HttpUrl httpUrl = HttpUrl.parse("http://localhost:8080/api/v1/ws");
+		//HttpUrl httpUrl = HttpUrl.parse("http://localhost:8080/api/v1/ws");
+		HttpUrl httpUrl = HttpUrl.parse("http://labswp-sose21-team4.it-stud.hs-heilbronn.de:8080/api/v1/ws");
 		//HttpUrl httpUrl = HttpUrl.parse("http://redconcrete.sytes.net:25591/api/v1/ws");
 
 		Request request = new Request.Builder()
