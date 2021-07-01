@@ -14,9 +14,9 @@ public class DBStatementManager {
         //DBCreator.createDB();
         //DBStatementManager db=new DBStatementManager();
         //db.createUser("AlphA","TesT");
-       // db.updateUserScore(10,"AlphA");
-       // System.out.println(db.getUser("AlphA"));
-       // db.deleteUser("AlphA");
+        // db.updateUserScore(10,"AlphA");
+        // System.out.println(db.getUser("AlphA"));
+        // db.deleteUser("AlphA");
         //System.out.println(db.getUser("AlphA"));
     }
 
@@ -32,7 +32,7 @@ public class DBStatementManager {
         try {
             this.connection = DBCreator.connector(DBCreator.dbURL, DBCreator.uName, DBCreator.password);
         } catch (SQLException e) {
-            throw new SQLException("Connection Failure");//TODO better error handling/returning
+            throw new SQLException("Connection Failure" + e.getMessage());//TODO better error handling/returning
         }
         try {//removed public from dbs
             getUser = connection.prepareStatement("SELECT * FROM player WHERE username=?");//get user by name
@@ -84,13 +84,13 @@ public class DBStatementManager {
         return update;
     }
 
-    public User createUser(String username,String password) {
-        User user=null;
+    public User createUser(String username, String password) {
+        User user = null;
         try {
-            createUser.setString(1,username);
-            createUser.setString(2,password);
+            createUser.setString(1, username);
+            createUser.setString(2, password);
             createUser.executeQuery();
-        }catch (SQLException e){
+        } catch (SQLException e) {
             System.err.println("createUser fail");
         }
         return getUser(username);//check if user inserted properly & return

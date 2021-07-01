@@ -26,7 +26,8 @@ public class LobbyScreen extends Screens implements Screen {
 
     public LobbyScreen(LOW aGame, Skin aSkin, String[] lobbyInfo) {
         super(aGame, aSkin);
-        this.gameInfoArr = lobbyInfo;
+        gameInfoArr=new String[4];
+        System.arraycopy(lobbyInfo,0,gameInfoArr,0,4);
         playerNameArr = new String[]{""}; // todo alle verbundenen spieler
 
         lobbyScreenEvent = new LobbyScreenEvent(game);
@@ -62,7 +63,6 @@ public class LobbyScreen extends Screens implements Screen {
 
         playerNameArr = lobbyScreenEvent.getPlayers();
         if (playerNameArr != null) {
-            System.out.println(Arrays.toString(playerNameArr)+"players");
             playerList.setItems(playerNameArr);
         }// for (int i = 0; i < playerNameArr.length; i++) {
         //     playerNameArr[i]=playerNameArr[i]+"\n";//TODO formatting properly
@@ -111,7 +111,7 @@ public class LobbyScreen extends Screens implements Screen {
         List<String> gameInfoList = new List<>(skin);
         String[] gameInfo=new String[gameInfoArr.length-1];
         System.arraycopy(gameInfoArr,0,gameInfo,0, gameInfoArr.length-1);
-        gameInfoList.setItems(gameInfo);
+        gameInfoList.setItems(gameInfoArr);
 
 
         startButton.addListener(new InputListener() {
