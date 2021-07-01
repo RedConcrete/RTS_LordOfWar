@@ -176,7 +176,6 @@ public class GameScreen extends Screens implements Screen {
         //TODO add castles to HB map
         for (int i = 0; i < startingCastle; i++) {
             //todo Castle neu ändern!! (objekte erzeugen und dann in das Array)
-            enemyCastleArrayList.add(castle);
             castle.setPosition(castlePosition[0], castlePosition[1]);
         }
         Rectangle myCastleHB = new Rectangle(castle.getBoundingRectangle());
@@ -224,10 +223,11 @@ public class GameScreen extends Screens implements Screen {
                                     getClickedOnEntity();
                                 } else {
                                     Rectangle selectRect = new Rectangle(rectangleBounds[0], rectangleBounds[1], rectangleBounds[2], rectangleBounds[3]);
-                                    for (Soldier soldier : soldierArrayList) {
+                                    for (Soldier soldier : ownSoldierArrayList) {
                                         soldier.setSelected(hitboxCheckRect(hitboxes.get(soldier.hashCode()), selectRect));
                                     }
-                                    for (Castle castle : castleArrayList) {
+                                    castle.setSelected(hitboxCheckRect(hitboxes.get(castle.hashCode()), selectRect));
+                                    for (Castle castle : enemyCastleArrayList) {
                                         castle.setSelected(hitboxCheckRect(hitboxes.get(castle.hashCode()), selectRect));
                                         System.out.println(castle.isSelected());
                                     }
