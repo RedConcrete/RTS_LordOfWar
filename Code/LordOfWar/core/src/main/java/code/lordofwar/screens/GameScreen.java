@@ -223,15 +223,13 @@ public class GameScreen extends Screens implements Screen {
                                 if (rectangleStart == null && rectangleEnd == null) {
                                     getClickedOnEntity();
                                 } else {
-                                    float[] recCoords = new float[]{rectangleBounds[0], rectangleBounds[1]};
-                                    float[] vilCoords;
-                                    for (Soldier soldier : ownSoldierArrayList) {
-                                        vilCoords = translateXYCoordinatesToScreen(soldier.getX() + soldier.getWidth() / 2, soldier.getY() + soldier.getHeight() / 2);
-                                        if (vilCoords[0] >= recCoords[0] && vilCoords[1] >= recCoords[1]) {
-                                            if (vilCoords[0] <= recCoords[0] + rectangleBounds[2] && vilCoords[1] <= recCoords[1] + rectangleBounds[3]) {
-                                                soldier.setSelected(true);
-                                            }
-                                        }
+                                    Rectangle selectRect = new Rectangle(rectangleBounds[0], rectangleBounds[1], rectangleBounds[2], rectangleBounds[3]);
+                                    for (Soldier soldier : soldierArrayList) {
+                                        soldier.setSelected(hitboxCheckRect(hitboxes.get(soldier.hashCode()), selectRect));
+                                    }
+                                    for (Castle castle : castleArrayList) {
+                                        castle.setSelected(hitboxCheckRect(hitboxes.get(castle.hashCode()), selectRect));
+                                        System.out.println(castle.isSelected());
                                     }
                                 }
                                 break;
@@ -796,30 +794,61 @@ public class GameScreen extends Screens implements Screen {
         return gameScreenEvent;
     }
 
+    /**
+     * Checks whether two Hitboxes overlap.
+     * @param hitbox the first hitbox
+     * @param hitbox2 the second hitbox
+     * @return {@code true} if they overlap.
+     */
+    private boolean hitboxCheckRect(Rectangle hitbox, Rectangle hitbox2) {//did this to reduce copying a bit appreciated advice on how to further reduce
+        return hitbox.overlaps(hitbox2);
+    }
+
+    /**
+     * Checks whether a point is within a hitbox
+     * @param hitbox the hitbox
+     * @param coords a float array where index 0 are the x coordinates and index 1 are the y coordinates
+     * @return {@code true} if the hitbox contains the given coordinates.
+     *///NOTICE: DO not use Rectangle#contains it doesnt work correctly.
+    private boolean hitboxCheckXY(Rectangle hitbox, float[] coords) {//did this to reduce copying a bit appreciated advice on how to further reduce
+        if (hitbox != null) {//should never happen but better be sure
+            return hitbox.getX() <= coords[0] && hitbox.getX() + hitbox.getWidth() >= coords[0] && hitbox.getY() <= coords[1] && hitbox.getY() + hitbox.getHeight() >= coords[1];
+        }
+        return false;
+    }
+
     public void getClickedOnEntity() {
 
         float[] coords = translateXYCoordinatesFromScreen(Gdx.input.getX(), Gdx.input.getY());
+        Rectangle hitbox;
         for (Soldier soldier : ownSoldierArrayList) {
-            float[] checkCoordsRect = new float[]{soldier.getX() - soldier.getWidth(),
-                    soldier.getY() - soldier.getHeight(),
-                    soldier.getX() + soldier.getWidth(),
-                    soldier.getY() + soldier.getHeight()};
-            if ((coords[0] >= checkCoordsRect[0] && coords[1] >= checkCoordsRect[1]) && (coords[0] <= checkCoordsRect[2] && coords[1] <= checkCoordsRect[3])) {
+            hitbox = hitboxes.get(soldier.hashCode());
+            if (hitboxCheckXY(hitbox, coords)) {//should never happen but better be sure
                 soldier.setSelected(!soldier.isSelected());
             } else {
                 soldier.setSelected(false);
             }
         }
-        for (Castle c : enemyCastleArrayList) {
 
-            if (c.getX() < (int) coords[0] && c.getY() < (int) coords[1]) {
-                if (c.getX() + c.getWidth() >= (int) coords[0] && c.getY() + c.getHeight() >= (int) coords[1]) {
-                    c.setSelected(!c.isSelected());
-                } else {
-                    c.setSelected(false);
-                }
-            }
+        hitbox = hitboxes.get(castle.hashCode());
+
+        if (hitboxCheckXY(hitbox, coords)) {//should never happen but better be sure
+            castle.setSelected(!castle.isSelected());
+        } else {
+            castle.setSelected(false);
         }
+
+        //todo wenn enemyCastle gesendent wird verwerdne um hp anzu zeigen!
+
+//        for (Castle c : enemyCastleArrayList) {
+//            hitbox = hitboxes.get(c.hashCode());
+//
+//            if (hitboxCheckXY(hitbox, coords)) {//should never happen but better be sure
+//                c.setSelected(!c.isSelected());
+//            } else {
+//                c.setSelected(false);
+//            }
+//        }
 
 //        try {
 //            if (collisionUnitLayer.getCell((int) coords[0] / collisionUnitLayer.getTileWidth(), (int) coords[1] / collisionUnitLayer.getTileHeight())
