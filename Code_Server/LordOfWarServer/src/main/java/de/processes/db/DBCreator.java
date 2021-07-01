@@ -12,7 +12,7 @@ public class DBCreator {
     public static final String dbURL = "jdbc:postgresql://localhost:5432/game";
     public static final String uName = "postgres";
     public static final String password = "admin123";
-/*
+/*s
     private static final String DB_CREATION_DDL_SCRIPT =
             "CREATE SCHEMA public;\n" +
                     "CREATE TABLE Player(\n" +
