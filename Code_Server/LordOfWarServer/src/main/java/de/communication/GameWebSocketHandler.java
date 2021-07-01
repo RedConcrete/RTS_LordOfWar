@@ -5,6 +5,7 @@ import de.constants.MessageIdentifier;
 import de.model.ServerGame;
 import de.model.ServerLobby;
 import de.model.User;
+import de.processes.DataManager;
 import de.processes.Login;
 import de.processes.Register;
 
@@ -13,11 +14,7 @@ import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 
 import static de.constants.Constants.STRINGSEPERATOR;
 import static de.constants.MessageIdentifier.*;
@@ -27,9 +24,10 @@ import static de.constants.MessageIdentifier.*;
 
 public class GameWebSocketHandler {
 
-    Map<String, Session> sessions = new ConcurrentHashMap<>();
-    Map<String, User> userSessions = new ConcurrentHashMap<>();
-    Map<String, ServerLobby> lobbys = new ConcurrentHashMap<>();
+    private Map<String, Session> sessions = new ConcurrentHashMap<>();
+    private Map<String, User> userSessions = new ConcurrentHashMap<>();
+    private Map<String, ServerLobby> lobbys = new ConcurrentHashMap<>();
+private DataManager dataManager=new DataManager();
 
     @OnOpen
     public void onOpen(Session session) {
@@ -69,11 +67,10 @@ public class GameWebSocketHandler {
         for (MessageIdentifier messageIdentifier : MessageIdentifier.values()) {
             if (data[0].equals(messageIdentifier.toString())) {
                 if (data[0].equals(LOGIN.toString())) {
-                    Login login = new Login();
-                    User newUser = login.isLoginValid(data, sessions.get(data[1]));
+                    User newUser = new Login(dataManager).isLoginValid(data, sessions.get(data[1]));
                     loginUser(newUser);
                 } else if (data[0].equals(REGISTER.toString())) {
-                    Register register = new Register();
+                    Register register = new Register(dataManager);
                     register.isRegisterValid(data, sessions.get(data[1]));
                 } else if (data[0].equals(GET_GAME_POINTS.toString())) {
                     ServerLobby serverLobby = findLobby(data);
@@ -151,6 +148,7 @@ public class GameWebSocketHandler {
         }
     }
 
+    //ENUM,LOBBYID,Usersession
     public void sendPlayerListUpdate(String[] data) {//this should get triggered once the game is over (incase anyone left during the game); maybe public later
         ServerLobby lobby = lobbys.get(data[2]);
         if (lobby.getGame() == null) {
@@ -173,7 +171,6 @@ public class GameWebSocketHandler {
     private void joinLobby(String[] data) {
         boolean joined = false;
         ServerLobby lobby = findLobby(data);
-        System.out.println(lobby);
         if (lobby != null) {
             if (lobby.getGame() == null) {
                 joined = lobby.joinLobby(userSessions.get(data[1]));
@@ -200,8 +197,6 @@ public class GameWebSocketHandler {
 
     private void createLobby(String[] data) {
         //TODO where to put this?
-        System.out.println(Arrays.toString(data));
-        System.out.println(lobbys.size());
         if (userSessions.containsKey(data[1])) {
             if (!lobbys.containsKey(data[2])) {
                 User[] users = new User[Integer.parseInt(data[4])];
@@ -235,11 +230,7 @@ public class GameWebSocketHandler {
         }
     }
 
-    private void updatePos(String[] data){
-
-    }
-
-    private Map<String, Session> getSessions() {
+    public Map<String, Session> getSessions() {
         return sessions;
     }
 
