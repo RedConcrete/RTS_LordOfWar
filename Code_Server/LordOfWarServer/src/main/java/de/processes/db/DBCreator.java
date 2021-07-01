@@ -1,6 +1,6 @@
 package de.processes.db;
 
-import org.postgresql.util.PSQLException;
+
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,7 +12,7 @@ public class DBCreator {
     public static final String dbURL = "jdbc:postgresql://localhost:5432/game";
     public static final String uName = "postgres";
     public static final String password = "admin123";
-
+/*
     private static final String DB_CREATION_DDL_SCRIPT =
             "CREATE SCHEMA public;\n" +
                     "CREATE TABLE Player(\n" +
@@ -31,7 +31,6 @@ public class DBCreator {
                     + "CREATE INDEX userLoginIndex On Player(UserName,PassWord);\n"
                     + "CREATE INDEX userGetIndex On Player USING hash(UserName);\n";
 
-
     public static void createDB() throws ClassNotFoundException, SQLException{
         Class.forName(org.hsqldb.jdbcDriver.class.getName());//TODO insert proper drivers into project
         Connection connection = connector(dbURL, uName, password);
@@ -45,7 +44,8 @@ public class DBCreator {
             statement.executeUpdate(DB_CREATION_DDL_SCRIPT);
         }
     }
-    public static Connection connector(String dbURL, String userName, String userPassword) throws SQLException {
+*/
+public static Connection connector(String dbURL, String userName, String userPassword) throws SQLException {
         return DriverManager.getConnection(dbURL, userName, userPassword);
     }
 

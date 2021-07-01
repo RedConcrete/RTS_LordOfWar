@@ -36,11 +36,13 @@ public class LobbyScreenEvent extends Events {
         ArrayList<String> playerRequest = new ArrayList<>();
         playerRequest.add(game.getSessionID());
         playerRequest.add(lobbyName);
+        System.out.println(playerRequest+" sendingrequest");
         webSocket.send(DataPacker.packData(LOBBY_PLAYERS, DataPacker.stringCombiner(playerRequest)));
 
     }
 
     public void setPlayers(String[] players) {
+        System.out.println(Arrays.toString(players) +"recievedplayers");
         this.players = new String[players.length - 2];
         if (players.length - 2 >= 0) {
             recievedData = true;//todo move later

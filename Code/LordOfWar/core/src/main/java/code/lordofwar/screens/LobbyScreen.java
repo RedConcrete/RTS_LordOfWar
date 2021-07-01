@@ -51,7 +51,6 @@ public class LobbyScreen extends Screens implements Screen {
             //System.out.println(Arrays.toString(gameData));
             game.setScreen(new GameScreen(game, skin, gameData[0],lobbyScreenEvent.getPosition(),lobbyScreenEvent.getPlayers()));//todo insert data here via lobbyScreenEvent.getData
         }
-
         if (!lobbyScreenEvent.isRecievedData()) {//later data requests (map etc) also go here
             lobbyScreenEvent.sendPlayerRequest(gameInfoArr[0]);//possible to move this to the end of setupUi()?
         }
@@ -63,6 +62,7 @@ public class LobbyScreen extends Screens implements Screen {
 
         playerNameArr = lobbyScreenEvent.getPlayers();
         if (playerNameArr != null) {
+            System.out.println(Arrays.toString(playerNameArr)+"players");
             playerList.setItems(playerNameArr);
         }// for (int i = 0; i < playerNameArr.length; i++) {
         //     playerNameArr[i]=playerNameArr[i]+"\n";//TODO formatting properly
