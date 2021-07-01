@@ -15,9 +15,9 @@ public class Soldier extends Sprite {
     private float speed = 60 * 2;
     private int hp;
     private List<PathCell> destination;
+
     private Team team;
     private Sprite sprite;
-
     private TiledMapTileLayer collisionLayer;
 
     public Soldier(Sprite sprite, TiledMapTileLayer collisionLayer, Team team) {
@@ -28,8 +28,6 @@ public class Soldier extends Sprite {
         destination = null;
         this.team = team;
     }
-
-
 
     @Override
     public void draw(Batch batch) {
@@ -157,20 +155,9 @@ public class Soldier extends Sprite {
 //
     }
 
-    public Vector2 getVelocity() {
-        return velocity;
-    }
-
-    public void setVelocity(Vector2 velocity) {
-        this.velocity = velocity;
-    }
-
-    public float getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(float speed) {
-        this.speed = speed;
+    @Override
+    public String toString() {
+        return this.getX() +","+  this.getY();
     }
 
     public TiledMapTileLayer getCollisionLayer() {
@@ -206,6 +193,14 @@ public class Soldier extends Sprite {
     }
 
     public Team getTeam() { return team; }
+
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
+    public void setSprite(Sprite sprite) {
+        this.sprite = sprite;
+    }
 
     public Sprite getSprite() { return sprite; }
 }

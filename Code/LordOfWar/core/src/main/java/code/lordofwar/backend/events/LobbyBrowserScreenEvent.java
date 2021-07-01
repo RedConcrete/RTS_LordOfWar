@@ -33,9 +33,10 @@ public class LobbyBrowserScreenEvent extends Events{
 
     public void setJoined(String[] lobbyJoinRequestResponse) {
         if (lobbyJoinRequestResponse[1].equals("true")) {
+            System.out.println(Arrays.toString(lobbyJoinRequestResponse));
             lobbyInfo = new String[lobbyJoinRequestResponse.length - 2];
             System.arraycopy(lobbyJoinRequestResponse,2,this.lobbyInfo,0,lobbyJoinRequestResponse.length - 2);
-            System.out.println(lobbyInfo);
+
         }
     }
 

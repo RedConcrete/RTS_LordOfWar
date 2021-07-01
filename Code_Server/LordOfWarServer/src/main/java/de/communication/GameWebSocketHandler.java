@@ -1,7 +1,6 @@
 package de.communication;
 
 
-import de.constants.MessageIdentifier;
 import de.model.ServerGame;
 import de.model.ServerLobby;
 import de.model.User;
@@ -27,20 +26,20 @@ public class GameWebSocketHandler {
     private Map<String, Session> sessions = new ConcurrentHashMap<>();
     private Map<String, User> userSessions = new ConcurrentHashMap<>();
     private Map<String, ServerLobby> lobbys = new ConcurrentHashMap<>();
-private DataManager dataManager=new DataManager();
+    private DataManager dataManager=new DataManager();
 
     @OnOpen
     public void onOpen(Session session) {
-
         sessions.put(session.getId(), session);
-        session.getAsyncRemote().sendObject(DataPacker.packData(CONNECTION, session.getId()));
+        session.getAsyncRemote().sendText(DataPacker.packData(CONNECTION, session.getId()));
         //todo hier wird der player der sich verbinden will als neuer player geaddet (er ist noch nicht eingelogt!! Player --> user)
 
     }
 
-    @OnClose
-    public void onClose() {
-    }
+    // @OnClose
+   // public void onClose() {//two players in one lobby : result both close
+   //     System.out.println("closed");
+   // }
 
     @OnError
     public void onError(Throwable throwable) {
@@ -49,8 +48,15 @@ private DataManager dataManager=new DataManager();
 
     @OnMessage
     public void onMessage(String message) {
+        System.out.println(message);
         String[] dataArray = depackData(message);
         checkDataDir(dataArray);
+    }
+    @OnClose
+    public void onClose(Session session,
+                        CloseReason closeReason){
+        System.out.println(session.getId());
+        System.out.println(closeReason.toString());
     }
 
     private String[] depackData(String message) {
@@ -64,39 +70,35 @@ private DataManager dataManager=new DataManager();
         //TODO change data processing (see dataSendConvention.txt)
         //TODO change all methods associated with data processing
 
-        for (MessageIdentifier messageIdentifier : MessageIdentifier.values()) {
-            if (data[0].equals(messageIdentifier.toString())) {
-                if (data[0].equals(LOGIN.toString())) {
-                    User newUser = new Login(dataManager).isLoginValid(data, sessions.get(data[1]));
-                    loginUser(newUser);
-                } else if (data[0].equals(REGISTER.toString())) {
-                    Register register = new Register(dataManager);
-                    register.isRegisterValid(data, sessions.get(data[1]));
-                } else if (data[0].equals(GET_GAME_POINTS.toString())) {
-                    ServerLobby serverLobby = findLobby(data);
-                    if (serverLobby != null) {
-                        sessions.get(data[1]).getAsyncRemote().sendObject(DataPacker.packData(GET_GAME_POINTS, String.valueOf(serverLobby.getGame().getPoints(data[1]))));
-                    }
-                } else if (data[0].equals(CREATE_LOBBY.toString())) {
-                    createLobby(data);
-                } else if (data[0].equals(GAME_START.toString())) {
-                    startGame(data);
-                } else if (data[0].equals(GET_LOBBYS.toString())) {
-                    sendLobbysToClient(data[1]);
-                } else if (data[0].equals(JOIN_LOBBY.toString())) {
-                    joinLobby(data);
-                } else if (data[0].equals(LEAVE_LOBBY.toString())) {
-                    leaveLobby(data);
-                } else if (data[0].equals(LOBBY_PLAYERS.toString())) {
-                    sendPlayerListUpdate(data);
-                } else if (data[0].equals(UPDATE_POS.toString())) {
-                    // data = [0] = s.getX() [1] = s.getY() [2] = c.getX() [3] = c.getY()
-                    System.out.println(Arrays.toString(data));
-                    updatePos(data);
-                }
 
+        if (data[0].equals(LOGIN.toString())) {
+
+            User newUser = new Login(dataManager).isLoginValid(data, sessions.get(data[1]));
+            loginUser(newUser);
+        } else if (data[0].equals(REGISTER.toString())) {
+            Register register = new Register(dataManager);
+            register.isRegisterValid(data, sessions.get(data[1]));
+        } else if (data[0].equals(GET_GAME_POINTS.toString())) {
+            ServerLobby serverLobby = findLobby(data);
+            if (serverLobby != null) {
+                sessions.get(data[1]).getAsyncRemote().sendText(DataPacker.packData(GET_GAME_POINTS, String.valueOf(serverLobby.getGame().getPoints(data[1]))));
             }
+        } else if (data[0].equals(CREATE_LOBBY.toString())) {
+            createLobby(data);
+        } else if (data[0].equals(GAME_START.toString())) {
+            startGame(data);
+        } else if (data[0].equals(GET_LOBBYS.toString())) {
+            sendLobbysToClient(data[1]);
+        } else if (data[0].equals(JOIN_LOBBY.toString())) {
+            joinLobby(data);
+        } else if (data[0].equals(LEAVE_LOBBY.toString())) {
+            leaveLobby(data);
+        } else if (data[0].equals(LOBBY_PLAYERS.toString())) {
+            sendPlayerListUpdate(data);
+        } else if (data[0].equals(UPDATE_SOLDIER_POS.toString())) {
+            genPosArray(data);
         }
+
     }
 
     private void startGame(String[] data) {
@@ -113,7 +115,7 @@ private DataManager dataManager=new DataManager();
                 for (User player : lobby.getPlayers()) {
                     stringRep = String.valueOf(i);
                     gameData.add(stringRep);//give startingposition
-                    player.getuSession().getAsyncRemote().sendObject(DataPacker.packData(GAME_START, DataPacker.stringCombiner(gameData)));
+                    player.getuSession().getAsyncRemote().sendText(DataPacker.packData(GAME_START, DataPacker.stringCombiner(gameData)));
                     gameData.remove(stringRep);//remove startingposition for next loop
                     i++;
                 }
@@ -131,7 +133,7 @@ private DataManager dataManager=new DataManager();
                 arr.add(String.valueOf(entry.getValue().getPlayerAmount()));
             }
         }
-        sessions.get(userID).getAsyncRemote().sendObject(DataPacker.packData(GET_LOBBYS, DataPacker.stringCombiner(arr)));
+        sessions.get(userID).getAsyncRemote().sendText(DataPacker.packData(GET_LOBBYS, DataPacker.stringCombiner(arr)));
         System.out.println(arr.toString());
     }
 
@@ -154,7 +156,7 @@ private DataManager dataManager=new DataManager();
         if (lobby.getGame() == null) {
             ArrayList<String> changedData = new ArrayList<>(lobby.getPlayerNames());
             changedData.add(String.valueOf(lobby.getPlayerOrder(userSessions.get(data[1]))));
-            sessions.get(data[1]).getAsyncRemote().sendObject(DataPacker.packData(LOBBY_PLAYERS, DataPacker.stringCombiner(changedData)));
+            sessions.get(data[1]).getAsyncRemote().sendText(DataPacker.packData(LOBBY_PLAYERS, DataPacker.stringCombiner(changedData)));
         }
     }
 
@@ -163,7 +165,7 @@ private DataManager dataManager=new DataManager();
             for (User user : lobby.getPlayers()) {
                 ArrayList<String> changedData = new ArrayList<>(lobby.getPlayerNames());
                 changedData.add(String.valueOf(lobby.getPlayerOrder(user)));
-                user.getuSession().getAsyncRemote().sendObject(DataPacker.packData(LOBBY_PLAYERS, DataPacker.stringCombiner(changedData)));
+                user.getuSession().getAsyncRemote().sendText(DataPacker.packData(LOBBY_PLAYERS, DataPacker.stringCombiner(changedData)));
             }
         }
     }
@@ -185,12 +187,12 @@ private DataManager dataManager=new DataManager();
                     lobbyDataToSend.add(String.valueOf(lobby.getPlayerOrder((userSessions.get(data[1])))));
                     System.out.println(lobbyDataToSend);
 
-                    sessions.get(data[1]).getAsyncRemote().sendObject(DataPacker.packData(JOIN_LOBBY, DataPacker.stringCombiner(lobbyDataToSend)));
+                    sessions.get(data[1]).getAsyncRemote().sendText(DataPacker.packData(JOIN_LOBBY, DataPacker.stringCombiner(lobbyDataToSend)));
                 }
             }
         }
         if (!joined) {
-            sessions.get(data[1]).getAsyncRemote().sendObject(DataPacker.packData(JOIN_LOBBY, "false"));
+            sessions.get(data[1]).getAsyncRemote().sendText(DataPacker.packData(JOIN_LOBBY, "false"));
         }
         //TODO send joined success back
     }
@@ -208,11 +210,11 @@ private DataManager dataManager=new DataManager();
                 dataList.add("true");
                 dataList.add(data[2]);
                 dataList.add(String.valueOf(newLobby.getPlayerOrder(users[0])));
-                sessions.get(data[1]).getAsyncRemote().sendObject(DataPacker.packData(CREATE_LOBBY, DataPacker.stringCombiner(dataList)));
+                sessions.get(data[1]).getAsyncRemote().sendText(DataPacker.packData(CREATE_LOBBY, DataPacker.stringCombiner(dataList)));
                 return;
             }
         }
-        sessions.get(data[1]).getAsyncRemote().sendObject(DataPacker.packData(CREATE_LOBBY, "false"));
+        sessions.get(data[1]).getAsyncRemote().sendText(DataPacker.packData(CREATE_LOBBY, "false"));
     }
 
     private ServerLobby findLobby(String[] args) {
@@ -226,6 +228,28 @@ private DataManager dataManager=new DataManager();
             String id = user.getuSession().getId();
             if (sessions.containsKey(id)) {
                 userSessions.put(id, user);
+            }
+        }
+    }
+
+    private void genPosArray(String[] data) {
+
+        ServerLobby lobby = findLobby(data);
+        if (lobby != null) {
+            if (lobby.getGame() != null) {
+                ArrayList<String> changedData = new ArrayList<>();
+                changedData.add(data[3]);
+                for (int i = 4; i < data.length; i += 2) {
+                    changedData.add(data[i]);
+                    changedData.add(data[i + 1]);
+                }
+                for (User user : lobby.getPlayers()) {
+                    if (!sessions.get(data[1]).equals(user.getuSession())) {
+                        //1001 error here ; Server thinks client navigates away/closes?
+                        soldierPos.put(data[1],changedData);
+                        user.getuSession().getAsyncRemote().sendText(DataPacker.packData(UPDATE_SOLDIER_POS, DataPacker.stringCombiner(changedData)));
+                    }
+                }
             }
         }
     }

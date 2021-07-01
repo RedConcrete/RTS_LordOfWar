@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class LobbyScreen extends Screens implements Screen {
@@ -47,6 +48,7 @@ public class LobbyScreen extends Screens implements Screen {
         if (lobbyScreenEvent.isStartedGame()) {
             String[] gameData = lobbyScreenEvent.getGameData();
             //[1]=lobbyname[2]=gamemode[3]=map
+            //System.out.println(Arrays.toString(gameData));
             game.setScreen(new GameScreen(game, skin, gameData[0],lobbyScreenEvent.getPosition(),lobbyScreenEvent.getPlayers()));//todo insert data here via lobbyScreenEvent.getData
         }
 
@@ -107,7 +109,9 @@ public class LobbyScreen extends Screens implements Screen {
         playerList.setItems(playerNameArr);//no point to this anymore right?
 
         List<String> gameInfoList = new List<>(skin);
-        gameInfoList.setItems(gameInfoArr);
+        String[] gameInfo=new String[gameInfoArr.length-1];
+        System.arraycopy(gameInfoArr,0,gameInfo,0, gameInfoArr.length-1);
+        gameInfoList.setItems(gameInfo);
 
 
         startButton.addListener(new InputListener() {

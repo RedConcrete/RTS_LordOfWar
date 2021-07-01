@@ -107,6 +107,7 @@ public class LobbyBrowserScreen extends Screens implements Screen {
                                         Gdx.app.postRunnable(
                                                 () -> {
                                                     if (lobbyBrowserScreenEvent.getLobbyInfo() != null) {
+                                                        System.out.println(Arrays.toString(lobbyBrowserScreenEvent.getLobbyInfo()));
                                                         game.setScreen(new LobbyScreen(game, skin, lobbyBrowserScreenEvent.getLobbyInfo()));
                                                         stage.dispose();
 
