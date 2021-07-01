@@ -35,7 +35,6 @@ public class GameScreen extends Screens implements Screen {
 
     private ShapeRenderer rectangleRenderer;
 
-    private final Vector2 vectorSpeed;
     private final TiledMapTileLayer collisionUnitLayer;
     private final OrthographicCamera camera;
     private final boolean cameraDebug;
@@ -55,10 +54,9 @@ public class GameScreen extends Screens implements Screen {
     private Label entityATK;
     private Label entityDEF;
 
-
     private final ArrayList<Soldier> soldierArrayList;
     private final ArrayList<Castle> castleArrayList;
-    private ArrayList<Object> entityArrayList;
+
     private Sprite soldierSprite;
     private Sprite castleSprite;
 
@@ -70,7 +68,7 @@ public class GameScreen extends Screens implements Screen {
 
     private boolean isLeftPressed;
     private boolean isRightPressed;
-    private Castle myCastle;
+    private Castle castle;
 
     private Label soldierLabel;
     private Label goldLabel;
@@ -84,19 +82,20 @@ public class GameScreen extends Screens implements Screen {
     private int goldAmount = 100;
 
     private float pointTimerCounter;
-    private Point2D.Float rectangleStart;//used to check where the select rectangle was started
+    private Point2D.Float rectangleStart; //used to check where the select rectangle was started
     private Point2D.Float rectangleEnd;
     private final float[] rectangleBounds;
-
     private HashMap<Integer, Rectangle> hitboxes;//yeah sorry couldnt come up with a better way to dynamically check than just checking rectangles
+    private ArrayList<String> connectedPlayers;
 
     Image castleImage;
     Image soldierImage;
 
-    public GameScreen(LOW aGame, Skin aSkin, String lobbyID, int startingPosition, String[] connectedPlayers) {
+    public GameScreen(LOW aGame, Skin aSkin, String lobbyID, Integer startingPosition, String[] connectedPlayersArray) {
         super(aGame, aSkin);
+        this.connectedPlayers = ArrayToArraylist(connectedPlayersArray);
+        mapDebug = false;
         hitboxes = new HashMap<>();
-        mapDebug = true;
         isLeftPressed = false;
         isRightPressed = false;
         entityName = new Label("", skin);
@@ -105,8 +104,6 @@ public class GameScreen extends Screens implements Screen {
         gameScreenEvent = new GameScreenEvent(game, lobbyID);
         posCameraDesired = new Vector3();
         cameraDebug = false;
-        vectorSpeed = new Vector2();
-        posCameraDesired = new Vector3();
         soldierArrayList = new ArrayList<>();
         castleArrayList = new ArrayList<>();
 
@@ -120,8 +117,13 @@ public class GameScreen extends Screens implements Screen {
         rectangleBounds = new float[4];//0=originX1=originY2=width3=height
         soldierSprite = new Sprite(unitAtlas.findRegion("Character_Green"));
         loader = new TmxMapLoader();
+        camera = new OrthographicCamera();
 
-        gameScreenEvent.getConnectedPlayer(connectedPlayers);
+        //todo zeigt alle verbunden players
+        //System.out.println(Arrays.toString(connectedPlayers));
+        gameScreenEvent.getConnectedPlayer(connectedPlayers, startingPosition);
+
+
         String mapPath = "maps/map_1.tmx";
         map = loader.load(mapPath);
         MapProperties mapProperties = map.getProperties();
@@ -135,46 +137,43 @@ public class GameScreen extends Screens implements Screen {
                 mapProperties.get("height", Integer.class) * mapProperties.get("tileheight", Integer.class)
         };
         //TODO way to tell maps apart
-        float[] castlePosition;
+        float[] castlePosition = {};
+        System.out.println(startingPosition);
         switch (startingPosition) {
-            case 1:
+            case 0:
                 castlePosition = Constants.MAP1CC1;
                 break;
-            case 2:
+            case 1:
                 castlePosition = Constants.MAP1CC2;
                 break;
-            case 3:
+            case 2:
                 castlePosition = Constants.MAP1CC3;
                 break;
-            case 4:
+            case 3:
                 castlePosition = Constants.MAP1CC4;
                 break;
-            case 5:
-                castlePosition = Constants.MAP1CC5;
-                break;
-            case 6:
-                castlePosition = Constants.MAP1CC6;
-                break;
             default:
-                throw new IllegalStateException("Unexpected value: " + startingPosition);//max of 6 players; thus error
+                //THIS SHOULD NEVER HAPPEN
+                System.err.println("Unexpected value: " + startingPosition);//max of 4 players; thus error
         }
-        camera = new OrthographicCamera();
-        //TODO why doesnt this work
-        //TODO add castle hitbox
+
+        collisionUnitLayer = (TiledMapTileLayer) map.getLayers().get(1);
+
         posCameraDesired.x = castlePosition[0];
         posCameraDesired.y = castlePosition[1];
-        collisionUnitLayer = (TiledMapTileLayer) map.getLayers().get(1);
-        myCastle = new Castle(castleSprite, collisionUnitLayer);
+        castle = new Castle(castleSprite, collisionUnitLayer, new Team(startingPosition));
+        castle.setPosition(castlePosition[0], castlePosition[1]);
+
         //TODO add castles to HB map
         for (int i = 0; i < startingCastle; i++) {
             //todo Castle neu ändern!! (objekte erzeugen und dann in das Array)
-            castleArrayList.add(myCastle);
-            myCastle.setPosition(Constants.MAP1CC1[0], Constants.MAP1CC1[1]);
+            castleArrayList.add(castle);
+            castle.setPosition(castlePosition[0], castlePosition[1]);
         }
-        Rectangle myCastleHB = new Rectangle(myCastle.getBoundingRectangle());
+        Rectangle myCastleHB = new Rectangle(castle.getBoundingRectangle());
         myCastleHB.setWidth(myCastleHB.getWidth());
         myCastleHB.setHeight(myCastleHB.getHeight() - 64);
-        hitboxes.put(myCastle.hashCode(), myCastleHB);
+        hitboxes.put(castle.hashCode(), myCastleHB);
         setupUI();
 
     }
@@ -228,7 +227,6 @@ public class GameScreen extends Screens implements Screen {
                                 break;
                         }
 
-
                         //rectange should be reset no matter what
                         rectangleEnd = null;
                         rectangleStart = null;
@@ -247,8 +245,6 @@ public class GameScreen extends Screens implements Screen {
         return false;
     }
 
-    ;
-
     @Override
     public void render(float delta) {
         clearStage();
@@ -264,16 +260,14 @@ public class GameScreen extends Screens implements Screen {
         debugRenderer.begin();
         renderer.getBatch().begin();
 
-        pointTimerCounter += delta;
-        if (pointTimerCounter > 1) { //1 second update
-            gameScreenEvent.sendPointRequest();//TODO move this to server???
-            pointTimerCounter = 0;
-        }
+        gameScreenEvent.CameraKeyEvents(camera, CAMERASPEED, posCameraDesired);
+
+        countPoints(delta);
 
         scoreLabel.setText(gameScreenEvent.getPoints());
 
-        soldierLabel.setText(myCastle.getVillager());
-        goldLabel.setText(myCastle.getGold());
+        soldierLabel.setText(castle.getVillager());
+        goldLabel.setText(castle.getGold());
 
         for (Castle c : castleArrayList) {
             c.draw(renderer.getBatch());
@@ -282,6 +276,17 @@ public class GameScreen extends Screens implements Screen {
 
                 entityHp.setText(c.getHp());
                 buttonRecruit.setVisible(true);
+
+                //todo braucht seine eigene forEach !!
+                if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
+                    if (!isRightPressed) {
+                        isRightPressed = true;
+                    } else {
+                        if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
+                            isRightPressed = false;
+                        }
+                    }
+                }
 
                 //todo Progresbar benutzen
                 entityName.setText("Castle");
@@ -292,19 +297,20 @@ public class GameScreen extends Screens implements Screen {
                 s.draw(renderer.getBatch());
 
             }
-
         }
 
+        for (Soldier s : soldierArrayList) {
+            s.draw(renderer.getBatch());
 
-        for (Soldier soldier : soldierArrayList) {
-            soldier.draw(renderer.getBatch());
-            if (soldier.getDestination() != null) {
-                if (soldier.getDestination().isEmpty()) {
-                    soldier.setDestination(null);
+            gameScreenEvent.updatePos(s);
+
+            if (s.getDestination() != null) {
+                if (s.getDestination().isEmpty()) {
+                    s.setDestination(null);
                 } else {
 
-                    int vX = (int) ((soldier.getX() + 32) / 64);
-                    int vY = (int) ((soldier.getY() + 32) / 64);
+                    int vX = (int) ((s.getX() + 32) / 64);
+                    int vY = (int) ((s.getY() + 32) / 64);
 //                    System.out.println(soldier.getX());
 //                    System.out.println(soldier.getY());
 //                    System.out.println(vX);
@@ -322,7 +328,7 @@ public class GameScreen extends Screens implements Screen {
 //                        }
 //                    }
 
-                    if (vX != soldier.getDestination().get(0).coords.x || vY != soldier.getDestination().get(0).coords.y) {
+                    if (vX != s.getDestination().get(0).coords.x || vY != s.getDestination().get(0).coords.y) {
                         /*
                              if (vX != v.getDestination().get(0).coords.x || vY != v.getDestination().get(0).coords.y) {
                         if (v.getDestination().get(0).coords.x>vX){
@@ -344,58 +350,58 @@ public class GameScreen extends Screens implements Screen {
                         soldier.translateY(soldier.getDestination().get(0).coords.y - vY);
                         soldier.translate(soldier.getDestination().get(0).coords.x - vX, soldier.getDestination().get(0).coords.y - vY);
                          */
-                        if (soldier.getDestination().get(0).coords.x < vX) {
-                            soldier.translateX(-1);
-                        } else if (soldier.getDestination().get(0).coords.x > vX) {
-                            soldier.translateX(1);
+                        if (s.getDestination().get(0).coords.x < vX) {
+                            s.translateX(-1);
+                        } else if (s.getDestination().get(0).coords.x > vX) {
+                            s.translateX(1);
                         }
-                        if (soldier.getDestination().get(0).coords.y < vY) {
-                            soldier.translateY(-1);
-                        } else if (soldier.getDestination().get(0).coords.y > vY) {
-                            soldier.translateY(1);
+                        if (s.getDestination().get(0).coords.y < vY) {
+                            s.translateY(-1);
+                        } else if (s.getDestination().get(0).coords.y > vY) {
+                            s.translateY(1);
                         }
 
                         //TODO maybe do a isColliding method in soldier? idk discuss
-                        if (isColliding(soldier)) {
+                        if (isColliding(s)) {
                             //reverse direction
-                            if (soldier.getDestination().get(0).coords.x < vX) {
-                                soldier.setX(soldier.getX() + soldier.getWidth() / 2);
-                            } else if (soldier.getDestination().get(0).coords.x > vX) {
-                                soldier.setX(soldier.getX() - soldier.getWidth() / 2);
+                            if (s.getDestination().get(0).coords.x < vX) {
+                                s.setX(s.getX() + s.getWidth() / 2);
+                            } else if (s.getDestination().get(0).coords.x > vX) {
+                                s.setX(s.getX() - s.getWidth() / 2);
                             }
-                            if (soldier.getDestination().get(0).coords.y < vY) {
-                                soldier.setY(soldier.getY() - soldier.getHeight() / 2);
+                            if (s.getDestination().get(0).coords.y < vY) {
+                                s.setY(s.getY() - s.getHeight() / 2);
 
-                            } else if (soldier.getDestination().get(0).coords.y > vY) {
-                                soldier.setY(soldier.getY() - soldier.getHeight() / 2);
+                            } else if (s.getDestination().get(0).coords.y > vY) {
+                                s.setY(s.getY() - s.getHeight() / 2);
                             }
-                            getPathFinding(soldier, (int) soldier.getDestination().get(soldier.getDestination().size() - 1).coords.x * collisionUnitLayer.getTileWidth(), (int) (soldier.getDestination().get(soldier.getDestination().size() - 1).coords.y * collisionUnitLayer.getTileHeight()));
+                            getPathFinding(s, (int) s.getDestination().get(s.getDestination().size() - 1).coords.x * collisionUnitLayer.getTileWidth(), (int) (s.getDestination().get(s.getDestination().size() - 1).coords.y * collisionUnitLayer.getTileHeight()));
                         }
 
-                    } else if (vX == soldier.getDestination().get(0).coords.x && vY == soldier.getDestination().get(0).coords.y) {
-                        if (soldier.getDestination().size() >= 1) {
-                            System.out.println(soldier.getDestination().get(0).coords.x + " " + soldier.getDestination().get(0).coords.y + " reached");
-                            soldier.getDestination().remove(0);
-                            hitboxes.put(soldier.hashCode(), soldier.getBoundingRectangle());//set hitbox when having reached a tile
+                    } else if (vX == s.getDestination().get(0).coords.x && vY == s.getDestination().get(0).coords.y) {
+                        if (s.getDestination().size() >= 1) {
+                            System.out.println(s.getDestination().get(0).coords.x + " " + s.getDestination().get(0).coords.y + " reached");
+                            s.getDestination().remove(0);
+                            hitboxes.put(s.hashCode(), s.getBoundingRectangle());//set hitbox when having reached a tile
                         }
                     }
 
                 }
             } else {
-                hitboxes.put(soldier.hashCode(), soldier.getBoundingRectangle());//set hitbox when having stopped moving
+                hitboxes.put(s.hashCode(), s.getBoundingRectangle());//set hitbox when having stopped moving
             }
 
-            if (soldier.isSelected()) {
-                entityHp.setText(soldier.getHp());
+            if (s.isSelected()) {
+                entityHp.setText(s.getHp());
                 buttonRecruit.setVisible(false);
 
                 //todo braucht seine eigene forEach !!
                 entityName.setText("Soldier");
-                Sprite s = new Sprite(uiAtlas.findRegion("button-normal"));
-                s.setColor(soldier.getTeam().getColor());
-                s.setSize(soldier.getHp(), 10);
-                s.setPosition(soldier.getX() + 5, soldier.getY() + 60);
-                s.draw(renderer.getBatch());
+                Sprite sprite = new Sprite(uiAtlas.findRegion("button-normal"));
+                sprite.setColor(s.getTeam().getColor());
+                sprite.setSize(s.getHp(), 10);
+                sprite.setPosition(sprite.getX() + 5, sprite.getY() + 60);
+                sprite.draw(renderer.getBatch());
             }
         }
         if (mapDebug) {
@@ -416,7 +422,6 @@ public class GameScreen extends Screens implements Screen {
         debugRenderer.end();
         renderer.getBatch().end();
 
-
         if (rectangleStart != null && rectangleEnd != null) {
             //calc Rectangle
             //todo find a more efficient way to do this?
@@ -433,7 +438,7 @@ public class GameScreen extends Screens implements Screen {
             rectangleRenderer.end();
             //draw rectangle here
         }
-        if (myCastle.isSelected()) {
+        if (castle.isSelected()) {
             entityName.setText("Castle");
         }
 
@@ -443,10 +448,8 @@ public class GameScreen extends Screens implements Screen {
         stage.draw();
     }
 
-
     @Override
     public void resize(int width, int height) {
-        camera.position.set(stage.getWidth() / 2f, stage.getHeight() / 2f, 0);
         camera.viewportWidth = width;
         camera.viewportHeight = height;
         camera.update();
@@ -472,7 +475,6 @@ public class GameScreen extends Screens implements Screen {
         stage.dispose();
         map.dispose();
         renderer.dispose();
-
     }
 
     private void setupUI() {
@@ -500,7 +502,6 @@ public class GameScreen extends Screens implements Screen {
         TextButton backButton = new TextButton("Back", skin);
         TextButton backButton2 = new TextButton("Back", skin);
 
-
         TextButton exitButton = new TextButton("Back", skin);
         Window windowNoVillager = new Window("NoVillager", skin, "border");
         windowNoVillager.setVisible(false);
@@ -518,10 +519,7 @@ public class GameScreen extends Screens implements Screen {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
-
-
         });
-
 
         Window windowNoGold = new Window("", skin, "border");
         windowNoGold.setVisible(false);
@@ -539,16 +537,13 @@ public class GameScreen extends Screens implements Screen {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
-
-
         });
-
 
         Window windowExit = new Window("Surrender?", skin, "border");
         windowExit.setMovable(false);
         windowExit.defaults().pad(20f);
 
-        TextButton exitGameButton = new TextButton("Surrender", skin);
+        TextButton exitGameButton = new TextButton("Exit", skin);
         exitGameButton.getLabel().setFontScale(3f);
 
         TextButton addGoldButton = new TextButton("AddGold", skin);
@@ -679,14 +674,15 @@ public class GameScreen extends Screens implements Screen {
         buttonRecruit.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("Recruit Villager");
-                if (myCastle.getVillager() != 0 && myCastle.getGold() - 10 >= 0) {
-                    if (soldierArrayList.size() <= myCastle.getMaxUnits()) {
-                        myCastle.setVillager(myCastle.getVillager() - 1);
-                        myCastle.setGold(myCastle.getGold() - 10);
-                        soldierSprite.setColor(gameScreenEvent.getTeamHashMap().get("Username").getColor());// todo username richtig abfragen
-                        Soldier soldier = new Soldier(soldierSprite, collisionUnitLayer, gameScreenEvent.getTeamHashMap().get("Username"));// todo username richtig abfragen
+                if (castle.getVillager() != 0 && castle.getGold() - 10 >= 0) {
+                    if (soldierArrayList.size() <= castle.getMaxUnits()) {
+                        castle.setVillager(castle.getVillager() - 1);
+                        castle.setGold(castle.getGold() - 10); //todo Gold wert nicht hartCoded!!
+
+                        soldierSprite.setColor(castle.getTeam().getColor());
+                        Soldier soldier = new Soldier(soldierSprite, collisionUnitLayer, castle.getTeam());
                         soldierArrayList.add(soldier);
+
                     }
                 } else {
                     windowNoVillager.setPosition(stage.getWidth() / 2, stage.getHeight() / 2);
@@ -707,9 +703,9 @@ public class GameScreen extends Screens implements Screen {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
 
-                if (myCastle.getGold() - myCastle.getMaxUnits() >= 0) {
-                    myCastle.setGold(myCastle.getGold() - myCastle.getMaxUnits());
-                    myCastle.setMaxUnits(myCastle.getMaxUnits() + 10);
+                if (castle.getGold() - castle.getMaxUnits() >= 0) {
+                    castle.setGold(castle.getGold() - castle.getMaxUnits());
+                    castle.setMaxUnits(castle.getMaxUnits() + 10);
                 } else {
                     windowNoGold.setPosition(stage.getWidth() / 2, stage.getHeight() / 2);
                     windowNoGold.setVisible(true);
@@ -734,16 +730,16 @@ public class GameScreen extends Screens implements Screen {
         entityWindow.add(buttonRecruit).padRight(30f).row();
         entityWindow.add(defLabel);
         entityWindow.add(buttonIncreaseMaxUnits).padRight(30f).row();
-        ;
         entityWindow.add(entityDEF);
         entityWindow.setPosition(stage.getWidth() / 2 - 300, 0);
-
 
         packWindow(resourceBarWindow, stage);
         packWindow(exitWindow, stage);
         packWindow(entityWindow, stage);
         packWindow(windowNoVillager, stage);
         packWindow(windowNoGold, stage);
+
+        gameScreenEvent.StageKeyEvents(windowExit, yesButton, noButton, stage);
 
         stage.addActor(windowNoVillager);
         stage.addActor(entityWindow);
@@ -764,7 +760,7 @@ public class GameScreen extends Screens implements Screen {
         yClicked = Gdx.input.getY();
 
         //Todo camera movement überarbeiten !!
-        processCameraMovement(xClicked, yClicked);
+        gameScreenEvent.processCameraMovement(xClicked, yClicked, camera, CAMERASPEED, debugMovement, cameraDebug, posCameraDesired);
         camera.position.lerp(posCameraDesired, 0.1f);
         keepCameraInBounds();
 
@@ -796,121 +792,6 @@ public class GameScreen extends Screens implements Screen {
             posCameraDesired.y = mapSizes[5] - camera.viewportHeight / 2;
             camera.position.y = mapSizes[5] - camera.viewportHeight / 2;
         }
-    }
-
-
-    /**
-     * The Method processCameraMovement moves the Camera in the direction the mouse is pointing at.
-     *
-     * @author Robin Hefner
-     */
-    private void processCameraMovement(float xClicked, float yClicked) {
-
-        //oben links
-        if (xClicked <= camera.viewportWidth * 2 / 32 && yClicked <= camera.viewportHeight * 1 / 18) {
-            posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
-            posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
-
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(0, camera.viewportHeight - camera.viewportHeight * 1 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 1 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
-        }
-        //mitte links
-        else if (xClicked <= camera.viewportWidth * 2 / 32 && yClicked >= camera.viewportHeight * 1 / 18 && yClicked <= camera.viewportHeight * 17 / 18) {
-            posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
-
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(0, camera.viewportHeight - camera.viewportHeight * 17 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 16 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
-        }
-        //unten links
-        else if (xClicked <= camera.viewportWidth * 2 / 32 && yClicked >= camera.viewportHeight * 17 / 18 && yClicked <= camera.viewportHeight) {
-            posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
-            posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
-
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(0, 0, camera.viewportWidth * 2 / 32, camera.viewportHeight * 1 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
-        }
-
-        //oben rechts
-        else if (xClicked >= camera.viewportWidth * 30 / 32 && yClicked <= camera.viewportHeight * 1 / 18) {
-            posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
-            posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
-
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 2 / 32, camera.viewportHeight - camera.viewportHeight * 1 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 1 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
-        }
-        //mitte rechts
-        else if (xClicked >= camera.viewportWidth * 30 / 32 && yClicked >= camera.viewportHeight * 1 / 18 && yClicked <= camera.viewportHeight * 17 / 18) {
-            posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
-
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 2 / 32, camera.viewportHeight - camera.viewportHeight * 17 / 18, camera.viewportWidth * 2 / 32, camera.viewportHeight * 16 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
-        }
-        //unten rechts
-        else if (xClicked >= camera.viewportWidth * 30 / 32 && yClicked >= camera.viewportHeight * 17 / 18) {
-            posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
-            posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
-
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 2 / 32, 0, camera.viewportWidth * 2 / 32, camera.viewportHeight * 1 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
-        }
-
-        //mitte oben
-        else if (xClicked >= camera.viewportWidth * 2 / 32 && xClicked <= camera.viewportWidth * 30 / 32 && yClicked <= camera.viewportHeight * 1 / 18) {
-            posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
-
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 30 / 32, camera.viewportHeight - camera.viewportHeight * 1 / 18, camera.viewportWidth * 28 / 32, camera.viewportHeight * 1 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
-        }
-        //mitte unten
-        else if (xClicked >= camera.viewportWidth * 2 / 32 && xClicked <= camera.viewportWidth * 30 / 32 && yClicked >= camera.viewportHeight * 17 / 18) {
-            posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
-
-            if (cameraDebug) {
-                debugMovement.begin();
-                debugMovement.rect(camera.viewportWidth - camera.viewportWidth * 30 / 32, 0, camera.viewportWidth * 28 / 32, camera.viewportHeight * 1 / 18);
-                debugMovement.end();
-            }
-
-            camera.update();
-        } else {
-            camera.update();
-        }
-
     }
 
     public static void DrawDebugLine(Vector2 start, Vector2 end, int lineWidth, Color color, Matrix4
@@ -1042,6 +923,20 @@ public class GameScreen extends Screens implements Screen {
 
         //end=start
 
+    }
+
+    public void countPoints(float delta) {
+        pointTimerCounter += delta;
+        if (pointTimerCounter > 1) { //1 second update
+            gameScreenEvent.sendPointRequest();//TODO move this to server???
+            pointTimerCounter = 0;
+        }
+    }
+
+    private ArrayList<String> ArrayToArraylist(String[] strings) {
+        ArrayList<String> arrayList = new ArrayList<>();
+        arrayList.addAll(Arrays.asList(strings));
+        return arrayList;
     }
 
 }

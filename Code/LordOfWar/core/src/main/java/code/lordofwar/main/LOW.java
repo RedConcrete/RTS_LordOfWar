@@ -65,8 +65,8 @@ public class LOW extends Game {
 	@Override
 	public void dispose() {
 
-	}
 
+	}
 	public void buildWebSocketConnection(){
 
 		OkHttpClient client = new OkHttpClient.Builder()

@@ -6,7 +6,7 @@ public class Team {
 
     private int color;
     private int unitCounter;
-
+    private int startingPos;
 
     public Team(int color) {
         this.color = color;
@@ -41,5 +41,15 @@ public class Team {
         this.unitCounter = unitCounter;
     }
 
+    public void setColor(int color) {
+        this.color = color;
+    }
 
+    public int getStartingPos() {
+        return startingPos;
+    }
+
+    public void setStartingPos(int startingPos) {
+        this.startingPos = startingPos;
+    }
 }

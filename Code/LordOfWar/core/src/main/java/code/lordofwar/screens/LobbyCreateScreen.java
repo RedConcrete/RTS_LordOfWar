@@ -78,7 +78,6 @@ public class LobbyCreateScreen extends Screens implements Screen {
         windowLobbyCreate.defaults().pad(20f);
         windowLobbyCreate.setMovable(false);
 
-
         TextButton lobbyCreateButton = new TextButton("Create Lobby", skin);
         lobbyCreateButton.getLabel().setFontScale(3f);
 
@@ -95,7 +94,6 @@ public class LobbyCreateScreen extends Screens implements Screen {
 
         Label mapLabel = new Label("Map", skin);
         mapLabel.setFontScale(2f);
-
 
         SelectBox<Integer> playerAmountSelectBox = new SelectBox(skin);
         playerAmountSelectBox.setItems(2, 4, 6);
@@ -133,25 +131,17 @@ public class LobbyCreateScreen extends Screens implements Screen {
                             e.printStackTrace();
                         }
                         Gdx.app.postRunnable(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (lobbyCreateScreenEvent.isCreated()) {
-                                            game.setScreen(new LobbyScreen(game, skin, new String[]{lobbyName.getText(), mapSelctBox.getSelected(), String.valueOf(playerAmountSelectBox.getSelected()), gameModeSelectBox.getSelected()}));
-
-                                        } else {
-
-                                            Rumble.rumble(1f, .2f);
-
-                                            printErrorWindow(windowLobbyCreate, "Can´t create Lobby");
-                                        }
+                                () -> {
+                                    if (lobbyCreateScreenEvent.isCreated()) {
+                                        game.setScreen(new LobbyScreen(game, skin, new String[]{lobbyName.getText(), mapSelctBox.getSelected(), String.valueOf(playerAmountSelectBox.getSelected()), gameModeSelectBox.getSelected()}));
+                                        stage.dispose();
+                                    } else {
+                                        Rumble.rumble(1f, .2f);
+                                        printErrorWindow(windowLobbyCreate, "Can´t create Lobby");
                                     }
                                 });
                     }).start();
-
                 }
-
-
             }
 
             @Override

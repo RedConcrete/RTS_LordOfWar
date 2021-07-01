@@ -11,12 +11,10 @@ public class Constants {
     public static final String BLOCK_TILE_PROPERTY="blocked";
     //GAME STATICS
     //TODO FILL THESE ARRAYS with actual coords
-    public static final float[] MAP1CC1=new float[]{352,352};//insert coords here
-    public static final float[] MAP1CC2=new float[]{};//insert coords here
-    public static final float[] MAP1CC3=new float[]{};//insert coords here
-    public static final float[] MAP1CC4=new float[]{};//insert coords here
-    public static final float[] MAP1CC5=new float[]{};//insert coords here
-    public static final float[] MAP1CC6=new float[]{};//insert coords here
+    public static final float[] MAP1CC1=new float[]{400,300};//insert coords here
+    public static final float[] MAP1CC2=new float[]{600,300};//insert coords here
+    public static final float[] MAP1CC3=new float[]{800,300};//insert coords here
+    public static final float[] MAP1CC4=new float[]{900,300};//insert coords here
 
     public Boolean WEBSOCKET_OPEN;
     public Boolean FPS;

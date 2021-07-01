@@ -8,12 +8,11 @@ public enum MessageIdentifier {
     REGISTER,
     REGISTER_VALID,
     GET_GAME_POINTS,
-    START_GAME,
-
+    GAME_START,
     CREATE_LOBBY,
     JOIN_LOBBY,
     LEAVE_LOBBY,
     GET_LOBBYS,
-    LOBBY_PLAYERS
-    ;
+    LOBBY_PLAYERS,
+    UPDATE_POS
 }

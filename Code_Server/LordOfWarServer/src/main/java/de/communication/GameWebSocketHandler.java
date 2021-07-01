@@ -12,16 +12,15 @@ import de.processes.Register;
 import javax.enterprise.context.ApplicationScoped;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 import static de.constants.Constants.STRINGSEPERATOR;
 import static de.constants.MessageIdentifier.*;
 
 @ServerEndpoint("/api/v1/ws")
 @ApplicationScoped
-
 
 public class GameWebSocketHandler {
 
@@ -41,21 +40,17 @@ private DataManager dataManager=new DataManager();
 
     @OnClose
     public void onClose() {
-
     }
 
     @OnError
     public void onError(Throwable throwable) {
-
-
+        System.err.println(throwable.getMessage());
     }
 
     @OnMessage
     public void onMessage(String message) {
-
         String[] dataArray = depackData(message);
         checkDataDir(dataArray);
-
     }
 
     private String[] depackData(String message) {
@@ -68,6 +63,7 @@ private DataManager dataManager=new DataManager();
         //send session id on connect to identify? send username with every query and check if said username is currently logged in? idk
         //TODO change data processing (see dataSendConvention.txt)
         //TODO change all methods associated with data processing
+
         for (MessageIdentifier messageIdentifier : MessageIdentifier.values()) {
             if (data[0].equals(messageIdentifier.toString())) {
                 if (data[0].equals(LOGIN.toString())) {
@@ -83,6 +79,8 @@ private DataManager dataManager=new DataManager();
                     }
                 } else if (data[0].equals(CREATE_LOBBY.toString())) {
                     createLobby(data);
+                } else if (data[0].equals(GAME_START.toString())) {
+                    startGame(data);
                 } else if (data[0].equals(GET_LOBBYS.toString())) {
                     sendLobbysToClient(data[1]);
                 } else if (data[0].equals(JOIN_LOBBY.toString())) {
@@ -91,9 +89,12 @@ private DataManager dataManager=new DataManager();
                     leaveLobby(data);
                 } else if (data[0].equals(LOBBY_PLAYERS.toString())) {
                     sendPlayerListUpdate(data);
-                } else if (data[0].equals(START_GAME.toString())) {
-                    startGame(data);
+                } else if (data[0].equals(UPDATE_POS.toString())) {
+                    // data = [0] = s.getX() [1] = s.getY() [2] = c.getX() [3] = c.getY()
+                    System.out.println(Arrays.toString(data));
+                    updatePos(data);
                 }
+
             }
         }
     }
@@ -112,7 +113,7 @@ private DataManager dataManager=new DataManager();
                 for (User player : lobby.getPlayers()) {
                     stringRep = String.valueOf(i);
                     gameData.add(stringRep);//give startingposition
-                    player.getuSession().getAsyncRemote().sendObject(DataPacker.packData(START_GAME, DataPacker.stringCombiner(gameData)));
+                    player.getuSession().getAsyncRemote().sendObject(DataPacker.packData(GAME_START, DataPacker.stringCombiner(gameData)));
                     gameData.remove(stringRep);//remove startingposition for next loop
                     i++;
                 }
@@ -151,16 +152,18 @@ private DataManager dataManager=new DataManager();
     public void sendPlayerListUpdate(String[] data) {//this should get triggered once the game is over (incase anyone left during the game); maybe public later
         ServerLobby lobby = lobbys.get(data[2]);
         if (lobby.getGame() == null) {
-            //ist das der Sender?
-            sessions.get(data[1]).getAsyncRemote().sendObject(DataPacker.packData(LOBBY_PLAYERS, DataPacker.stringCombiner(lobby.getPlayerNames())));
-            System.out.println(lobby.getPlayerNames());
+            ArrayList<String> changedData = new ArrayList<>(lobby.getPlayerNames());
+            changedData.add(String.valueOf(lobby.getPlayerOrder(userSessions.get(data[1]))));
+            sessions.get(data[1]).getAsyncRemote().sendObject(DataPacker.packData(LOBBY_PLAYERS, DataPacker.stringCombiner(changedData)));
         }
     }
 
     public void sendPlayerChangeUpdate(ServerLobby lobby) {
         if (lobby.getGame() == null) {
             for (User user : lobby.getPlayers()) {
-                user.getuSession().getAsyncRemote().sendObject(DataPacker.packData(LOBBY_PLAYERS, DataPacker.stringCombiner(lobby.getPlayerNames())));
+                ArrayList<String> changedData = new ArrayList<>(lobby.getPlayerNames());
+                changedData.add(String.valueOf(lobby.getPlayerOrder(user)));
+                user.getuSession().getAsyncRemote().sendObject(DataPacker.packData(LOBBY_PLAYERS, DataPacker.stringCombiner(changedData)));
             }
         }
     }
@@ -179,6 +182,8 @@ private DataManager dataManager=new DataManager();
                     lobbyDataToSend.add(lobby.getLobbyMap());
                     lobbyDataToSend.add(String.valueOf(lobby.getPlayerAmount()));
                     lobbyDataToSend.add(lobby.getGamemode());
+                    lobbyDataToSend.add(String.valueOf(lobby.getPlayerOrder((userSessions.get(data[1])))));
+                    System.out.println(lobbyDataToSend);
 
                     sessions.get(data[1]).getAsyncRemote().sendObject(DataPacker.packData(JOIN_LOBBY, DataPacker.stringCombiner(lobbyDataToSend)));
                 }
@@ -202,6 +207,7 @@ private DataManager dataManager=new DataManager();
                 ArrayList<String> dataList = new ArrayList<>();
                 dataList.add("true");
                 dataList.add(data[2]);
+                dataList.add(String.valueOf(newLobby.getPlayerOrder(users[0])));
                 sessions.get(data[1]).getAsyncRemote().sendObject(DataPacker.packData(CREATE_LOBBY, DataPacker.stringCombiner(dataList)));
                 return;
             }

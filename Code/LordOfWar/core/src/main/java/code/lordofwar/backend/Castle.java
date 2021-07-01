@@ -14,9 +14,11 @@ public class Castle extends Sprite {
     private int maxUnits;
     private TiledMapTileLayer collisionLayer;
     private Sprite sprite;
+    private Team team;
 
-    public Castle(Sprite sprite, TiledMapTileLayer collisionLayer) {
+    public Castle(Sprite sprite, TiledMapTileLayer collisionLayer, Team team) {
         super(sprite);
+        this.team = team;
         this.collisionLayer = collisionLayer;
         this.sprite = sprite;
         villager = 1;
@@ -107,5 +109,13 @@ public class Castle extends Sprite {
 
     public void setMaxUnits(int maxUnits) {
         this.maxUnits = maxUnits;
+    }
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
     }
 }

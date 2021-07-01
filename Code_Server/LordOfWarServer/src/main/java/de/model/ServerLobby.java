@@ -1,6 +1,7 @@
 package de.model;
 
 import de.communication.DataPacker;
+import org.graalvm.collections.Pair;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,6 +64,22 @@ public class ServerLobby {
             }
         }
         return false;
+    }
+
+    /**
+     * Returns the starting order of the joined players.
+     *
+     * @return starting position of that player or null if that player doesnt exist
+     */
+    public Integer getPlayerOrder(User user) {
+        if (players.contains(user)) {//player exists
+            for (int i = 0; i < players.size(); i++) {
+                if (players.get(i).equals(user)) {
+                    return i;//always will be number between 0 and max players-1
+                }
+            }
+        }
+        return null;//if player is not in list
     }
 
     public boolean leaveLobby(User user) {
