@@ -1,7 +1,6 @@
 package de.communication;
 
 
-import de.constants.MessageIdentifier;
 import de.model.ServerGame;
 import de.model.ServerLobby;
 import de.model.User;
@@ -27,6 +26,9 @@ public class GameWebSocketHandler {
     Map<String, Session> sessions = new ConcurrentHashMap<>();
     Map<String, User> userSessions = new ConcurrentHashMap<>();
     Map<String, ServerLobby> lobbys = new ConcurrentHashMap<>();
+    Map<String, ArrayList<String>> soldierPos = new ConcurrentHashMap<>();
+
+
 
     @OnOpen
     public void onOpen(Session session) {
@@ -97,6 +99,8 @@ public class GameWebSocketHandler {
         } else if (data[0].equals(LOBBY_PLAYERS.toString())) {
             sendPlayerListUpdate(data);
         } else if (data[0].equals(UPDATE_SOLDIER_POS.toString())) {
+            genPosArray(data);
+        } else if (data[0].equals(SEND_UPDATE_SOLDIER_POS.toString())) {
             updatePos(data);
         }
 
@@ -236,7 +240,7 @@ public class GameWebSocketHandler {
         }
     }
 
-    private void updatePos(String[] data) {
+    private void genPosArray(String[] data) {
 
         ServerLobby lobby = findLobby(data);
         if (lobby != null) {
@@ -251,11 +255,16 @@ public class GameWebSocketHandler {
                     if (!sessions.get(data[1]).equals(user.getuSession())) {
                         System.out.println(changedData);
                         //1001 error here ; Server thinks client navigates away/closes?
+                        soldierPos.put(data[1],changedData);
                         user.getuSession().getAsyncRemote().sendText(DataPacker.packData(UPDATE_SOLDIER_POS, DataPacker.stringCombiner(changedData)));
                     }
                 }
             }
         }
+    }
+
+    private void updatePos(String[] data){
+
     }
 
     private Map<String, Session> getSessions() {

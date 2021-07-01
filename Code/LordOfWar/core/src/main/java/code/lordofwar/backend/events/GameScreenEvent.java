@@ -309,7 +309,7 @@ public class GameScreenEvent extends Events {
         System.arraycopy(data, 1, enemyArray, 0, data.length - 1);
         this.enemyUnits.addAll(Arrays.asList(enemyArray));
         //System.out.println(Arrays.toString(enemyArray));
-        gameScreen.createSoldiers(enemyUnits);
+        gameScreen.createSoldiers(new ArrayList<>(Arrays.asList(enemyArray)));
 
     }
 

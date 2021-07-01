@@ -46,7 +46,6 @@ public class GameScreen extends Screens implements Screen {
     private TextButton buttonRecruit;
     private TextButton buttonIncreaseMaxUnits;
 
-    private boolean knowTheWay = false;
     private LinkedList<PathCell> theKnowenWay;
     private Vector3 posCameraDesired;
     private final TiledMap map;
@@ -58,12 +57,6 @@ public class GameScreen extends Screens implements Screen {
     private Label entityDEF;
 
     private final ArrayList<Soldier> ownSoldierArrayList;
-
-    private final ArrayList<Soldier> enemySoldierArrayList;
-    private final ArrayList<Soldier> redSoldierArrayList;
-    private final ArrayList<Soldier> blueSoldierArrayList;
-    private final ArrayList<Soldier> greenSoldierArrayList;
-    private final ArrayList<Soldier> yellowSoldierArrayList;
 
     HashMap<String, Soldier> hashSoldierMap = new HashMap<>();
     private final ArrayList<Castle> enemyCastleArrayList;
@@ -100,8 +93,6 @@ public class GameScreen extends Screens implements Screen {
     private HashMap<Integer, Rectangle> hitboxes;//yeah sorry couldnt come up with a better way to dynamically check than just checking rectangles
     private ArrayList<String> connectedPlayers;
 
-
-    private float sendTimer;
     Image castleImage;
     Image soldierImage;
     Image enemySoldierImage;
@@ -121,11 +112,6 @@ public class GameScreen extends Screens implements Screen {
         cameraDebug = false;
 
         ownSoldierArrayList = new ArrayList<>();
-        enemySoldierArrayList = new ArrayList<>();
-        redSoldierArrayList = new ArrayList<>();
-        blueSoldierArrayList = new ArrayList<>();
-        greenSoldierArrayList = new ArrayList<>();
-        yellowSoldierArrayList = new ArrayList<>();
 
         enemyCastleArrayList = new ArrayList<>();
 
@@ -138,6 +124,7 @@ public class GameScreen extends Screens implements Screen {
         rectangleEnd = null;
         rectangleBounds = new float[4];//0=originX1=originY2=width3=height
         soldierSprite = new Sprite(unitAtlas.findRegion("Character_Green"));
+        enemySprite = new Sprite(unitAtlas.findRegion("Character_Green"));
         loader = new TmxMapLoader();
         camera = new OrthographicCamera();
 
@@ -197,8 +184,6 @@ public class GameScreen extends Screens implements Screen {
         myCastleHB.setHeight(myCastleHB.getHeight() - 64);
         hitboxes.put(castle.hashCode(), myCastleHB);
 
-        sendTimer=0;
-
         setupUI();
 
     }
@@ -253,7 +238,6 @@ public class GameScreen extends Screens implements Screen {
                             default:
                                 break;
                         }
-
                         //rectange should be reset no matter what
                         rectangleEnd = null;
                         rectangleStart = null;
@@ -329,7 +313,7 @@ public class GameScreen extends Screens implements Screen {
         a.add(game.getSessionID());
         a.add(gameScreenEvent.getLobbyID());
         a.add(String.valueOf(castle.getTeam().getStartingPos()));
-        for (Soldier s : enemySoldierArrayList) {
+        for (Soldier s : hashSoldierMap.values()) {
             s.draw(renderer.getBatch());
         }
 
@@ -403,11 +387,7 @@ public class GameScreen extends Screens implements Screen {
             }
         }
 
-        sendTimer+=delta;
-        if (sendTimer>=1) {
-            gameScreenEvent.updateSoldierPos(a);
-            sendTimer=0;
-        }
+        gameScreenEvent.updateSoldierPos(a);
 
         //send a here
         if (mapDebug) {
@@ -928,56 +908,32 @@ public class GameScreen extends Screens implements Screen {
     }
 
     public void createSoldiers(ArrayList<String> enemyArrList) {
-
         int startPos = Integer.parseInt(enemyArrList.get(0));
-
-        if (enemySoldierArrayList != null) {
+        Team team = new Team(startPos);
+        Set<String> hashCompareSet = new HashSet<>();
+        if (hashSoldierMap != null) {
             for (int i = 1; i < enemyArrList.size(); i += 2) {
-                System.out.println(enemySoldierArrayList);//todo löschen wenn es geht
                 String[] pos = enemyArrList.get(i).split(",");//x and y pos
+                hashCompareSet.add(enemyArrList.get(i + 1));//add hashcode to list no matter what
                 if (!hashSoldierMap.containsKey(enemyArrList.get(i + 1))) {
                     //POsition [x anzahl von koordinaten und hashcodes]
-                    Team team = new Team(startPos);
                     enemySprite.setColor(team.getColor());
                     Soldier soldier = new Soldier(enemySprite, collisionUnitLayer, team);
                     soldier.setPosition(Float.parseFloat(pos[0]), Float.parseFloat(pos[1]));
                     hashSoldierMap.put(enemyArrList.get(i + 1), soldier);
-
-                    switch (startPos) {
-                        case 0:
-                            redSoldierArrayList.add(soldier);
-                            break;
-                        case 1:
-                            blueSoldierArrayList.add(soldier);
-                            break;
-                        case 2:
-                            greenSoldierArrayList.add(soldier);
-                            break;
-                        case 3:
-                            yellowSoldierArrayList.add(soldier);
-                            break;
-                        default:
-                            //THIS SHOULD NEVER HAPPEN
-                            System.err.println("Unexpected value: " + startPos);//max of 4 players; thus error
-                    }
                 } else {
                     hashSoldierMap.get(enemyArrList.get(i + 1)).setPosition(Float.parseFloat(pos[0]), Float.parseFloat(pos[1]));
                 }
             }
-            enemySoldierArrayList.removeAll(redSoldierArrayList);
-            enemySoldierArrayList.addAll(redSoldierArrayList);
-            enemySoldierArrayList.removeAll(blueSoldierArrayList);
-            enemySoldierArrayList.addAll(blueSoldierArrayList);
-            enemySoldierArrayList.removeAll(greenSoldierArrayList);
-            enemySoldierArrayList.addAll(greenSoldierArrayList);
-            enemySoldierArrayList.removeAll(yellowSoldierArrayList);
-            enemySoldierArrayList.addAll(yellowSoldierArrayList);
+            //how to handle a dead soldier?
+            for (Map.Entry<String, Soldier> entry : hashSoldierMap.entrySet()) {
+                if (entry.getValue().getTeam().getStartingPos() == team.getStartingPos()) {//check if current team
+                    if (!hashCompareSet.contains(entry.getKey())) {//check if entry does not contain key
+                        hashSoldierMap.remove(entry.getKey());//remove soldier if he wasnt contained in the message
+                    }
+                }
+            }
         }
-        //hashmap to check if soldier already exists
-        //every time a team (starting position) sends data: drop/update the old list
-        //Hashmap<Integer,Soldier> Hashcode=key erstellter Soldier=value
-        //in Render eine for each methode machen die durch das Mapset iteriert und alles zeichnet
-
     }
 
 }

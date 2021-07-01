@@ -15,5 +15,6 @@ public enum MessageIdentifier {
     LOBBY_PLAYERS,
     GAME_START,
     GET_LOBBY_INFO,
-    UPDATE_SOLDIER_POS
+    UPDATE_SOLDIER_POS,
+    SEND_UPDATE_SOLDIER_POS
 }
