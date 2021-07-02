@@ -7,7 +7,7 @@ import java.sql.SQLException;
 
 public class DBCreator {
     //TODO get adress etc
-    public static final String dbURL = "jdbc:postgresql://localhost:5432/game";
+    public static final String dbURL = "jdbc:postgresql://localhost:5432/Players";
     public static final String uName = "postgres";
     public static final String password = "admin123";
 

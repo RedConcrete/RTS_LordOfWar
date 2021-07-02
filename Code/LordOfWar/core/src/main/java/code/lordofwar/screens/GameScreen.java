@@ -278,6 +278,8 @@ public class GameScreen extends Screens implements Screen {
         soldierLabel.setText(castle.getVillager());
         goldLabel.setText(castle.getGold());
 
+        castle.draw(renderer.getBatch());
+
         for (Castle c : enemyCastleArrayList) {
             c.draw(renderer.getBatch());
 
