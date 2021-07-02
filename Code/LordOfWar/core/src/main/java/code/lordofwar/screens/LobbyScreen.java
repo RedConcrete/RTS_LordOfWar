@@ -109,8 +109,6 @@ public class LobbyScreen extends Screens implements Screen {
         playerList.setItems(playerNameArr);//no point to this anymore right?
 
         List<String> gameInfoList = new List<>(skin);
-        String[] gameInfo=new String[gameInfoArr.length-1];
-        System.arraycopy(gameInfoArr,0,gameInfo,0, gameInfoArr.length-1);
         gameInfoList.setItems(gameInfoArr);
 
 
