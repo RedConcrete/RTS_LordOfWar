@@ -9,10 +9,11 @@ import java.sql.Statement;
 
 public class DBCreator {
     //TODO get adress etc
-    public static final String dbURL = "jdbc:postgresql://localhost:5432/game";
+    public static final String dbURL = "jdbc:postgresql://localhost:5432/postgres";
     public static final String uName = "postgres";
     public static final String password = "admin123";
 
+    /*
     private static final String DB_CREATION_DDL_SCRIPT =
             "CREATE SCHEMA public;\n" +
                     "CREATE TABLE Player(\n" +
@@ -45,6 +46,8 @@ public class DBCreator {
             statement.executeUpdate(DB_CREATION_DDL_SCRIPT);
         }
     }
+
+    */
     public static Connection connector(String dbURL, String userName, String userPassword) throws SQLException {
         return DriverManager.getConnection(dbURL, userName, userPassword);
     }

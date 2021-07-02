@@ -30,7 +30,6 @@ public class LobbyCreateScreenEvent extends Events{
         lobbyArr.add(String.valueOf(lobby.getPlayerAmount()));//4
         lobbyArr.add(lobby.getGamemode());//5
 
-        System.out.println(lobbyArr);
         webSocket.send(DataPacker.packData(CREATE_LOBBY, DataPacker.stringCombiner(lobbyArr)));
     }
 
@@ -42,7 +41,6 @@ public class LobbyCreateScreenEvent extends Events{
         if (arr[1].equals("true")) {
             lobbyID = arr[2];
             isCreated = true;
-            System.out.println(getLobbyID());
         }
     }
 

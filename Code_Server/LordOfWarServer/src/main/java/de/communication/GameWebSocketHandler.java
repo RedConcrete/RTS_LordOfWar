@@ -14,6 +14,7 @@ import javax.websocket.server.ServerEndpoint;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static de.constants.Constants.STRINGSEPERATOR;
 import static de.constants.MessageIdentifier.*;
@@ -156,6 +157,7 @@ public class GameWebSocketHandler {
         if (lobby.getGame() == null) {
             ArrayList<String> changedData = new ArrayList<>(lobby.getPlayerNames());
             changedData.add(String.valueOf(lobby.getPlayerOrder(userSessions.get(data[1]))));
+            System.out.println(changedData);
             sessions.get(data[1]).getAsyncRemote().sendText(DataPacker.packData(LOBBY_PLAYERS, DataPacker.stringCombiner(changedData)));
         }
     }
@@ -246,7 +248,6 @@ public class GameWebSocketHandler {
                 for (User user : lobby.getPlayers()) {
                     if (!sessions.get(data[1]).equals(user.getuSession())) {
                         //1001 error here ; Server thinks client navigates away/closes?
-                        soldierPos.put(data[1],changedData);
                         user.getuSession().getAsyncRemote().sendText(DataPacker.packData(UPDATE_SOLDIER_POS, DataPacker.stringCombiner(changedData)));
                     }
                 }

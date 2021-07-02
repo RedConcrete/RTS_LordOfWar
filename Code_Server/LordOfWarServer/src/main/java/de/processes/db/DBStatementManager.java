@@ -11,12 +11,12 @@ public class DBStatementManager {
 
     public static void main(String[] args) throws Exception {
         //TODO config db
-        DBCreator.createDB();
+        //DBCreator.createDB();
         //DBStatementManager db=new DBStatementManager();
         //db.createUser("AlphA","TesT");
-       // db.updateUserScore(10,"AlphA");
-       // System.out.println(db.getUser("AlphA"));
-       // db.deleteUser("AlphA");
+        // db.updateUserScore(10,"AlphA");
+        // System.out.println(db.getUser("AlphA"));
+        // db.deleteUser("AlphA");
         //System.out.println(db.getUser("AlphA"));
     }
 

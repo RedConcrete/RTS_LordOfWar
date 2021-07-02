@@ -31,7 +31,6 @@ public class RegisterScreenEvent extends Events{
     }
 
     public void setRegisterAnswer(String[] strings) {
-        System.out.println(strings[1]);
         registerAnswer = strings[1].equals("true");
     }
 }

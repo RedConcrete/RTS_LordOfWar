@@ -43,7 +43,6 @@ public class GameWebSocketListener extends WebSocketListener {
 
     @Override
     public void onMessage(@NotNull WebSocket webSocket, @NotNull String message) {
-        System.out.println(message);
         String[] dataArray = depackData(message);
         checkDataDir(dataArray);
     }
@@ -89,7 +88,6 @@ public class GameWebSocketListener extends WebSocketListener {
             }
         } else if (strings[0].equals(UPDATE_SOLDIER_POS.toString())) {
             if (game.getScreen() instanceof GameScreen) {
-                System.out.println(Arrays.toString(strings));
                 ((GameScreen) game.getScreen()).getGameScreenEvent().processSoilders(strings);
             }
         }
