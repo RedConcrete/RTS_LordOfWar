@@ -2,6 +2,7 @@ package code.lordofwar.screens;
 
 import code.lordofwar.backend.*;
 import code.lordofwar.backend.events.GameScreenEvent;
+import code.lordofwar.backend.interfaces.CombatEntity;
 import code.lordofwar.main.LOW;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -57,6 +58,7 @@ public class GameScreen extends Screens implements Screen {
     private HashMap<Integer, Soldier> ownSoldierHashMap;
     private HashMap<String, Soldier> enemySoldierHashMap = new HashMap<>();
     private final ArrayList<Castle> enemyCastleArrayList;
+    private HashMap<String, Castle> enemyCastleMap;
 
     private Sprite soldierSprite;
     private Sprite enemySprite;
@@ -113,6 +115,7 @@ public class GameScreen extends Screens implements Screen {
         ownSoldierHashMap = new HashMap<>();
 
         enemyCastleArrayList = new ArrayList<>();
+        enemyCastleMap = new HashMap<>();
 
         soldierLabel = new Label("", skin);
         goldLabel = new Label("", skin);
@@ -172,11 +175,9 @@ public class GameScreen extends Screens implements Screen {
         castle = new Castle(castleSprite, collisionUnitLayer, new Team(startingPosition));
         castle.setPosition(castlePosition[0], castlePosition[1]);
 
-        //TODO add castles to HB map
-        for (int i = 0; i < startingCastle; i++) {
-            //todo Castle neu ändern!! (objekte erzeugen und dann in das Array)
-            castle.setPosition(castlePosition[0], castlePosition[1]);
-        }
+        //TODO get enemy castles and add them to enemyCastleMap
+        //TODO add enemy castles to hitboxes  ()
+
         Rectangle myCastleHB = new Rectangle(castle.getBoundingRectangle());
         myCastleHB.setWidth(myCastleHB.getWidth());
         myCastleHB.setHeight(myCastleHB.getHeight() - 64);
@@ -383,11 +384,13 @@ public class GameScreen extends Screens implements Screen {
             if (s.isAlive()) {
                 if (s.canAttack()) {
                     for (Map.Entry<String, Rectangle> hitbox : enemyHitboxes.entrySet()) {
-                        if (enemySoldierHashMap.get(hitbox.getKey()).isAlive()) {
-                            if (s.getTarget() == null || enemySoldierHashMap.get(hitbox.getKey()) == s.getTarget()) {
+                        HashMap<String, CombatEntity> enemyMap = new HashMap<>(enemySoldierHashMap);
+                        enemyMap.putAll(enemyCastleMap);
+                        if (enemyMap.get(hitbox.getKey()).isAlive()) {
+                            if (s.getTarget() == null || enemyMap.get(hitbox.getKey()) == s.getTarget()) {
                                 if (s.getCombatReach().overlaps(hitbox.getValue())) {
                                     //  enemySoldierHashMap.get(hitbox.getKey()).receiveDmg(s.dealDmg());//transmit dmg to appropiate color via msg instead of calculating here?
-                                    gameScreenEvent.sendAtkRequest(s.dealDmg(), hitbox.getKey(), enemySoldierHashMap.get(hitbox.getKey()));//send atk data
+                                    gameScreenEvent.sendAtkRequest(s.dealDmg(), hitbox.getKey(), enemyMap.get(hitbox.getKey()));//send atk data
                                 }
                             }
                         }
@@ -904,7 +907,7 @@ public class GameScreen extends Screens implements Screen {
         //pathingCollisionMap.getCell((int) (v.getX()+32)/64, (int) (v.getY()+32)/64).getTile().getProperties().clear();
         HashMap<Integer, Rectangle> tempHitboxes = hitboxes;
         tempHitboxes.remove(v.hashCode());
-        HashSet<Rectangle> tempHitboxesColl=new HashSet<>(tempHitboxes.values());
+        HashSet<Rectangle> tempHitboxesColl = new HashSet<>(tempHitboxes.values());
         tempHitboxesColl.addAll(enemyHitboxes.values());
         PathCell p = new Pathfinding(xTile, yTile, (int) v.getX() + 32, (int) v.getY() + 32, pathingCollisionMap, tempHitboxesColl).algorithm();
         LinkedList<PathCell> cellList = new LinkedList<>();
