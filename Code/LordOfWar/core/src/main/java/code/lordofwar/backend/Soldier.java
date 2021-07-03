@@ -1,32 +1,32 @@
 package code.lordofwar.backend;
 
+import code.lordofwar.backend.interfaces.AbstractCombatEntity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.List;
 
-public class Soldier extends Sprite {
+public class Soldier extends AbstractCombatEntity {
 
+    public final static String UNIT_TYPE = "SOLDIER";
     private boolean selected;
     private Vector2 velocity = new Vector2();
     private float speed = 60 * 2;
-    private int hp;
     private List<PathCell> destination;
 
-    private Team team;
     private Sprite sprite;
     private TiledMapTileLayer collisionLayer;
 
+
     public Soldier(Sprite sprite, TiledMapTileLayer collisionLayer, Team team) {
-        super(sprite);
+        super(sprite, 50, 3, 1, 10, 1, team);
         this.sprite = sprite;
         this.collisionLayer = collisionLayer;
-        hp = 50;
         destination = null;
-        this.team = team;
     }
 
     @Override
@@ -36,9 +36,11 @@ public class Soldier extends Sprite {
     }
 
     private void update(float deltaTime) {
+        if (this.getCombatTimer() < this.getCombatTimerLimit()) {
+            this.incrementCombatTimer(deltaTime);
+        }
         endOfMapCollision();
-        setPosition(getX() + velocity.x * deltaTime,getY()+ velocity.y * deltaTime);
-        objectCollision(deltaTime);
+        setPosition(getX() + velocity.x * deltaTime, getY() + velocity.y * deltaTime);
     }
 
     private void endOfMapCollision() {
@@ -56,108 +58,9 @@ public class Soldier extends Sprite {
 
     }
 
-
-    private void objectCollision(float deltaTime) {
-//
-//        //Todo https://youtu.be/DOpqkaX9844 Fix Colloison
-
-
-
-//
-//        float oldX = getX(), oldY = getY(), tileWidth = collisionLayer.getTileWidth(), tileHeight = collisionLayer.getTileHeight();
-//        boolean collisionX= false, collisionY = false;
-//
-
-//
-//        if (velocity.x < 0) {
-//
-//            //Top left
-//            collisionX = collisionLayer.getCell((int) (getX() / tileWidth), (int) ((getY() + getHeight()) / tileHeight))
-//                    .getTile().getProperties().containsKey("isCastle");
-//
-//            //Middel left
-//            if(!collisionX)
-//                collisionX = collisionLayer.getCell((int) (getX() / tileWidth), (int) ((getY() + getHeight() / 2) / tileHeight))
-//                        .getTile().getProperties().containsKey("isCastle");
-//
-//            //Bottem left
-//            if(!collisionX)
-//                collisionX = collisionLayer.getCell((int) (getX() / tileWidth), (int) (getY() / tileHeight))
-//                        .getTile().getProperties().containsKey("isCastle");
-//
-//        } else if (velocity.x > 0) {
-//
-//            //rechts mitte
-//            collisionX = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) ((getY() + getHeight() / 2) / tileHeight)).getTile().getProperties().containsKey("blocked");
-//
-//            //Top right
-//            collisionX = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) ((getY() + getHeight()) / tileHeight))
-//                    .getTile().getProperties().containsKey("isCastle");
-//
-//            //Middel right
-//            if(!collisionX)
-//                collisionX = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) ((getY() + getHeight() / 2) / tileHeight))
-//                        .getTile().getProperties().containsKey("isCastle");
-//
-//            //Bottem right
-//            if(!collisionX)
-//                collisionX = collisionLayer.getCell((int) ((getX() + getWidth())/ tileWidth), (int) (getY() / tileHeight))
-//                        .getTile().getProperties().containsKey("isCastle");
-//
-//        }
-//
-//        //react to x coll
-//        if(collisionX){
-//            setX(oldX);
-//            velocity.x = 0;
-//        }
-//
-//        // moving in y
-
-//
-//
-//        if (velocity.y < 0) {
-//
-//            //bottom left
-//            collisionY = collisionLayer.getCell((int) (getX() / tileWidth), (int) (getY()  / tileHeight))
-//                    .getTile().getProperties().containsKey("isCastle");
-//            //bottom Middel
-//            if(!collisionY)
-//                collisionY = collisionLayer.getCell((int) ((getX() + getWidth() / 2) / tileWidth ), (int) (getY() / tileHeight))
-//                        .getTile().getProperties().containsKey("isCastle");
-//            //bottem right
-//            if(!collisionY)
-//                collisionY = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) (getY() / tileHeight))
-//                        .getTile().getProperties().containsKey("isCastle");
-//
-//
-//        } else if (velocity.y > 0) {
-//
-//            //Top left
-//            collisionY = collisionLayer.getCell((int) (getX()  / tileWidth), (int) ((getY() + getHeight()) / tileHeight))
-//                    .getTile().getProperties().containsKey("isCastle");
-//            //Top middel
-//            if(!collisionY)
-//                collisionY = collisionLayer.getCell((int) ((getX() + getWidth() / 2) / tileWidth), (int) ((getY() + getHeight()/2) / tileHeight))
-//                        .getTile().getProperties().containsKey("isCastle");
-//            //Top right
-//            if(!collisionY)
-//                collisionY = collisionLayer.getCell((int) ((getX() + getWidth()) / tileWidth), (int) ((getY() + getHeight()) / tileHeight))
-//                        .getTile().getProperties().containsKey("isCastle");
-//
-//        }
-//
-//        //react to y coll
-//        if(collisionY){
-//            setY(oldY);
-//            velocity.y = 0;
-//        }
-//
-    }
-
     @Override
     public String toString() {
-        return this.getX() +","+  this.getY();
+        return this.getX() + "," + this.getY();
     }
 
     public TiledMapTileLayer getCollisionLayer() {
@@ -176,14 +79,6 @@ public class Soldier extends Sprite {
         return selected;
     }
 
-    public int getHp() {
-        return hp;
-    }
-
-    public void setHp(int hp) {
-        this.hp = hp;
-    }
-
     public List<PathCell> getDestination() {
         return destination;
     }
@@ -192,15 +87,27 @@ public class Soldier extends Sprite {
         this.destination = destination;
     }
 
-    public Team getTeam() { return team; }
-
-    public void setTeam(Team team) {
-        this.team = team;
-    }
-
     public void setSprite(Sprite sprite) {
         this.sprite = sprite;
     }
 
-    public Sprite getSprite() { return sprite; }
+    public Sprite getSprite() {
+        return sprite;
+    }
+
+    @Override
+    public void die() {
+        this.setAlive(false);
+        //TODO do i need to do more here?
+    }
+
+    @Override
+    public Rectangle getCombatReach() {
+        return new Rectangle(getX() - getBoundingRectangle().getWidth(), getY() - getBoundingRectangle().getHeight(), getBoundingRectangle().getWidth() * 3, getBoundingRectangle().getHeight() * 3);
+    }
+
+    @Override
+    public String getUnitType() {
+        return UNIT_TYPE;
+    }
 }

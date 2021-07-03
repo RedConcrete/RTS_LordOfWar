@@ -1,16 +1,12 @@
 package code.lordofwar.backend;
 
-import code.lordofwar.backend.events.GameScreenEvent;
 import code.lordofwar.main.LOW;
 import code.lordofwar.screens.*;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
-import okio.ByteString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Arrays;
 
 import static code.lordofwar.backend.Constants.STRINGSEPERATOR;
 import static code.lordofwar.backend.MessageIdentifier.*;
@@ -43,7 +39,7 @@ public class GameWebSocketListener extends WebSocketListener {
 
     @Override
     public void onMessage(@NotNull WebSocket webSocket, @NotNull String message) {
-        System.out.println(message);
+
         String[] dataArray = depackData(message);
         checkDataDir(dataArray);
     }
@@ -89,8 +85,12 @@ public class GameWebSocketListener extends WebSocketListener {
             }
         } else if (strings[0].equals(UPDATE_SOLDIER_POS.toString())) {
             if (game.getScreen() instanceof GameScreen) {
-                System.out.println(Arrays.toString(strings));
-                ((GameScreen) game.getScreen()).getGameScreenEvent().processSoilders(strings);
+                ((GameScreen) game.getScreen()).getGameScreenEvent().processSoldiers(strings);
+            }
+        }else if (strings[0].equals(UPDATE_UNIT_HEALTH.toString())){
+            if (game.getScreen() instanceof GameScreen) {
+                System.out.println("processing");
+                ((GameScreen) game.getScreen()).getGameScreenEvent().receiveDmg(strings);
             }
         }
     }

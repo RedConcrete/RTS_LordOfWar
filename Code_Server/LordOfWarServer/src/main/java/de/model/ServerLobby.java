@@ -1,14 +1,8 @@
 package de.model;
 
-import de.communication.DataPacker;
-import org.graalvm.collections.Pair;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import static de.constants.MessageIdentifier.JOIN_LOBBY;
-import static de.constants.MessageIdentifier.LOBBY_PLAYERS;
 
 
 public class ServerLobby {
@@ -73,8 +67,14 @@ public class ServerLobby {
      */
     public Integer getPlayerOrder(User user) {
         if (players.contains(user)) {//player exists
+            User[] users;
+            //changed this so order stays static while ingame
+            if (game != null) {
+                users = game.getPlayers();
+            } else users = players.toArray(new User[0]);
+
             for (int i = 0; i < players.size(); i++) {
-                if (players.get(i).equals(user)) {
+                if (users[i].equals(user)) {//will remain static once game starts
                     return i;//always will be number between 0 and max players-1
                 }
             }

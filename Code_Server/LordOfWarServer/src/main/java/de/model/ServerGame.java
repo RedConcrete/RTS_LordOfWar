@@ -48,4 +48,8 @@ public class ServerGame {
     }
     //TODO add score to keep track for each player
     //TODO add rest of relevant code(not part of my userstory)
+
+    public User[] getPlayers(){
+        return players;
+    }
 }
