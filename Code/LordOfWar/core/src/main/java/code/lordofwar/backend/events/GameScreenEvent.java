@@ -1,11 +1,10 @@
 package code.lordofwar.backend.events;
 
 import code.lordofwar.backend.DataPacker;
-import code.lordofwar.backend.Soldier;
 import code.lordofwar.backend.Team;
+import code.lordofwar.backend.interfaces.CombatEntity;
 import code.lordofwar.main.LOW;
 import code.lordofwar.screens.GameScreen;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Camera;
@@ -14,6 +13,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import kotlin.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -297,14 +297,36 @@ public class GameScreenEvent extends Events {
         webSocket.send(DataPacker.packData(UPDATE_SOLDIER_POS, DataPacker.stringCombiner(a)));
     }
 
+    public void sendAtkRequest(Pair<Integer, Integer> dmgPair, String enemyHashcode, CombatEntity entity) {
+        //Syntax: [MI,lobbyID,starting STARTING POSITION (of enemy),UNITTYPE(Soldier or castle),enemy hashcode, DAMAGE TYPE,ATK]
+        //      UPDATE_UNIT_HEALTH,entity.getTeam(),entity.getUnitType(),dmgPair.getFirst(),dmgPair.getSecond();
+        ArrayList<String> atkData = new ArrayList<>();
+        atkData.add(String.valueOf(entity.getTeam().getStartingPos()));
+        atkData.add(lobbyID);
+        atkData.add(entity.getUnitType());
+        atkData.add(enemyHashcode);
+        atkData.add(String.valueOf(dmgPair.getFirst()));
+        atkData.add(String.valueOf(dmgPair.getSecond()));
+        webSocket.send(DataPacker.packData(UPDATE_UNIT_HEALTH, DataPacker.stringCombiner(atkData)));
+    }
+
+    public void receiveDmg(String[] dmgData) {
+        //Syntax: [MI,UNITTYPE(Soldier or castle),enemy hashcode, DAMAGE TYPE,ATK]
+        String unitType = dmgData[1];
+        Integer unitHash = Integer.parseInt(dmgData[2]);
+        Integer dmgType = Integer.parseInt(dmgData[3]);
+        Integer dmg = Integer.parseInt(dmgData[4]);
+        gameScreen.processDmg(unitType, unitHash, dmgType, dmg);
+    }
+
     public String getLobbyID() {
         return lobbyID;
     }
 
-    public void processSoilders(String[] data) {
+    public void processSoldiers(String[] data) {
 
         // data [0] = MessageID / data [1] = startigPos / data[2] = x Pos,y Pos / data[3] = SoldatenHash
-        String[] enemyArray = new String[data.length-1];
+        String[] enemyArray = new String[data.length - 1];
         System.arraycopy(data, 1, enemyArray, 0, data.length - 1);
         this.enemyUnits.addAll(Arrays.asList(enemyArray));
         gameScreen.createSoldiers(new ArrayList<>(Arrays.asList(enemyArray)));

@@ -8,28 +8,28 @@ import java.sql.SQLException;
 public class DBCreator {
     //TODO get adress etc
     public static final String dbURL = "jdbc:postgresql://localhost:5432/postgres";
+   // public static final String dbURL = "jdbc:postgresql://localhost:5432/Players";
     public static final String uName = "postgres";
     public static final String password = "admin123";
 
     /*
-    private static final String DB_CREATION_DDL_SCRIPT =
-            "CREATE SCHEMA public;\n" +
-                    "CREATE TABLE Player(\n" +
-                    " UserID INT8 NOT NULL,\n" +
-                    " UserName VARCHAR(50) NOT NULL,\n" +
-                    " PassWord VARCHAR(50) NOT NULL,\n" +
-                    " Score INT8,\n" +
-                    " primary key (UserID)\n" +
-                    ");\n" +
-                    //creating id incrementer
-                    "CREATE SEQUENCE idGenerator\n" +
-                    "INCREMENT 1\n" +
-                    "MINVALUE 1\n" +
-                    "START 1;\n"
-                    //creating indexes
-                    + "CREATE INDEX userLoginIndex On Player(UserName,PassWord);\n"
-                    + "CREATE INDEX userGetIndex On Player USING hash(UserName);\n";
-
+        private static final String DB_CREATION_DDL_SCRIPT =
+                "CREATE SCHEMA public;\n" +
+                        "CREATE TABLE Player(\n" +
+                        " UserID INT8 NOT NULL,\n" +
+                        " UserName VARCHAR(50) NOT NULL,\n" +
+                        " PassWord VARCHAR(50) NOT NULL,\n" +
+                        " Score INT8,\n" +
+                        " primary key (UserID)\n" +
+                        ");\n" +
+                        //creating id incrementer
+                        "CREATE SEQUENCE idGenerator\n" +
+                        "INCREMENT 1\n" +
+                        "MINVALUE 1\n" +
+                        "START 1;\n"
+                        //creating indexes
+                        + "CREATE INDEX userLoginIndex On Player(UserName,PassWord);\n"
+                        + "CREATE INDEX userGetIndex On Player USING hash(UserName);\n";
 
     public static void createDB() throws ClassNotFoundException, SQLException{
         Class.forName(org.hsqldb.jdbcDriver.class.getName());//TODO insert proper drivers into project
