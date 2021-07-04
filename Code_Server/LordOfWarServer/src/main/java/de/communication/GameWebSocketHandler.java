@@ -157,6 +157,7 @@ public class GameWebSocketHandler {
         if (lobby.getGame() == null) {
             ArrayList<String> changedData = new ArrayList<>(lobby.getPlayerNames());
             changedData.add(String.valueOf(lobby.getPlayerOrder(userSessions.get(data[1]))));
+            System.out.println(changedData);
             sessions.get(data[1]).getAsyncRemote().sendText(DataPacker.packData(LOBBY_PLAYERS, DataPacker.stringCombiner(changedData)));
         }
     }

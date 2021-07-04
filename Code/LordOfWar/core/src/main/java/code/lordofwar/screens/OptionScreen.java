@@ -154,13 +154,13 @@ public class OptionScreen extends Screens implements Screen {
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
 
                 Graphics.DisplayMode currentMode = Gdx.graphics.getDisplayMode();
-                System.out.println(fullscreenButton.getX() + STRINGSEPERATOR + fullscreenButton.getY());
+                //System.out.println(fullscreenButton.getX() + STRINGSEPERATOR + fullscreenButton.getY());
 
                 if (!Gdx.graphics.isFullscreen()) {
                     Gdx.graphics.setFullscreenMode(currentMode);
                     stage.getViewport().setScreenWidth(currentMode.width);
                     stage.getViewport().setScreenHeight(currentMode.height);
-                    System.out.println(fullscreenButton.getX() + STRINGSEPERATOR + fullscreenButton.getY());
+                    //System.out.println(fullscreenButton.getX() + STRINGSEPERATOR + fullscreenButton.getY());
                     fullscreenButton.setText("Fullscreen OFF");
                 } else {
                     Gdx.graphics.setWindowedMode(WORLD_WIDTH_PIXEL, WORLD_HEIGHT_PIXEL);

@@ -33,13 +33,7 @@ public class Pathfinding {
         this.collisionLayer = collisionLayer;
         this.hitboxes = hitboxes;
         getStartAndEndCell(xPosUnit, yPosUnit, xClicked, yClicked);
-        //if (!checkPossible(xClicked, yClicked)) {
-
         cache = new Vector2(xStartCell, yStartCell);
-        //} else {
-
-        //System.out.println("impossible");
-        //}
     }
 /*
     private boolean checkPossible(int x, int y) {
