@@ -270,7 +270,7 @@ public class GameScreenEvent extends Events {
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            System.out.println("sdfadssa");
+
         }
 
     }
@@ -329,7 +329,6 @@ public class GameScreenEvent extends Events {
         String[] enemyArray = new String[data.length - 1];
         System.arraycopy(data, 1, enemyArray, 0, data.length - 1);
         this.enemyUnits.addAll(Arrays.asList(enemyArray));
-        //System.out.println(Arrays.toString(enemyArray));
         gameScreen.createSoldiers(new ArrayList<>(Arrays.asList(enemyArray)));
 
     }
