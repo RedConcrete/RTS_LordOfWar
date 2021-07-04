@@ -11,9 +11,9 @@ import de.processes.Register;
 import javax.enterprise.context.ApplicationScoped;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static de.constants.Constants.STRINGSEPERATOR;
@@ -27,7 +27,7 @@ public class GameWebSocketHandler {
     private Map<String, Session> sessions = new ConcurrentHashMap<>();
     private Map<String, User> userSessions = new ConcurrentHashMap<>();
     private Map<String, ServerLobby> lobbys = new ConcurrentHashMap<>();
-    private DataManager dataManager=new DataManager();
+    private DataManager dataManager = new DataManager();
 
     @OnOpen
     public void onOpen(Session session) {
@@ -38,9 +38,9 @@ public class GameWebSocketHandler {
     }
 
     // @OnClose
-   // public void onClose() {//two players in one lobby : result both close
-   //     System.out.println("closed");
-   // }
+    // public void onClose() {//two players in one lobby : result both close
+    //     System.out.println("closed");
+    // }
 
     @OnError
     public void onError(Throwable throwable) {
@@ -49,13 +49,14 @@ public class GameWebSocketHandler {
 
     @OnMessage
     public void onMessage(String message) {
-        System.out.println(message);
+       // System.out.println(message);
         String[] dataArray = depackData(message);
         checkDataDir(dataArray);
     }
+
     @OnClose
     public void onClose(Session session,
-                        CloseReason closeReason){
+                        CloseReason closeReason) {
         System.out.println(session.getId());
         System.out.println(closeReason.toString());
     }
@@ -98,6 +99,9 @@ public class GameWebSocketHandler {
             sendPlayerListUpdate(data);
         } else if (data[0].equals(UPDATE_SOLDIER_POS.toString())) {
             genPosArray(data);
+        } else if (data[0].equals(UPDATE_UNIT_HEALTH.toString())) {
+            System.out.println("recieved data "+ Arrays.toString(data));
+            updateUnitHealth(data);
         }
 
     }
@@ -157,7 +161,6 @@ public class GameWebSocketHandler {
         if (lobby.getGame() == null) {
             ArrayList<String> changedData = new ArrayList<>(lobby.getPlayerNames());
             changedData.add(String.valueOf(lobby.getPlayerOrder(userSessions.get(data[1]))));
-            System.out.println(changedData);
             sessions.get(data[1]).getAsyncRemote().sendText(DataPacker.packData(LOBBY_PLAYERS, DataPacker.stringCombiner(changedData)));
         }
     }
@@ -251,6 +254,21 @@ public class GameWebSocketHandler {
                         user.getuSession().getAsyncRemote().sendText(DataPacker.packData(UPDATE_SOLDIER_POS, DataPacker.stringCombiner(changedData)));
                     }
                 }
+            }
+        }
+    }
+
+    private void updateUnitHealth(String[] data) {
+//Syntax: [MI,lobbyID,starting STARTING POSITION (of enemy),UNITTYPE(Soldier or castle),enemy hashcode, DAMAGE TYPE,ATK]
+        ServerLobby lobby = findLobby(data);
+        if (lobby != null) {
+            if (lobby.getGame() != null) {
+                ArrayList<String> updateData = new ArrayList<>();
+                updateData.add(data[3]);//unittype
+                updateData.add(data[4]);//hashcode
+                updateData.add(data[5]);//dmgtype
+                updateData.add(data[6]);//dmg
+                lobby.getGame().getPlayers()[Integer.parseInt(data[1])].getuSession().getAsyncRemote().sendText(DataPacker.packData(UPDATE_UNIT_HEALTH, DataPacker.stringCombiner(updateData)));
             }
         }
     }

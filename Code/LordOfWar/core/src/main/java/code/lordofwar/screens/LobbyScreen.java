@@ -26,7 +26,8 @@ public class LobbyScreen extends Screens implements Screen {
 
     public LobbyScreen(LOW aGame, Skin aSkin, String[] lobbyInfo) {
         super(aGame, aSkin);
-        this.gameInfoArr = lobbyInfo;
+        gameInfoArr=new String[4];
+        System.arraycopy(lobbyInfo,0,gameInfoArr,0,4);
         playerNameArr = new String[]{""}; // todo alle verbundenen spieler
 
         lobbyScreenEvent = new LobbyScreenEvent(game);
@@ -51,7 +52,6 @@ public class LobbyScreen extends Screens implements Screen {
             //System.out.println(Arrays.toString(gameData));
             game.setScreen(new GameScreen(game, skin, gameData[0],lobbyScreenEvent.getPosition(),lobbyScreenEvent.getPlayers()));//todo insert data here via lobbyScreenEvent.getData
         }
-
         if (!lobbyScreenEvent.isRecievedData()) {//later data requests (map etc) also go here
             lobbyScreenEvent.sendPlayerRequest(gameInfoArr[0]);//possible to move this to the end of setupUi()?
         }
@@ -109,9 +109,7 @@ public class LobbyScreen extends Screens implements Screen {
         playerList.setItems(playerNameArr);//no point to this anymore right?
 
         List<String> gameInfoList = new List<>(skin);
-        String[] gameInfo=new String[gameInfoArr.length-1];
-        System.arraycopy(gameInfoArr,0,gameInfo,0, gameInfoArr.length-1);
-        gameInfoList.setItems(gameInfo);
+        gameInfoList.setItems(gameInfoArr);
 
 
         startButton.addListener(new InputListener() {

@@ -1,29 +1,28 @@
 package code.lordofwar.backend;
 
+import code.lordofwar.backend.interfaces.AbstractCombatEntity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.math.Rectangle;
 
 
-public class Castle extends Sprite {
+public class Castle extends AbstractCombatEntity {
+    public final static String UNIT_TYPE ="CASTLE";
     private boolean selected;
     private int villager;
     private int gold;
-    private int hp;
     private int maxUnits;
     private TiledMapTileLayer collisionLayer;
     private Sprite sprite;
-    private Team team;
 
     public Castle(Sprite sprite, TiledMapTileLayer collisionLayer, Team team) {
-        super(sprite);
-        this.team = team;
+        super(sprite,100,6,1,0,0,team);
         this.collisionLayer = collisionLayer;
         this.sprite = sprite;
         villager = 1;
         gold = 99;
-        hp = 100;
         maxUnits = 50;
         increaseVillagerPerMinute();
         increaseGoldEveryTenSeconds();
@@ -91,14 +90,6 @@ public class Castle extends Sprite {
         return collisionLayer;
     }
 
-    public int getHp() {
-        return hp;
-    }
-
-    public void setHp(int hp) {
-        this.hp = hp;
-    }
-
     public Sprite getSprite() {
         return sprite;
     }
@@ -111,11 +102,18 @@ public class Castle extends Sprite {
         this.maxUnits = maxUnits;
     }
 
-    public Team getTeam() {
-        return team;
+    @Override
+    public void die() {
+        this.setAlive(false);
     }
 
-    public void setTeam(Team team) {
-        this.team = team;
+    @Override
+    public Rectangle getCombatReach() {
+        return null;
+    }//this isnt a combat unit so it shouldnt be capable of attacking
+
+    @Override
+    public String getUnitType() {
+        return UNIT_TYPE;
     }
 }

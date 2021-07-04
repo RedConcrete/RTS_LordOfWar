@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A* Pathfinding
@@ -27,9 +28,9 @@ public class Pathfinding {
     private Vector2 cache;
 
     private TiledMapTileLayer collisionLayer;
-    private HashMap<Integer, Rectangle> hitboxes;
+    private Set<Rectangle> hitboxes;
 
-    public Pathfinding(int xClicked, int yClicked, int xPosUnit, int yPosUnit, TiledMapTileLayer collisionLayer, HashMap<Integer, Rectangle> hitboxes) {
+    public Pathfinding(int xClicked, int yClicked, int xPosUnit, int yPosUnit, TiledMapTileLayer collisionLayer,Set<Rectangle> hitboxes) {
         this.collisionLayer = collisionLayer;
         this.hitboxes = hitboxes;
         getStartAndEndCell(xPosUnit, yPosUnit, xClicked, yClicked);
@@ -124,7 +125,7 @@ public class Pathfinding {
                 if (tile != null) {
                     MapProperties properties = tile.getProperties();
                     if (!properties.containsKey(Constants.BLOCK_TILE_PROPERTY)) {//todo change this to generic blocked
-                        for (Rectangle hitbox : hitboxes.values()) {
+                        for (Rectangle hitbox : hitboxes) {
                             if (hitbox.overlaps(//check wether hitbox overlaps with tile
                                     new Rectangle(((int) pathCell.coords.x) * collisionLayer.getTileWidth()-2, ((int) pathCell.coords.y) * collisionLayer.getTileHeight()-2,
                                             collisionLayer.getTileWidth() - 2, collisionLayer.getTileHeight() - 2))) {//todo put this offset into a variable?
