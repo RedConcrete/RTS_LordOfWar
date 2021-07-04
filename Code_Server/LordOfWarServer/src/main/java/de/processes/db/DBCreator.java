@@ -31,19 +31,20 @@ public class DBCreator {
                         + "CREATE INDEX userLoginIndex On Player(UserName,PassWord);\n"
                         + "CREATE INDEX userGetIndex On Player USING hash(UserName);\n";
 
-        public static void createDB() throws ClassNotFoundException, SQLException{
-            Class.forName(org.hsqldb.jdbcDriver.class.getName());//TODO insert proper drivers into project
-            Connection connection = connector(dbURL, uName, password);
-            Statement statement = connection.createStatement();
-            try {
-                statement.executeUpdate(DB_CREATION_DDL_SCRIPT);
-            } catch (PSQLException e) {
-                System.err.println("Schema »public« is already defined dropping schema and retrying...");
-                System.err.println(e.getMessage());
-                statement.executeUpdate("DROP SCHEMA public CASCADE;");
-                statement.executeUpdate(DB_CREATION_DDL_SCRIPT);
-            }
+    public static void createDB() throws ClassNotFoundException, SQLException{
+        Class.forName(org.hsqldb.jdbcDriver.class.getName());//TODO insert proper drivers into project
+        Connection connection = connector(dbURL, uName, password);
+        Statement statement = connection.createStatement();
+        try {
+            statement.executeUpdate(DB_CREATION_DDL_SCRIPT);
+        } catch (PSQLException e) {
+            System.err.println("Schema »public« is already defined dropping schema and retrying...");
+            System.err.println(e.getMessage());
+            statement.executeUpdate("DROP SCHEMA public CASCADE;");
+            statement.executeUpdate(DB_CREATION_DDL_SCRIPT);
         }
+    }
+
     */
     public static Connection connector(String dbURL, String userName, String userPassword) throws SQLException {
         return DriverManager.getConnection(dbURL, userName, userPassword);
