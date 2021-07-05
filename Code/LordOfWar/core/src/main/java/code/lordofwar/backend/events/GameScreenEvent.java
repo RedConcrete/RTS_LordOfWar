@@ -1,5 +1,6 @@
 package code.lordofwar.backend.events;
 
+import code.lordofwar.backend.Castle;
 import code.lordofwar.backend.DataPacker;
 import code.lordofwar.backend.Soldier;
 import code.lordofwar.backend.Team;
@@ -12,6 +13,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 
@@ -180,9 +182,6 @@ public class GameScreenEvent extends Events {
             camera.update();
         }
 
-        /**
-         * moves the Camera left
-         */
         //mitte links
         if (xClicked <= 5 && yClicked >= 50 && yClicked <= camera.viewportHeight - 50) {
             posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
@@ -274,6 +273,13 @@ public class GameScreenEvent extends Events {
         }
 
     }
+
+    public void setLabelText(Label scoreLabel, Label soldierLabel, Label goldLabel, Castle castle){
+        scoreLabel.setText(gameScreenEvent.getPoints());
+        soldierLabel.setText(castle.getVillager());
+        goldLabel.setText(castle.getGold());
+    }
+
 
     public GameScreenEvent getGameScreenEvent() {
 
