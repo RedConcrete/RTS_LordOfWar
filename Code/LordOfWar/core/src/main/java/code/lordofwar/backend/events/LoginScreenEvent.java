@@ -36,7 +36,6 @@ public class LoginScreenEvent extends Events{
     }
 
     public void setLoginAnswer(String[] strings) {
-        System.out.println(strings[1]);
         loginAnswer = strings[1].equals("true");
     }
 

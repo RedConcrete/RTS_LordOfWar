@@ -14,5 +14,6 @@ public enum MessageIdentifier {
     LEAVE_LOBBY,
     GET_LOBBYS,
     LOBBY_PLAYERS,
-    UPDATE_SOLDIER_POS
+    UPDATE_SOLDIER_POS,
+    UPDATE_UNIT_HEALTH//Syntax: [MI,starting STARTING POSITION (of enemy),UNITTYPE(Soldier or castle), DAMAGE TYPE,ATK]
 }

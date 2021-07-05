@@ -60,7 +60,6 @@ public class LobbyScreenEvent extends Events {
     public void setGameData(String[] gameData) {
         this.gameData = new String[gameData.length - 1];
         if (gameData.length - 1 >= 0) {
-            System.out.println(Arrays.toString(gameData) +" gamedata");
             System.arraycopy(gameData, 1, this.gameData, 0, gameData.length - 1);
             startedGame = true;
         }

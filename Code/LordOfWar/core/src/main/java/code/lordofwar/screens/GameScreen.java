@@ -2,6 +2,7 @@ package code.lordofwar.screens;
 
 import code.lordofwar.backend.*;
 import code.lordofwar.backend.events.GameScreenEvent;
+import code.lordofwar.backend.interfaces.CombatEntity;
 import code.lordofwar.main.LOW;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -24,6 +25,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import kotlin.Pair;
 
 import java.awt.geom.Point2D;
 import java.util.*;
@@ -58,6 +60,16 @@ public class GameScreen extends Screens implements Screen {
     private final int[] mapSizes;
     private OrthogonalTiledMapRenderer renderer;
 
+    private Label entityHp;
+    private Label entityATK;
+
+
+    private HashMap<Integer, Soldier> ownSoldierHashMap;
+    private HashMap<String, Soldier> enemySoldierHashMap = new HashMap<>();
+    private final ArrayList<Castle> enemyCastleArrayList;
+    private HashMap<String, Castle> enemyCastleMap;
+
+
     private TextButton buttonRecruit;
 
     private final Label entityHp;
@@ -85,6 +97,9 @@ public class GameScreen extends Screens implements Screen {
     private Point2D.Float rectangleStart;
     private Point2D.Float rectangleEnd;
     private final float[] rectangleBounds;
+    private HashMap<Integer, Rectangle> hitboxes;//yeah sorry couldnt come up with a better way to dynamically check than just checking rectangles
+    private HashMap<String, Rectangle> enemyHitboxes;//only for enemy units/castles
+    private ArrayList<String> connectedPlayers;
 
 
     public GameScreen(LOW aGame, Skin aSkin, String lobbyID, Integer startingPosition, String[] connectedPlayersArray) {
@@ -92,6 +107,7 @@ public class GameScreen extends Screens implements Screen {
         this.connectedPlayers = ArrayToArraylist(connectedPlayersArray);
         mapDebug = false;
         hitboxes = new HashMap<>();
+        enemyHitboxes = new HashMap<>();
         isRightPressed = false;
         entityName = new Label("", skin);
         castleSprite = new Sprite(mapAtlas.findRegion("Castle"));
@@ -100,9 +116,10 @@ public class GameScreen extends Screens implements Screen {
         posCameraDesired = new Vector3();
         cameraDebug = false;
 
-        ownSoldierArrayList = new ArrayList<>();
+        ownSoldierHashMap = new HashMap<>();
 
         enemyCastleArrayList = new ArrayList<>();
+        enemyCastleMap = new HashMap<>();
 
         soldierLabel = new Label("", skin);
         goldLabel = new Label("", skin);
@@ -160,11 +177,9 @@ public class GameScreen extends Screens implements Screen {
         castle = new Castle(castleSprite, collisionUnitLayer, new Team(startingPosition));
         castle.setPosition(castlePosition[0], castlePosition[1]);
 
-        //TODO add castles to HB map
-        for (int i = 0; i < startingCastle; i++) {
-            //todo Castle neu ändern!! (objekte erzeugen und dann in das Array)
-            castle.setPosition(castlePosition[0], castlePosition[1]);
-        }
+        //TODO get enemy castles and add them to enemyCastleMap
+        //TODO add enemy castles to hitboxes  ()
+
         Rectangle myCastleHB = new Rectangle(castle.getBoundingRectangle());
         myCastleHB.setWidth(myCastleHB.getWidth());
         myCastleHB.setHeight(myCastleHB.getHeight() - 64);
@@ -198,7 +213,7 @@ public class GameScreen extends Screens implements Screen {
                     public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                         switch (event.getButton()) {
                             case Input.Buttons.RIGHT:
-                                for (Soldier s : ownSoldierArrayList) {
+                                for (Soldier s : ownSoldierHashMap.values()) {
                                     if (s.isSelected()) {
                                         getPathFinding(s);
                                     }
@@ -209,13 +224,18 @@ public class GameScreen extends Screens implements Screen {
                                     getClickedOnEntity();
                                 } else {
                                     Rectangle selectRect = new Rectangle(rectangleBounds[0], rectangleBounds[1], rectangleBounds[2], rectangleBounds[3]);
-                                    for (Soldier soldier : ownSoldierArrayList) {
-                                        soldier.setSelected(hitboxCheckRect(hitboxes.get(soldier.hashCode()), selectRect));
+                                    for (Soldier soldier : ownSoldierHashMap.values()) {
+                                        if (hitboxes.containsKey(soldier.hashCode())) {
+                                            soldier.setSelected(hitboxCheckRect(hitboxes.get(soldier.hashCode()), selectRect));
+                                        }
                                     }
-                                    castle.setSelected(hitboxCheckRect(hitboxes.get(castle.hashCode()), selectRect));
-                                    for (Castle castle : enemyCastleArrayList) {
+                                    if (hitboxes.containsKey(castle.hashCode())) {
                                         castle.setSelected(hitboxCheckRect(hitboxes.get(castle.hashCode()), selectRect));
-                                        System.out.println(castle.isSelected());
+                                    }
+                                    for (Castle castle : enemyCastleArrayList) {
+                                        if (hitboxes.containsKey(castle.hashCode())) {
+                                            castle.setSelected(hitboxCheckRect(hitboxes.get(castle.hashCode()), selectRect));
+                                        }
                                     }
                                 }
                                 break;
@@ -229,6 +249,18 @@ public class GameScreen extends Screens implements Screen {
                 }
         );
         renderer = new OrthogonalTiledMapRenderer(map);
+    }
+
+    private boolean isColliding(Sprite sprite) {
+        for (Map.Entry<Integer, Rectangle> hitbox : hitboxes.entrySet()) {
+            if (hitbox.getKey() != sprite.hashCode() && sprite.getBoundingRectangle().overlaps(hitbox.getValue())) {
+                return true;
+            }
+        }
+        for (Rectangle hitbox : enemyHitboxes.values()) {//hashcode doesnt need to be checked
+            return sprite.getBoundingRectangle().overlaps(hitbox);
+        }
+        return false;
     }
 
     @Override
@@ -248,31 +280,22 @@ public class GameScreen extends Screens implements Screen {
 
         gameScreenEvent.CameraKeyEvents(camera, CAMERASPEED, posCameraDesired);
         gameScreenEvent.setLabelText(scoreLabel,soldierLabel,goldLabel,castle);
-        
+
         countPoints(delta);
 
 
 
 
-        for (Castle c : enemyCastleArrayList) {
+        ArrayList<Castle> castles = enemyCastleArrayList;
+        castles.add(castle);
+        for (Castle c : castles) {
             c.draw(renderer.getBatch());
 
             if (c.isSelected()) {
-
                 entityHp.setText(c.getHp());
-                buttonRecruit.setVisible(true);
-
-                //todo braucht seine eigene forEach !!
-                if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
-                    if (!isRightPressed) {
-                        isRightPressed = true;
-                    } else {
-                        if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
-                            isRightPressed = false;
-                        }
-                    }
+                if (c == castle) {
+                    buttonRecruit.setVisible(true);
                 }
-
                 //todo Progresbar benutzen
                 entityName.setText("Castle");
                 Sprite s = new Sprite(uiAtlas.findRegion("button-normal"));
@@ -287,13 +310,12 @@ public class GameScreen extends Screens implements Screen {
         a.add(game.getSessionID());
         a.add(gameScreenEvent.getLobbyID());
         a.add(String.valueOf(castle.getTeam().getStartingPos()));
-        for (Soldier s : hashSoldierMap.values()) {
+        for (Soldier s : enemySoldierHashMap.values()) {
             s.draw(renderer.getBatch());
         }
 
-        for (Soldier s : ownSoldierArrayList) {
+        for (Soldier s : ownSoldierHashMap.values()) {
             s.draw(renderer.getBatch());
-
             a.add(s.toString());
             a.add(String.valueOf(s.hashCode()));
 
@@ -348,16 +370,34 @@ public class GameScreen extends Screens implements Screen {
             }
 
             if (s.isSelected()) {
-                entityHp.setText(s.getHp());
+                entityHp.setText(s.getHP());
                 buttonRecruit.setVisible(false);
 
                 //todo braucht seine eigene forEach !!
                 entityName.setText("Soldier");
                 Sprite sprite = new Sprite(uiAtlas.findRegion("button-normal"));
                 sprite.setColor(s.getTeam().getColor());
-                sprite.setSize(s.getHp(), 10);
+                sprite.setSize(s.getHP(), 10);
                 sprite.setPosition(sprite.getX() + 5, sprite.getY() + 60);
                 sprite.draw(renderer.getBatch());
+            }
+            //combat checks
+            if (s.isAlive()) {
+                if (s.canAttack()) {
+                    for (Map.Entry<String, Rectangle> hitbox : enemyHitboxes.entrySet()) {
+                        HashMap<String, CombatEntity> enemyMap = new HashMap<>(enemySoldierHashMap);
+                        enemyMap.putAll(enemyCastleMap);
+                        if (enemyMap.get(hitbox.getKey()).isAlive()) {
+                            if (s.getTarget() == null || enemyMap.get(hitbox.getKey()) == s.getTarget()) {
+                                if (s.getCombatReach().overlaps(hitbox.getValue())) {
+                                    //  enemySoldierHashMap.get(hitbox.getKey()).receiveDmg(s.dealDmg());//transmit dmg to appropiate color via msg instead of calculating here?
+                                    gameScreenEvent.sendAtkRequest(s.dealDmg(), hitbox.getKey(), enemyMap.get(hitbox.getKey()));//send atk data
+                                }
+                            }
+                        }
+                    }
+                }
+                //TODO after enemy hitbox
             }
         }
 
@@ -398,6 +438,8 @@ public class GameScreen extends Screens implements Screen {
             rectangleRenderer.end();
             //draw rectangle here
         }
+
+
         if (castle.isSelected()) {
             entityName.setText("Castle");
         }
@@ -644,16 +686,9 @@ public class GameScreen extends Screens implements Screen {
 
         packWindow(exitWindow, stage);
         stage.addActor(exitWindow);
+
     }
 
-    private boolean isColliding(Sprite sprite) {
-        for (Map.Entry<Integer, Rectangle> hitbox : hitboxes.entrySet()) {
-            if (hitbox.getKey() != sprite.hashCode() && sprite.getBoundingRectangle().overlaps(hitbox.getValue())) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     //Todo camera movement überarbeiten !!
     private void mouseOnEdgeofCamera() {
@@ -708,7 +743,8 @@ public class GameScreen extends Screens implements Screen {
 
     /**
      * Checks whether two Hitboxes overlap.
-     * @param hitbox the first hitbox
+     *
+     * @param hitbox  the first hitbox
      * @param hitbox2 the second hitbox
      * @return {@code true} if they overlap.
      */
@@ -718,6 +754,7 @@ public class GameScreen extends Screens implements Screen {
 
     /**
      * Checks whether a point is within a hitbox
+     *
      * @param hitbox the hitbox
      * @param coords a float array where index 0 are the x coordinates and index 1 are the y coordinates
      * @return {@code true} if the hitbox contains the given coordinates.
@@ -733,7 +770,7 @@ public class GameScreen extends Screens implements Screen {
 
         float[] coords = translateXYCoordinatesFromScreen(Gdx.input.getX(), Gdx.input.getY());
         Rectangle hitbox;
-        for (Soldier soldier : ownSoldierArrayList) {
+        for (Soldier soldier : ownSoldierHashMap.values()) {
             hitbox = hitboxes.get(soldier.hashCode());
             if (hitboxCheckXY(hitbox, coords)) {
                 soldier.setSelected(!soldier.isSelected());
@@ -743,8 +780,7 @@ public class GameScreen extends Screens implements Screen {
         }
 
         hitbox = hitboxes.get(castle.hashCode());
-
-        if (hitboxCheckXY(hitbox, coords)) {
+        if (hitboxCheckXY(hitbox, coords)) {//should never happen but better be sure
             castle.setSelected(!castle.isSelected());
         } else {
             castle.setSelected(false);
@@ -798,7 +834,9 @@ public class GameScreen extends Screens implements Screen {
         //pathingCollisionMap.getCell((int) (v.getX()+32)/64, (int) (v.getY()+32)/64).getTile().getProperties().clear();
         HashMap<Integer, Rectangle> tempHitboxes = hitboxes;
         tempHitboxes.remove(v.hashCode());
-        PathCell p = new Pathfinding(xTile, yTile, (int) v.getX() + 32, (int) v.getY() + 32, pathingCollisionMap, tempHitboxes).algorithm();
+        HashSet<Rectangle> tempHitboxesColl = new HashSet<>(tempHitboxes.values());
+        tempHitboxesColl.addAll(enemyHitboxes.values());
+        PathCell p = new Pathfinding(xTile, yTile, (int) v.getX() + 32, (int) v.getY() + 32, pathingCollisionMap, tempHitboxesColl).algorithm();
         LinkedList<PathCell> cellList = new LinkedList<>();
 
         while (p != null) {
@@ -822,10 +860,7 @@ public class GameScreen extends Screens implements Screen {
         }
         Collections.reverse(cellList);
         v.setDestination(cellList);
-        for (PathCell t : cellList) {
-            System.out.println(t.coords);
 
-        }
 
         //end=start
 
@@ -840,36 +875,65 @@ public class GameScreen extends Screens implements Screen {
     }
 
     private ArrayList<String> ArrayToArraylist(String[] strings) {
-        ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.addAll(Arrays.asList(strings));
-        return arrayList;
+        return new ArrayList<>(Arrays.asList(strings));
     }
 
     public void createSoldiers(ArrayList<String> enemyArrList) {
         int startPos = Integer.parseInt(enemyArrList.get(0));
         Team team = new Team(startPos);
         Set<String> hashCompareSet = new HashSet<>();
-        if (hashSoldierMap != null) {
+        if (enemySoldierHashMap != null) {
             for (int i = 1; i < enemyArrList.size(); i += 2) {
                 String[] pos = enemyArrList.get(i).split(",");//x and y pos
                 hashCompareSet.add(enemyArrList.get(i + 1));//add hashcode to list no matter what
-                if (!hashSoldierMap.containsKey(enemyArrList.get(i + 1))) {
+                if (!enemySoldierHashMap.containsKey(enemyArrList.get(i + 1))) {
                     //POsition [x anzahl von koordinaten und hashcodes]
                     enemySprite.setColor(team.getColor());
                     Soldier soldier = new Soldier(enemySprite, collisionUnitLayer, team);
                     soldier.setPosition(Float.parseFloat(pos[0]), Float.parseFloat(pos[1]));
-                    hashSoldierMap.put(enemyArrList.get(i + 1), soldier);
+                    enemySoldierHashMap.put(enemyArrList.get(i + 1), soldier);
+                    enemyHitboxes.put(enemyArrList.get(i + 1), soldier.getBoundingRectangle());
                 } else {
-                    hashSoldierMap.get(enemyArrList.get(i + 1)).setPosition(Float.parseFloat(pos[0]), Float.parseFloat(pos[1]));
+                    enemySoldierHashMap.get(enemyArrList.get(i + 1)).setPosition(Float.parseFloat(pos[0]), Float.parseFloat(pos[1]));
+                    enemyHitboxes.put(enemyArrList.get(i + 1), enemySoldierHashMap.get(enemyArrList.get(i + 1)).getBoundingRectangle());
                 }
             }
             //how to handle a dead soldier?
-            for (Map.Entry<String, Soldier> entry : hashSoldierMap.entrySet()) {
+            for (Map.Entry<String, Soldier> entry : enemySoldierHashMap.entrySet()) {
                 if (entry.getValue().getTeam().getStartingPos() == team.getStartingPos()) {//check if current team
                     if (!hashCompareSet.contains(entry.getKey())) {//check if entry does not contain key
-                        hashSoldierMap.remove(entry.getKey());//remove soldier if he wasnt contained in the message
+                        enemySoldierHashMap.remove(entry.getKey());//remove soldier if he wasnt contained in the message
+                        enemyHitboxes.remove(entry.getKey());
                     }
                 }
+            }
+        }
+    }
+
+    public void processDmg(String unitType, Integer unitHash, Integer dmgType, Integer dmg) {
+
+        if (unitType != null && unitHash != null && dmgType != null && dmg != null) {
+            if (unitType.equals(Soldier.UNIT_TYPE)) {
+                Soldier soldier = ownSoldierHashMap.get(unitHash);
+                if (soldier != null) {
+                    soldier.receiveDmg(new Pair<>(dmgType, dmg));
+                    System.out.println(soldier.getHP());
+                    if (!soldier.isAlive()) {
+                        ownSoldierHashMap.remove(unitHash);
+                        hitboxes.remove(soldier.hashCode());
+                        //soldier is no longer anywhere and should now be trashed by java
+                        //its also not gonna be sent to the server either after this render
+                    }
+                }
+
+            } else if (unitType.equals(Castle.UNIT_TYPE)) {
+                if (castle.hashCode() == unitHash) {
+                    castle.receiveDmg(new Pair<>(dmgType, dmg));
+                    if (!castle.isAlive()) {
+                        //todo kill castle and lose game here
+                    }
+                }
+
             }
         }
     }
