@@ -8,12 +8,14 @@ import okhttp3.WebSocketListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+
 import static code.lordofwar.backend.Constants.STRINGSEPERATOR;
 import static code.lordofwar.backend.MessageIdentifier.*;
 
 /**
- *
- * @author Robin Hefner
+ *  This class handles the communication between the server an the Server
+ * @author Franz Klose,Cem Arslan
  */
 public class GameWebSocketListener extends WebSocketListener {
 
@@ -47,8 +49,8 @@ public class GameWebSocketListener extends WebSocketListener {
     }
 
     /**
-     * Comunicats with the Server
-     * @param strings
+     * decision tree based on {@link MessageIdentifier}
+     * @param strings received data
      */
     private void checkDataDir(String[] strings) {
         if (strings[0].equals(LOGIN_VALID.toString())) {
@@ -89,13 +91,17 @@ public class GameWebSocketListener extends WebSocketListener {
             if (game.getScreen() instanceof GameScreen) {
                 ((GameScreen) game.getScreen()).getGameScreenEvent().processSoldiers(strings);
             }
-        } else if (strings[0].equals(UPDATE_CASTLE_POS.toString())) {//message is never sent so TODO SEND MESSAGE
+        } else if (strings[0].equals(UPDATE_CASTLE_POS.toString())) {
             if (game.getScreen() instanceof GameScreen) {
                 ((GameScreen) game.getScreen()).getGameScreenEvent().processCastles(strings);
             }
-        } else if (strings[0].equals(UPDATE_UNIT_HEALTH.toString())) {
+        } else if (strings[0].equals(ATTACK_UNIT_UPDATE.toString())) {
             if (game.getScreen() instanceof GameScreen) {
                 ((GameScreen) game.getScreen()).getGameScreenEvent().receiveDmg(strings);
+            }
+        }else if (strings[0].equals(GAME_OVER.toString())){
+            if (game.getScreen() instanceof GameScreen) {
+                ((GameScreen) game.getScreen()).getGameScreenEvent().gameOver(strings);
             }
         }
     }

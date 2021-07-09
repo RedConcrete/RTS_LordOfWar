@@ -2,6 +2,11 @@ package code.lordofwar.backend;
 
 import com.badlogic.gdx.graphics.Color;
 
+/**
+ * {@link Team} defines a team. A Team is defined by its color and starting Postion.
+ *
+ * @author Robin Hefner,Franz Klose
+ */
 public class Team {
 
     private int color;
@@ -13,6 +18,11 @@ public class Team {
         startingPos = color;
     }
 
+    /**
+     * gives the color for a specified a startigpos back
+     *
+     * @return
+     */
     public Color getColor() {
         Color defineColor = new Color();
         switch (color) {

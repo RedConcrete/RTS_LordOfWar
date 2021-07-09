@@ -10,6 +10,7 @@ import kotlin.Pair;
  * To deal damage a unit should have damage and a damagetype.
  * If a entity is only supposed to attack, implement {@link CombatEntity#receiveDmg(Pair)} so that the entity never receives damage.
  * If a entity is only supposed to defend, implement {@link CombatEntity#dealDmg()} so that the entity never deals damage.
+ * @author Cem Arslan
  */
 public interface CombatEntity {
 
@@ -19,8 +20,6 @@ public interface CombatEntity {
      * @return a {@link Pair<Integer,Double>} where the Integer represents the damage type and double represents the amount of dmg dealt.
      */
     public Pair<Integer, Integer> dealDmg();
-    //TODO implement dmg types (normal dmg, true dmg, max health dmg, maybe slicing vs penetration dmg? (sword vs spear vs shields?)
-    // point being many possibilities
 
     /**
      * This method represents the dmg a unit is dealt.

@@ -1,8 +1,8 @@
 package code.lordofwar.backend;
 
 /**
- *
- * @author Robin Hefner
+ * the Lobbyclass defines the lobby object
+ * @author Franz Klose,Cem Arslan
  */
 public class Lobby {
 

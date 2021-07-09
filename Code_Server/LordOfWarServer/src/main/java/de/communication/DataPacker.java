@@ -6,6 +6,10 @@ import java.util.ArrayList;
 
 import static de.constants.Constants.STRINGSEPERATOR;
 
+/**
+ * Handles packing and formatting of data
+ * @author Franz Klose,Robin Hefner,Cem Arslan
+ */
 public class DataPacker {
 
     public static String stringCombiner(ArrayList<String> arrayList){

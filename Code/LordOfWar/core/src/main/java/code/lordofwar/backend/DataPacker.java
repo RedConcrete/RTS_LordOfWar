@@ -21,6 +21,12 @@ public class DataPacker {
         return newString.toString();
     }
 
+    /**
+     * prepares the data with an specified MessageID
+     * @param messageIdentifier
+     * @param data
+     * @return
+     */
     public static String packData(MessageIdentifier messageIdentifier, String data){
         String dataPackage = "";
         dataPackage = messageIdentifier + STRINGSEPERATOR + data;

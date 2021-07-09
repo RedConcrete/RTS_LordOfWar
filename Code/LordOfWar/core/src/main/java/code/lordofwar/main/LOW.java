@@ -19,11 +19,10 @@ import java.util.concurrent.TimeUnit;
 import static code.lordofwar.backend.Constants.WORLD_HEIGHT_PIXEL;
 import static code.lordofwar.backend.Constants.WORLD_WIDTH_PIXEL;
 
-
-/*
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms.
-*/
-
+/**
+ * the mainclass to execute the Project
+ * @author Franz Klose
+ */
 public class LOW extends Game {
     private Stage stage;
     private Skin skin;
@@ -47,10 +46,7 @@ public class LOW extends Game {
         FitViewport fitViewport = new FitViewport(WORLD_WIDTH_PIXEL, WORLD_HEIGHT_PIXEL);
         stage = new Stage(fitViewport);
 
-        //TODO progressbar machen !! und Assetloader
-
         this.setScreen(new LoginScreen(this, skin));
-
         player.music("Ireland_2.wav");
 
     }
@@ -62,10 +58,13 @@ public class LOW extends Game {
 
     @Override
     public void dispose() {
-
-
     }
 
+    /**
+     * builds the websocket connection from Client to Server.
+     * httpURl defines which server is pointed at
+     *
+     */
     public void buildWebSocketConnection() {
 
         OkHttpClient client = new OkHttpClient.Builder()

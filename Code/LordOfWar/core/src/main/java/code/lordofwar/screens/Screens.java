@@ -13,6 +13,11 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+/**
+ * This class is a superclass for all Screen classes.
+ *
+ * @author Robin Hefner,Franz Klose
+ */
 public abstract class Screens extends Constants {
     protected final Stage stage;
     protected final LOW game;
@@ -28,6 +33,10 @@ public abstract class Screens extends Constants {
         stage = new Stage(new ScreenViewport());
     }
 
+    /**
+     * Defines the background of all the screens
+     * @param stage
+     */
     protected void createBackground(Stage stage) {
 
         int number = lowerBound + (int) (Math.random() * ((upperBound - lowerBound) + 1));
@@ -54,6 +63,9 @@ public abstract class Screens extends Constants {
         stage.addActor(image);
     }
 
+    /**
+     * clears the stage of a screen if needed
+     */
     protected void clearStage() {
         Gdx.graphics.getGL20().glClearColor(0, 0, 0, 1);
         Gdx.graphics.getGL20().glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -67,6 +79,11 @@ public abstract class Screens extends Constants {
 
     }
 
+    /**
+     * shows a fps counter on top right corner
+     * @param stage
+     * @param skin
+     */
     protected void fps(Stage stage, Skin skin) {
         if (game.getConstants().getFPS()) {
 
@@ -93,18 +110,20 @@ public abstract class Screens extends Constants {
      *
      * @author Robin Hefner
      */
-
-    protected void backButton(Stage stage, Skin skin, LOW game, Window window) {
+    protected void backButton(Stage stage, Skin skin, LOW game, Window window,boolean isBackToMenu) {
         TextButton backButton = new TextButton("Back", skin);
         backButton.getLabel().setFontScale(3f);
 
         backButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-
-                game.setScreen(new MenuScreen(game, skin));
-                stage.dispose();
-
+                if(isBackToMenu){
+                    game.setScreen(new MenuScreen(game, skin));
+                    stage.dispose();
+                }
+                else{
+                    window.setVisible(false);
+                }
             }
 
             @Override
@@ -130,6 +149,11 @@ public abstract class Screens extends Constants {
         stage.addActor(window);
     }
 
+    /**
+     * packs the window
+     * @param window
+     * @param stage
+     */
     protected void packWindow(Window window, Stage stage) {
         window.pack();
         stage.addActor(window);

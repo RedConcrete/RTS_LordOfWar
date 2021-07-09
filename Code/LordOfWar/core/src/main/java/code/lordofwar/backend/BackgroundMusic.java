@@ -5,9 +5,9 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * The Class Backgroundmusic is supposed to play Backgroundmusik in the menu as well as in the Game itself.
+ * The Class Backgroundmusic is supposed to play backgroundmusic in the menu as well as in the Game itself.
  *
- * @author Robin Hefner
+ * @author Cem Arslan
  */
 public class BackgroundMusic {
     private String currentTrack;//currently playing track
@@ -30,11 +30,11 @@ public class BackgroundMusic {
      * Currently only WAVE, AU & AIFF files are supported.
      *
      * @param track the name of the track to be named
-     *///TODO replace tracknames with enums?
+     */
     public synchronized void music(String track) {
         //CURRENTLY ONLY PLAYES WAVE AU AND AIFF Files
         //THIS MEANS CONVERT THE MP3 Files to .wav files using a CONVERTER!
-        if (currentTrack == null) {//TODO return something here so the program knows it plays
+        if (currentTrack == null) {
             currentTrack = track;
             final String trackName = "assets/music/" + currentTrack;
             new Thread(() -> {
@@ -78,7 +78,6 @@ public class BackgroundMusic {
      * @param volume the given volume in percent
      */
     public synchronized void setVolume(int volume) {
-         //Volume is basically 0 at 50% maybe find way to fix this TODO
         if (currentClip != null&&constants.MUSIC) {
             constants.musicVolume = volume;
             float range = Math.abs(((FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN)).getMinimum() - ((FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN)).getMaximum());

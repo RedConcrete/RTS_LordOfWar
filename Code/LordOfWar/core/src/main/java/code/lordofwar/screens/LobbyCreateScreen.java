@@ -11,6 +11,12 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 
+/**
+ * The LobbyCreateScreen that shows the LobbyCreateScreen and awaits
+ * the player input to create a new Lobby
+ *
+ * @author Franz Klose,Robin Hefner,Cem Arslan
+ */
 public class LobbyCreateScreen extends Screens implements Screen {
 
 
@@ -72,6 +78,9 @@ public class LobbyCreateScreen extends Screens implements Screen {
         stage.dispose();
     }
 
+    /**
+     * builds the Ui for the Screen
+     */
     private void setupUI() {
 
         Window windowLobbyCreate = new Window("", skin, "border");
@@ -102,7 +111,7 @@ public class LobbyCreateScreen extends Screens implements Screen {
         gameModeSelectBox.setItems(" Normal ", " Expert ");
 
         SelectBox<String> mapSelctBox = new SelectBox(skin);
-        //todo maps müsseten noch überabretet werden
+
         mapSelctBox.setItems("BIG", "SMALL");
 
 
@@ -110,7 +119,6 @@ public class LobbyCreateScreen extends Screens implements Screen {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
 
-                //Todo Abfrage entwickeln!!!
 
                 if (lobbyName.getText().isEmpty()) {
 
@@ -164,13 +172,17 @@ public class LobbyCreateScreen extends Screens implements Screen {
 
         windowLobbyCreate.add(lobbyCreateButton);
 
-        backButton(stage, skin, game, windowLobbyCreate);
+        backButton(stage, skin, game, windowLobbyCreate,true);
         packAndSetWindow(windowLobbyCreate, stage);
-
 
         stage.setDebugAll(false);
     }
 
+    /**
+     * cerates a error Window if something gone wrong
+     * @param windowLobbyCreate
+     * @param text
+     */
     private void printErrorWindow(Window windowLobbyCreate, String text) {
 
         Window errorWindow = new Window("", skin, "border");

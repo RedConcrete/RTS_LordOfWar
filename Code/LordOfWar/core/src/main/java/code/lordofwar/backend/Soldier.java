@@ -11,8 +11,8 @@ import com.badlogic.gdx.math.Vector2;
 import java.util.List;
 
 /**
- *
- * @author Robin Hefner
+ * the Soldierclass defines the soldier object
+ * @author Cem Arslan,Franz Klose
  */
 public class Soldier extends AbstractCombatEntity {
 
@@ -63,7 +63,7 @@ public class Soldier extends AbstractCombatEntity {
 
     @Override
     public String toString() {
-        return this.getX() + "," + this.getY();
+        return this.getX() + "," + this.getY() + "," + this.getHP();
     }
 
     public TiledMapTileLayer getCollisionLayer() {
@@ -101,7 +101,6 @@ public class Soldier extends AbstractCombatEntity {
     @Override
     public void die() {
         this.setAlive(false);
-        //TODO do i need to do more here?
     }
 
     @Override

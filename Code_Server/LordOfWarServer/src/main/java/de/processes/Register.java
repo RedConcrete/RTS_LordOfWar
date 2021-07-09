@@ -9,6 +9,10 @@ import javax.websocket.Session;
 import static de.constants.MessageIdentifier.REGISTER_VALID;
 
 
+/**
+ * Manages the register process & checks
+ * @author Cem Arslan
+ */
 public class Register {
 
 

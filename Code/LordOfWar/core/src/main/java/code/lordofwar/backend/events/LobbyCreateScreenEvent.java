@@ -10,7 +10,8 @@ import static code.lordofwar.backend.MessageIdentifier.CREATE_LOBBY;
 
 
 /**
- * The event from the
+ * The event from the lobbyscreen
+ *
  * @author Franz Klose,Robin Hefner,Cem Arslan
  */
 public class LobbyCreateScreenEvent extends Events{
@@ -22,6 +23,10 @@ public class LobbyCreateScreenEvent extends Events{
         isCreated = false;
     }
 
+    /**
+     * sends a lobby request
+     * @param lobby
+     */
     public void sendLobbyCreateRequest(Lobby lobby) {
 
         ArrayList<String> lobbyArr = new ArrayList<>();

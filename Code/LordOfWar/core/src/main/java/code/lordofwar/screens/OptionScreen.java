@@ -11,7 +11,11 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
-
+/**
+ * The OptionScreen that shows the LoginScreen
+ *
+ * @author Franz Klose,Cem Arslan,Robin Hefner
+ */
 public class OptionScreen extends Screens implements Screen {
 
 
@@ -60,10 +64,12 @@ public class OptionScreen extends Screens implements Screen {
 
     @Override
     public void dispose() {
-        //todo dispose alles was erstellt wurde (Texturen)
         stage.dispose();
     }
 
+    /**
+     * builds the Ui for the Screen
+     */
     private void setupUI() {
 
         Window windowOptionen = new Window("", skin, "border");
@@ -125,7 +131,7 @@ public class OptionScreen extends Screens implements Screen {
             }
 
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });
@@ -144,7 +150,7 @@ public class OptionScreen extends Screens implements Screen {
             }
 
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });
@@ -172,7 +178,7 @@ public class OptionScreen extends Screens implements Screen {
             }
 
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });
@@ -185,7 +191,7 @@ public class OptionScreen extends Screens implements Screen {
         windowOptionen.add(fpsButton).row();
         windowOptionen.add(fullscreenButton).row();
 
-        backButton(stage, skin, game, windowOptionen);
+        backButton(stage, skin, game, windowOptionen,true);
         packAndSetWindow(windowOptionen, stage);
 
         stage.setDebugAll(false);

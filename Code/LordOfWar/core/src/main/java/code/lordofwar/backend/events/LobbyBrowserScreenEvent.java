@@ -10,6 +10,7 @@ import static code.lordofwar.backend.MessageIdentifier.JOIN_LOBBY;
 
 /**
  * The event from the lobbybrowserscreen
+ *
  * @author Franz Klose,Robin Hefner,Cem Arslan
  */
 public class LobbyBrowserScreenEvent extends Events{

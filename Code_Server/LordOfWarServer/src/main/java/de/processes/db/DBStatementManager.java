@@ -7,6 +7,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Manages postgreSQL statements to DB.
+ * @author Cem Arslan
+ */
 public class DBStatementManager {
 
     public static void main(String[] args) throws Exception {
@@ -85,7 +89,6 @@ public class DBStatementManager {
     }
 
     public User createUser(String username, String password) {
-        User user = null;
         try {
             createUser.setString(1, username);
             createUser.setString(2, password);

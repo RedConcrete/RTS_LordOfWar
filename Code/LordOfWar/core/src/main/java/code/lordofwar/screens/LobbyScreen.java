@@ -17,6 +17,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * The LobbyScreen that shows the LobbyScreen a player is connected with
+ *
+ * @author Franz Klose,Cem Arslan
+ */
 public class LobbyScreen extends Screens implements Screen {
 
 
@@ -49,15 +54,11 @@ public class LobbyScreen extends Screens implements Screen {
             String[] gameData = lobbyScreenEvent.getGameData();
             //[1]=lobbyname[2]=gamemode[3]=map
             //System.out.println(Arrays.toString(gameData));
-            game.setScreen(new GameScreen(game, skin, gameData[0], lobbyScreenEvent.getPosition(), lobbyScreenEvent.getPlayers()));//todo insert data here via lobbyScreenEvent.getData
+            game.setScreen(new GameScreen(game, skin, gameData[0], lobbyScreenEvent.getPosition(), lobbyScreenEvent.getPlayers()));
         }
         if (!lobbyScreenEvent.isRecievedData()) {//later data requests (map etc) also go here
             lobbyScreenEvent.sendPlayerRequest(gameInfoArr[0]);//possible to move this to the end of setupUi()?
         }
-
-        Gdx.graphics.getGL20().glClearColor(0, 0, 0, 1);
-        Gdx.graphics.getGL20().glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        fps(stage, skin);
 
         playerNameArr = lobbyScreenEvent.getPlayers();
         if (playerNameArr != null) {
@@ -67,6 +68,7 @@ public class LobbyScreen extends Screens implements Screen {
             playerList.setItems(playerString);
         }
 
+        clearStage();
         stage.act();
         stage.draw();
     }
@@ -94,7 +96,7 @@ public class LobbyScreen extends Screens implements Screen {
     }
 
     /**
-     * inits the Ui
+     * builds the Ui for the Screen
      */
     private void setupUI() {
 
@@ -102,7 +104,7 @@ public class LobbyScreen extends Screens implements Screen {
         windowLobby.defaults().pad(50f);
 
         TextButton startButton = new TextButton("Start Game", skin);
-        startButton.setVisible(lobbyAdmin); // todo genial !!!!!!!!!!!!! ;D
+        startButton.setVisible(lobbyAdmin);
         startButton.getLabel().setFontScale(3f);
 
         playerList = new List<>(skin);
@@ -122,7 +124,7 @@ public class LobbyScreen extends Screens implements Screen {
             }
 
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
 
@@ -132,23 +134,35 @@ public class LobbyScreen extends Screens implements Screen {
 
         windowLobby.add(startButton).padTop(30f);
 
-        backButton(stage, skin, game, windowLobby);
+        backButton(stage, skin, game, windowLobby,true);
         packAndSetWindow(windowLobby, stage);
 
         stage.setDebugAll(false);
     }
 
+    /**
+     * A special defined back button
+     * @param stage
+     * @param skin
+     * @param game
+     * @param window
+     * @param isBackToMenu
+     */
     @Override
-    protected void backButton(Stage stage, Skin skin, LOW game, Window window) {
+    protected void backButton(Stage stage, Skin skin, LOW game, Window window,boolean isBackToMenu) {
         TextButton backButton = new TextButton("Back", skin);
         backButton.getLabel().setFontScale(3f);
 
         backButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                lobbyScreenEvent.sendLeaveLobbyNotice(LobbyScreen.this.gameInfoArr[0]);
-                game.setScreen(new MenuScreen(game, skin));
-                stage.dispose();
+                if (isBackToMenu) {
+                    lobbyScreenEvent.sendLeaveLobbyNotice(LobbyScreen.this.gameInfoArr[0]);
+                    game.setScreen(new MenuScreen(game, skin));
+                    stage.dispose();
+                } else {
+                    window.setVisible(false);
+                }
             }
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {

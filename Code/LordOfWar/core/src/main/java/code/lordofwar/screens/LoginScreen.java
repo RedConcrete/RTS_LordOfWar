@@ -14,6 +14,11 @@ import com.badlogic.gdx.utils.Align;
 
 import java.util.ArrayList;
 
+/**
+ * The LoginScreen that shows the LoginScreen
+ *
+ * @author Franz Klose,Cem Arslan
+ */
 public class LoginScreen extends Screens implements Screen {
 
 
@@ -21,7 +26,6 @@ public class LoginScreen extends Screens implements Screen {
     Image img;
     Image img2;
     String swordTexturePath = "ui/swords/sword_1.png";
-
 
     public LoginScreen(LOW aGame, Skin aSkin) {
         super(aGame, aSkin);
@@ -37,7 +41,6 @@ public class LoginScreen extends Screens implements Screen {
         setupUI();
 
     }
-
 
     @Override
     public void show() {
@@ -91,6 +94,9 @@ public class LoginScreen extends Screens implements Screen {
         stage.dispose();
     }
 
+    /**
+     * builds the Ui for the Screen
+     */
     private void setupUI() {
 
         Label name = new Label("Username", skin);
@@ -98,14 +104,14 @@ public class LoginScreen extends Screens implements Screen {
         name.setFontScale(4f);
         name.setWidth(Gdx.graphics.getWidth());
 
-        TextField usernameTextField = new TextField("", skin); //Todo wie kann man die Font größe ändern???
+        TextField usernameTextField = new TextField("", skin);
 
         Label password = new Label("Passwort", skin);
         password.setAlignment(Align.center);
         password.setFontScale(4f);
         password.setWidth(Gdx.graphics.getWidth());
 
-        TextField passwordTextField = new TextField("", skin); //Todo wie kann man die Font größe ändern???
+        TextField passwordTextField = new TextField("", skin);
         passwordTextField.setPasswordCharacter('*');
         passwordTextField.setPasswordMode(true);
 
@@ -181,7 +187,7 @@ public class LoginScreen extends Screens implements Screen {
             }
 
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });

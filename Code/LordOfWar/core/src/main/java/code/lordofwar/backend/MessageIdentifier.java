@@ -1,8 +1,8 @@
 package code.lordofwar.backend;
 
 /**
- *
- * @author Robin Hefner
+ * Represents message type.
+ * @author Franz Klose,Cem Arslan
  */
 public enum MessageIdentifier {
 
@@ -19,6 +19,7 @@ public enum MessageIdentifier {
     GET_LOBBYS,
     LOBBY_PLAYERS,
     UPDATE_SOLDIER_POS,
-    UPDATE_UNIT_HEALTH,//Syntax: [MI,starting STARTING POSITION (of enemy),UNITTYPE(Soldier or castle), DAMAGE TYPE,ATK]
-    UPDATE_CASTLE_POS
+    ATTACK_UNIT_UPDATE,//Syntax: [MI,starting STARTING POSITION (of enemy),UNITTYPE(Soldier or castle), DAMAGE TYPE,ATK]
+    UPDATE_CASTLE_POS,
+    GAME_OVER
 }
