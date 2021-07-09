@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * Represents a lobby.
+ * @author Cem Arslan
+ */
 public class ServerLobby {
 
     private ArrayList<User> players;
@@ -47,6 +50,10 @@ public class ServerLobby {
         this.gamemode = gamemode;
     }
 
+    /**
+     * @param user given user
+     * @return {@code true} if given user joined successfully.
+     */
     public boolean joinLobby(User user) {
         if (players.size() < playerAmount) {
             if (!joinOrder.containsKey(user)) {
@@ -82,6 +89,11 @@ public class ServerLobby {
         return null;//if player is not in list
     }
 
+    /**
+     * Removes the given player from the lobby. Also changes the admin if leaving player was the admin
+     * @param user the given user
+     * @return {@code true} if leaving was successful
+     */
     public boolean leaveLobby(User user) {
         if (players.contains(user)) {
             players.remove(user);

@@ -8,6 +8,11 @@ import javax.websocket.Session;
 import static de.constants.MessageIdentifier.LOGIN_VALID;
 
 
+/**
+ * Manages the login process & checks
+ *
+ * @author Cem Arslan
+ */
 public class Login {
 
     private boolean loginValid;
