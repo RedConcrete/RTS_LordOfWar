@@ -83,7 +83,7 @@ public class BackgroundMusic {
     public synchronized void setVolume(int volume) {
         //6.0206 -80.0 were the values on my pc TODO Check the sout on others pc
         //Volume is basically 0 at 50% maybe find way to
-        if (currentClip != null&&constants.MUSIC) {
+        if (currentClip != null && constants.MUSIC) {
             constants.musicVolume = volume;
             float range = Math.abs(((FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN)).getMinimum() - ((FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN)).getMaximum());
             ((FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN)).setValue(((range / 100) * volume) + ((FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN)).getMinimum());

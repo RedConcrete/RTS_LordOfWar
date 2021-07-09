@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Rectangle;
 
 
 public class Castle extends AbstractCombatEntity {
-    public final static String UNIT_TYPE ="CASTLE";
+    public final static String UNIT_TYPE = "CASTLE";
     private boolean selected;
     private int villager;
     private int gold;
@@ -18,7 +18,7 @@ public class Castle extends AbstractCombatEntity {
     private Sprite sprite;
 
     public Castle(Sprite sprite, TiledMapTileLayer collisionLayer, Team team) {
-        super(sprite,100,6,1,0,0,team);
+        super(sprite, 100, 6, 1, 0, 0, team);
         this.collisionLayer = collisionLayer;
         this.sprite = sprite;
         villager = 1;
@@ -35,7 +35,7 @@ public class Castle extends AbstractCombatEntity {
     }
 
     private void update(float deltaTime) {
-        setPosition(getX() ,getY());
+        setPosition(getX(), getY());
     }
 
     private void increaseVillagerPerMinute() {
@@ -74,9 +74,13 @@ public class Castle extends AbstractCombatEntity {
         return villager;
     }
 
-    public void setGold(int gold) { this.gold = gold; }
+    public void setGold(int gold) {
+        this.gold = gold;
+    }
 
-    public int getGold() { return gold; }
+    public int getGold() {
+        return gold;
+    }
 
     public boolean isSelected() {
         return selected;

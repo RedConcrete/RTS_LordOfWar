@@ -3,7 +3,6 @@ package code.lordofwar.main;
 import code.lordofwar.backend.BackgroundMusic;
 import code.lordofwar.backend.Constants;
 import code.lordofwar.backend.GameWebSocketListener;
-import code.lordofwar.backend.Sounds;
 import code.lordofwar.screens.LoginScreen;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -53,7 +52,6 @@ public class LOW extends Game {
         this.setScreen(new LoginScreen(this, skin));
 
         player.music("Ireland_2.wav");
-        new Sounds();
 
     }
 

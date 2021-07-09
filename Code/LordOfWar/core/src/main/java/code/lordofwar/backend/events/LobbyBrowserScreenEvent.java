@@ -4,12 +4,11 @@ import code.lordofwar.backend.DataPacker;
 import code.lordofwar.main.LOW;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static code.lordofwar.backend.MessageIdentifier.GET_LOBBYS;
 import static code.lordofwar.backend.MessageIdentifier.JOIN_LOBBY;
 
-public class LobbyBrowserScreenEvent extends Events{
+public class LobbyBrowserScreenEvent extends Events {
 
     private String[] lobbyList;
     private String[] lobbyInfo;
@@ -20,11 +19,11 @@ public class LobbyBrowserScreenEvent extends Events{
         lobbyInfo = null;
     }
 
-    public void sendRequestGetLobbys(){
-       webSocket.send(DataPacker.packData(GET_LOBBYS,game.getSessionID()));
+    public void sendRequestGetLobbys() {
+        webSocket.send(DataPacker.packData(GET_LOBBYS, game.getSessionID()));
     }
 
-    public void sendRequestJoinLobby(String lobbyName){
+    public void sendRequestJoinLobby(String lobbyName) {
         ArrayList<String> data = new ArrayList<>();
         data.add(game.getSessionID());
         data.add(lobbyName);
@@ -34,7 +33,7 @@ public class LobbyBrowserScreenEvent extends Events{
     public void setJoined(String[] lobbyJoinRequestResponse) {
         if (lobbyJoinRequestResponse[1].equals("true")) {
             lobbyInfo = new String[lobbyJoinRequestResponse.length - 2];
-            System.arraycopy(lobbyJoinRequestResponse,2,this.lobbyInfo,0,lobbyJoinRequestResponse.length - 2);
+            System.arraycopy(lobbyJoinRequestResponse, 2, this.lobbyInfo, 0, lobbyJoinRequestResponse.length - 2);
 
         }
     }

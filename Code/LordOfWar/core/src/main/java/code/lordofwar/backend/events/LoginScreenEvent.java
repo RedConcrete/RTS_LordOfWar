@@ -2,7 +2,6 @@ package code.lordofwar.backend.events;
 
 import code.lordofwar.backend.DataPacker;
 import code.lordofwar.main.LOW;
-import okhttp3.WebSocket;
 
 import java.util.ArrayList;
 
@@ -13,7 +12,7 @@ import static code.lordofwar.backend.MessageIdentifier.LOGIN;
         @author Robin Hefner
      */
 
-public class LoginScreenEvent extends Events{
+public class LoginScreenEvent extends Events {
 
 
     boolean loginAnswer;

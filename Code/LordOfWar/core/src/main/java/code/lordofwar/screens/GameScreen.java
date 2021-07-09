@@ -31,25 +31,21 @@ import java.awt.geom.Point2D;
 import java.util.*;
 
 
-
 public class GameScreen extends Screens implements Screen {
-
+    //TODO remove this from finished version
     private static final ShapeRenderer debugRenderer = new ShapeRenderer();
     private static final ShapeRenderer debugMovement = new ShapeRenderer();
 
-    private final TmxMapLoader loader;
     private final GameScreenEvent gameScreenEvent;
     private final ShapeRenderer rectangleRenderer;
     private final Castle castle;
     private final TiledMapTileLayer collisionUnitLayer;
     private final OrthographicCamera camera;
-    private final ArrayList<Soldier> ownSoldierArrayList;
 
-    HashMap<String, Soldier> hashSoldierMap = new HashMap<>();
+    private final HashMap<String, Rectangle> enemyHitboxes;//only for enemy units/castles
     private final ArrayList<Castle> enemyCastleArrayList;
 
-    private HashMap<Integer, Rectangle> hitboxes;
-    private ArrayList<String> connectedPlayers;
+    private final HashMap<Integer, Rectangle> hitboxes;
 
     private final boolean cameraDebug;
     private final boolean mapDebug;
@@ -60,13 +56,8 @@ public class GameScreen extends Screens implements Screen {
     private final int[] mapSizes;
     private OrthogonalTiledMapRenderer renderer;
 
-    private Label entityHp;
-    private Label entityATK;
-
-
     private HashMap<Integer, Soldier> ownSoldierHashMap;
     private HashMap<String, Soldier> enemySoldierHashMap = new HashMap<>();
-    private final ArrayList<Castle> enemyCastleArrayList;
     private HashMap<String, Castle> enemyCastleMap;
 
 
@@ -90,26 +81,21 @@ public class GameScreen extends Screens implements Screen {
     private final Sprite castleSprite;
 
     private final TextureAtlas uiAtlas = new TextureAtlas(Gdx.files.internal("ui/skin/uiskin.atlas"));
-    private final TextureAtlas unitAtlas = new TextureAtlas(Gdx.files.internal("maps/RTS_UNITS_TILES.txt"));
-    private final TextureAtlas mapAtlas = new TextureAtlas(Gdx.files.internal("maps/RTSSimple.txt"));
 
     private float pointTimerCounter;
     private Point2D.Float rectangleStart;
     private Point2D.Float rectangleEnd;
     private final float[] rectangleBounds;
-    private HashMap<Integer, Rectangle> hitboxes;//yeah sorry couldnt come up with a better way to dynamically check than just checking rectangles
-    private HashMap<String, Rectangle> enemyHitboxes;//only for enemy units/castles
-    private ArrayList<String> connectedPlayers;
 
 
     public GameScreen(LOW aGame, Skin aSkin, String lobbyID, Integer startingPosition, String[] connectedPlayersArray) {
         super(aGame, aSkin);
-        this.connectedPlayers = ArrayToArraylist(connectedPlayersArray);
         mapDebug = false;
         hitboxes = new HashMap<>();
         enemyHitboxes = new HashMap<>();
         isRightPressed = false;
         entityName = new Label("", skin);
+        TextureAtlas mapAtlas = new TextureAtlas(Gdx.files.internal("maps/RTSSimple.txt"));
         castleSprite = new Sprite(mapAtlas.findRegion("Castle"));
         pointTimerCounter = 10;
         gameScreenEvent = new GameScreenEvent(game, lobbyID, this);
@@ -129,13 +115,14 @@ public class GameScreen extends Screens implements Screen {
         rectangleStart = null;
         rectangleEnd = null;
         rectangleBounds = new float[4];//0=originX1=originY2=width3=height
+        TextureAtlas unitAtlas = new TextureAtlas(Gdx.files.internal("maps/RTS_UNITS_TILES.txt"));
         soldierSprite = new Sprite(unitAtlas.findRegion("Character_Green"));
         enemySprite = new Sprite(unitAtlas.findRegion("Character_Green"));
-        loader = new TmxMapLoader();
+        TmxMapLoader loader = new TmxMapLoader();
         camera = new OrthographicCamera();
 
         //todo zeigt alle verbunden players
-        gameScreenEvent.getConnectedPlayer(connectedPlayers, startingPosition);
+        gameScreenEvent.getConnectedPlayer(ArrayToArraylist(connectedPlayersArray), startingPosition);
 
 
         String mapPath = "maps/map_1.tmx";
@@ -188,6 +175,7 @@ public class GameScreen extends Screens implements Screen {
         setupUI();
 
     }
+
     @Override
     public void show() {
 
@@ -279,11 +267,9 @@ public class GameScreen extends Screens implements Screen {
         renderer.getBatch().begin();
 
         gameScreenEvent.CameraKeyEvents(camera, CAMERASPEED, posCameraDesired);
-        gameScreenEvent.setLabelText(scoreLabel,soldierLabel,goldLabel,castle);
+        gameScreenEvent.setLabelText(scoreLabel, soldierLabel, goldLabel, castle);
 
         countPoints(delta);
-
-
 
 
         ArrayList<Castle> castles = enemyCastleArrayList;
@@ -306,14 +292,15 @@ public class GameScreen extends Screens implements Screen {
 
             }
         }
-        ArrayList<String> a = new ArrayList<>();
-        a.add(game.getSessionID());
-        a.add(gameScreenEvent.getLobbyID());
-        a.add(String.valueOf(castle.getTeam().getStartingPos()));
+
         for (Soldier s : enemySoldierHashMap.values()) {
             s.draw(renderer.getBatch());
         }
 
+        ArrayList<String> a = new ArrayList<>();
+        a.add(game.getSessionID());
+        a.add(gameScreenEvent.getLobbyID());
+        a.add(String.valueOf(castle.getTeam().getStartingPos()));
         for (Soldier s : ownSoldierHashMap.values()) {
             s.draw(renderer.getBatch());
             a.add(s.toString());
@@ -445,7 +432,6 @@ public class GameScreen extends Screens implements Screen {
         }
 
 
-
         mouseOnEdgeofCamera();
 
         stage.act();
@@ -488,7 +474,7 @@ public class GameScreen extends Screens implements Screen {
         stage.setDebugAll(false);
     }
 
-    private void createResourceBarWindow(){
+    private void createResourceBarWindow() {
 
         Window resourceBarWindow = new Window("", skin);
         resourceBarWindow.setMovable(false);
@@ -514,7 +500,7 @@ public class GameScreen extends Screens implements Screen {
 
     }
 
-    private  void createEntityWindow(){
+    private void createEntityWindow() {
 
         // No Villager Window
         Window windowNoVillager = new Window("NoVillager", skin, "border");
@@ -522,7 +508,7 @@ public class GameScreen extends Screens implements Screen {
         windowNoVillager.setVisible(false);
         windowNoVillager.setMovable(false);
         windowNoVillager.add(new Label("You have not enough Villager to recruit a Soldier", skin)).padTop(20f).padRight(10f).padLeft(10f).row();
-        backButton(stage,skin,game,windowNoVillager);
+        backButton(stage, skin, game, windowNoVillager);
 
         // No Gold Window
         Window windowNoGold = new Window("", skin, "border");
@@ -530,7 +516,7 @@ public class GameScreen extends Screens implements Screen {
         windowNoGold.setVisible(false);
         windowNoGold.setMovable(false);
         windowNoGold.add(new Label("You have not enough Gold", skin)).padTop(20f).padRight(10f).padLeft(10f).row();
-        backButton(stage,skin,game,windowNoGold);
+        backButton(stage, skin, game, windowNoGold);
 
         // Entity Window
         Window entityWindow = new Window("", skin);
@@ -546,19 +532,19 @@ public class GameScreen extends Screens implements Screen {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 if (castle.getVillager() != 0 && castle.getGold() - SOLDIER_COST >= 0) {
-                    if (ownSoldierArrayList.size() <= castle.getMaxUnits()) {
+                    if (ownSoldierHashMap.size() <= castle.getMaxUnits()) {
                         castle.setVillager(castle.getVillager() - 1);
                         castle.setGold(castle.getGold() - SOLDIER_COST);
 
                         soldierSprite.setColor(castle.getTeam().getColor());
                         Soldier soldier = new Soldier(soldierSprite, collisionUnitLayer, castle.getTeam());
-                        ownSoldierArrayList.add(soldier);
+                        ownSoldierHashMap.put(soldier.hashCode(), soldier);
 
                     }
                 } else {
-                    if(castle.getGold() - SOLDIER_COST <= 0){
+                    if (castle.getGold() - SOLDIER_COST <= 0) {
                         windowNoGold.setVisible(true);
-                    }else {
+                    } else {
                         windowNoVillager.setVisible(true);
                     }
                 }
@@ -611,7 +597,7 @@ public class GameScreen extends Screens implements Screen {
         stage.addActor(entityWindow);
     }
 
-    private void createExitWindow(){
+    private void createExitWindow() {
         Window exitWindow = new Window("", skin);
         exitWindow.setMovable(false);
 
@@ -689,8 +675,6 @@ public class GameScreen extends Screens implements Screen {
 
     }
 
-
-    //Todo camera movement überarbeiten !!
     private void mouseOnEdgeofCamera() {
         float xClicked, yClicked;
         xClicked = Gdx.input.getX();
@@ -738,7 +722,6 @@ public class GameScreen extends Screens implements Screen {
         debugRenderer.end();
         Gdx.gl.glLineWidth(1);
     }
-
 
 
     /**
@@ -830,13 +813,12 @@ public class GameScreen extends Screens implements Screen {
     }
 
     public void getPathFinding(Soldier v, int xTile, int yTile) {
-        TiledMapTileLayer pathingCollisionMap = collisionUnitLayer;
         //pathingCollisionMap.getCell((int) (v.getX()+32)/64, (int) (v.getY()+32)/64).getTile().getProperties().clear();
         HashMap<Integer, Rectangle> tempHitboxes = hitboxes;
         tempHitboxes.remove(v.hashCode());
         HashSet<Rectangle> tempHitboxesColl = new HashSet<>(tempHitboxes.values());
         tempHitboxesColl.addAll(enemyHitboxes.values());
-        PathCell p = new Pathfinding(xTile, yTile, (int) v.getX() + 32, (int) v.getY() + 32, pathingCollisionMap, tempHitboxesColl).algorithm();
+        PathCell p = new Pathfinding(xTile, yTile, (int) v.getX() + 32, (int) v.getY() + 32, collisionUnitLayer, tempHitboxesColl).algorithm();
         LinkedList<PathCell> cellList = new LinkedList<>();
 
         while (p != null) {

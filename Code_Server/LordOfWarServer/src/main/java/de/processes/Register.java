@@ -26,14 +26,14 @@ public class Register {
             //TODO length check here
             //TODO return actual error messages
             User user = dataManager.registerUser(strings[2], strings[3]);
-            registerValid = user!=null;
+            registerValid = user != null;
         }
 
 
         if (registerValid) {
             session.getAsyncRemote().sendObject(DataPacker.packData(REGISTER_VALID, "true"));
         } else {
-
+            //TODO Reason?
         }
     }
 

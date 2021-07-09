@@ -11,8 +11,10 @@ import de.processes.Register;
 import javax.enterprise.context.ApplicationScoped;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static de.constants.Constants.STRINGSEPERATOR;
 import static de.constants.MessageIdentifier.*;
@@ -47,7 +49,7 @@ public class GameWebSocketHandler {
 
     @OnMessage
     public void onMessage(String message) {
-       // System.out.println(message);
+        // System.out.println(message);
         String[] dataArray = depackData(message);
         checkDataDir(dataArray);
     }
@@ -98,7 +100,7 @@ public class GameWebSocketHandler {
         } else if (data[0].equals(UPDATE_SOLDIER_POS.toString())) {
             genPosArray(data);
         } else if (data[0].equals(UPDATE_UNIT_HEALTH.toString())) {
-            System.out.println("recieved data "+ Arrays.toString(data));
+            //System.out.println("recieved data " + Arrays.toString(data));
             updateUnitHealth(data);
         }
 
@@ -249,7 +251,6 @@ public class GameWebSocketHandler {
                 for (User user : lobby.getPlayers()) {
                     if (!sessions.get(data[1]).equals(user.getuSession())) {
                         //1001 error here ; Server thinks client navigates away/closes?
-                        soldierPos.put(data[1],changedData);
                         user.getuSession().getAsyncRemote().sendText(DataPacker.packData(UPDATE_SOLDIER_POS, DataPacker.stringCombiner(changedData)));
                     }
                 }

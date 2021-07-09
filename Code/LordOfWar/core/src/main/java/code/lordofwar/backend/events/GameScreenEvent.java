@@ -26,9 +26,8 @@ import static code.lordofwar.backend.MessageIdentifier.*;
 public class GameScreenEvent extends Events {
     private int points;
     private final String lobbyID;
-    private GameScreenEvent gameScreenEvent;
-    private ArrayList connectedPlayers;
-    private HashMap<String, Team> teamHashMap = new HashMap<String, Team>();
+    private ArrayList<String> connectedPlayers;
+    private HashMap<String, Team> teamHashMap;
     private GameScreen gameScreen;
     private ArrayList<String> enemyUnits;
 
@@ -38,7 +37,9 @@ public class GameScreenEvent extends Events {
         points = 0;
         this.lobbyID = lobbyID;
         this.gameScreen = gameScreen;
+        teamHashMap = new HashMap<>();
         enemyUnits = new ArrayList<>();
+
 
     }
 
@@ -65,7 +66,7 @@ public class GameScreenEvent extends Events {
     public void createTeams(int startingPosition) {
         for (int i = 0; i < connectedPlayers.size(); i++) {
             Team team = new Team(i);
-            teamHashMap.put((String) connectedPlayers.get(i), team);
+            teamHashMap.put(connectedPlayers.get(i), team);
             team.setStartingPos(startingPosition);
         }
     }
@@ -257,6 +258,8 @@ public class GameScreenEvent extends Events {
         }
     }
 
+    //TODO remove this
+    //TODO move this to input listener
     public void StageKeyEvents(Window windowExit, TextButton yesButton, TextButton noButton, Stage stage) {
 
         if (Gdx.input.isKeyPressed(Input.Keys.F10)) {
@@ -269,21 +272,15 @@ public class GameScreenEvent extends Events {
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-
+            //TODO whats this supposed to be?
         }
 
     }
 
-    public void setLabelText(Label scoreLabel, Label soldierLabel, Label goldLabel, Castle castle){
-        scoreLabel.setText(gameScreenEvent.getPoints());
+    public void setLabelText(Label scoreLabel, Label soldierLabel, Label goldLabel, Castle castle) {
+        scoreLabel.setText(getPoints());
         soldierLabel.setText(castle.getVillager());
         goldLabel.setText(castle.getGold());
-    }
-
-
-    public GameScreenEvent getGameScreenEvent() {
-
-        return gameScreenEvent;
     }
 
     public void getConnectedPlayer(ArrayList<String> conPlayers, int startingPosition) {
@@ -330,13 +327,11 @@ public class GameScreenEvent extends Events {
     }
 
     public void processSoldiers(String[] data) {
-
         // data [0] = MessageID / data [1] = startigPos / data[2] = x Pos,y Pos / data[3] = SoldatenHash
         String[] enemyArray = new String[data.length - 1];
         System.arraycopy(data, 1, enemyArray, 0, data.length - 1);
         this.enemyUnits.addAll(Arrays.asList(enemyArray));
         gameScreen.createSoldiers(new ArrayList<>(Arrays.asList(enemyArray)));
-
     }
 
     public ArrayList<String> getEnemyUnits() {

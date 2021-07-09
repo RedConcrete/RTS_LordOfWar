@@ -3,13 +3,12 @@ package code.lordofwar.backend.events;
 import code.lordofwar.backend.DataPacker;
 import code.lordofwar.backend.Lobby;
 import code.lordofwar.main.LOW;
-import okhttp3.WebSocket;
 
 import java.util.ArrayList;
 
 import static code.lordofwar.backend.MessageIdentifier.CREATE_LOBBY;
 
-public class LobbyCreateScreenEvent extends Events{
+public class LobbyCreateScreenEvent extends Events {
 
 
     private String lobbyID;

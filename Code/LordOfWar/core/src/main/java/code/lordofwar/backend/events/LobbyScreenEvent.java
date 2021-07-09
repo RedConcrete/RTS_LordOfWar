@@ -4,7 +4,6 @@ import code.lordofwar.backend.DataPacker;
 import code.lordofwar.main.LOW;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static code.lordofwar.backend.MessageIdentifier.*;
 
