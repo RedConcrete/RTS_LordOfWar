@@ -14,10 +14,6 @@ import java.util.Set;
  * A* Pathfinding
  */
 public class Pathfinding {
-
-    private static final int diagonalCostMultiplayer = 14;
-    private static final int verticalCostMultiplayer = 10;
-
     private int xStartCell;
     private int yStartCell;
 

@@ -1,5 +1,8 @@
 package de.constants;
 
+/**
+ * Represents message type.
+ */
 public enum MessageIdentifier {
 
     CONNECTION,

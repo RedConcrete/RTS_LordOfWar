@@ -224,11 +224,6 @@ public class GameScreen extends Screens implements Screen {
                                     if (hitboxes.containsKey(castle.hashCode())) {
                                         castle.setSelected(hitboxCheckRect(hitboxes.get(castle.hashCode()), selectRect));
                                     }
-                                    for (Castle castle : enemyCastleHashMap.values()) {
-                                        if (hitboxes.containsKey(castle.hashCode())) {
-                                            castle.setSelected(hitboxCheckRect(hitboxes.get(castle.hashCode()), selectRect));
-                                        }
-                                    }
                                 }
                                 break;
                             default:
@@ -878,8 +873,6 @@ public class GameScreen extends Screens implements Screen {
      * @param yTile
      */
     public void getPathFinding(Soldier v, int xTile, int yTile) {
-
-        TiledMapTileLayer pathingCollisionMap = collisionUnitLayer; //todo muss das sein ??
         HashMap<Integer, Rectangle> tempHitboxes = hitboxes;
         tempHitboxes.remove(v.hashCode());
         HashSet<Rectangle> tempHitboxesColl = new HashSet<>(tempHitboxes.values());

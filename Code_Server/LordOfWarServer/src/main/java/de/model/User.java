@@ -4,6 +4,10 @@ package de.model;
 import javax.websocket.Session;
 
 
+/**
+ * Represents a User. A user is defined by his username, password, userid and score. A user also has a session
+ * @author Cem Arslan
+ */
 public class User {
     private String username;
     private String password;

@@ -18,9 +18,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import static de.constants.Constants.STRINGSEPERATOR;
 import static de.constants.MessageIdentifier.*;
 
+/**
+ * Handles all direct communication with the client.
+ *
+ * @author Franz Klose,Cem Arslan
+ */
 @ServerEndpoint("/api/v1/ws")
 @ApplicationScoped
-
 public class GameWebSocketHandler {
 
     private Map<String, Session> sessions = new ConcurrentHashMap<>();//connected sessions (sessionid,Session)
@@ -59,6 +63,12 @@ public class GameWebSocketHandler {
         return message.split(STRINGSEPERATOR);
     }
 
+
+    /**
+     * Decision tree based on  {@link de.constants.MessageIdentifier}
+     *
+     * @param data received String
+     */
     private void checkDataDir(String[] data) {
         if (data[0].equals(LOGIN.toString())) {
             User newUser = new Login(dataManager).isLoginValid(data, sessions.get(data[1]));
@@ -92,6 +102,11 @@ public class GameWebSocketHandler {
         }
     }
 
+    /**
+     * Starts a {@link ServerGame} for the given lobby.
+     *
+     * @param data received data
+     */
     private void startGame(String[] data) {
         ServerLobby lobby = lobbys.get(data[2]);
         if (lobby.getGame() == null) {
@@ -114,6 +129,11 @@ public class GameWebSocketHandler {
         }
     }
 
+    /**
+     * Sends all current lobbys that arent ingame to given client.
+     *
+     * @param userID sessionID of the given user
+     */
     private void sendLobbysToClient(String userID) {
         ArrayList<String> arr = new ArrayList<>();
         for (Map.Entry<String, ServerLobby> entry : lobbys.entrySet()) {
@@ -128,6 +148,11 @@ public class GameWebSocketHandler {
 
     }
 
+    /**
+     * Given user is removed from given lobby
+     *
+     * @param data received data
+     */
     private void leaveLobby(String[] data) {
         ServerLobby lobby = findLobby(data);
         if (lobby != null) {
@@ -141,6 +166,11 @@ public class GameWebSocketHandler {
         }
     }
 
+    /**
+     * Sends a update to all players in the given lobby about which players are connected to the given lobby.
+     *
+     * @param data received data
+     */
     //ENUM,LOBBYID,Usersession
     public void sendPlayerListUpdate(String[] data) {//this should get triggered once the game is over (incase anyone left during the game); maybe public later
         ServerLobby lobby = lobbys.get(data[2]);
@@ -151,6 +181,11 @@ public class GameWebSocketHandler {
         }
     }
 
+    /**
+     * Sends a update to all players in the given lobby about what their join order is.
+     *
+     * @param lobby received data
+     */
     public void sendPlayerChangeUpdate(ServerLobby lobby) {
         if (lobby.getGame() == null) {
             for (User user : lobby.getPlayers()) {
@@ -161,6 +196,11 @@ public class GameWebSocketHandler {
         }
     }
 
+    /**
+     * Join process for the given player and lobby. Sends an update to all players in the lobby if join is successful.
+     *
+     * @param data received data
+     */
     private void joinLobby(String[] data) {
         boolean joined = false;
         ServerLobby lobby = findLobby(data);
@@ -176,8 +216,6 @@ public class GameWebSocketHandler {
                     lobbyDataToSend.add(String.valueOf(lobby.getPlayerAmount()));
                     lobbyDataToSend.add(lobby.getGamemode());
                     lobbyDataToSend.add(String.valueOf(lobby.getPlayerOrder((userSessions.get(data[1])))));
-                    System.out.println(lobbyDataToSend);
-
                     sessions.get(data[1]).getAsyncRemote().sendText(DataPacker.packData(JOIN_LOBBY, DataPacker.stringCombiner(lobbyDataToSend)));
                 }
             }
@@ -185,11 +223,14 @@ public class GameWebSocketHandler {
         if (!joined) {
             sessions.get(data[1]).getAsyncRemote().sendText(DataPacker.packData(JOIN_LOBBY, "false"));
         }
-        //TODO send joined success back
     }
 
+    /**
+     * Creates a lobby with the given parameters if allowed
+     *
+     * @param data received data
+     */
     private void createLobby(String[] data) {
-        //TODO where to put this?
         if (userSessions.containsKey(data[1])) {
             if (!lobbys.containsKey(data[2])) {
                 User[] users = new User[Integer.parseInt(data[4])];
@@ -208,11 +249,20 @@ public class GameWebSocketHandler {
         sessions.get(data[1]).getAsyncRemote().sendText(DataPacker.packData(CREATE_LOBBY, "false"));
     }
 
+    /**
+     * @param args received data
+     * @return the lobby object with the lobbyname in {@param args[2]}
+     */
     private ServerLobby findLobby(String[] args) {
         return lobbys.getOrDefault(args[2], null);
     }
 
 
+    /**
+     * Saves user and session id in relevant lists for later retrieval
+     *
+     * @param user the given user
+     */
     private void loginUser(User user) {
         //TODO is this the most appropiate place for this?
         if (user != null && user.getuSession() != null) {
@@ -223,6 +273,11 @@ public class GameWebSocketHandler {
         }
     }
 
+    /**
+     * Sends positions and health of all units of given player to rest of lobby.
+     *
+     * @param data received data
+     */
     private void genSoldierPosArray(String[] data) {
         ServerLobby lobby = findLobby(data);
         if (lobby != null) {
@@ -243,6 +298,11 @@ public class GameWebSocketHandler {
         }
     }
 
+    /**
+     * Sends position and health of castle to the rest of the lobby
+     *
+     * @param data received data
+     */
     private void genCastlePosArray(String[] data) {
 //MI,UID,LID,Startingpos, health,hashcode
         ServerLobby lobby = findLobby(data);
@@ -271,6 +331,11 @@ public class GameWebSocketHandler {
         }
     }
 
+    /**
+     * Sends an game over message to all players within the lobby and relevant info (scores and lobby information)
+     *
+     * @param lobby the given lobby
+     */
     private void endGame(ServerLobby lobby) {
         ServerGame game = lobby.getGame();
         lobby.setGame(null);
@@ -292,10 +357,15 @@ public class GameWebSocketHandler {
         for (User user : lobby.getPlayers()) {
             gameOverData.add(String.valueOf(lobby.getPlayerOrder((user))));
             user.getuSession().getAsyncRemote().sendText(DataPacker.packData(GAME_OVER, DataPacker.stringCombiner(gameOverData)));
-            gameOverData.remove(gameOverData.size()-1);
+            gameOverData.remove(gameOverData.size() - 1);
         }
     }
 
+    /**
+     * Sends damage values and target to the relevant players
+     *
+     * @param data received data
+     */
     private void attackUnitUpdate(String[] data) {
         //Syntax: [MI,lobbyID,starting STARTING POSITION (of enemy),UNITTYPE(Soldier or castle),enemy hashcode, DAMAGE TYPE,ATK]
         ServerLobby lobby = findLobby(data);

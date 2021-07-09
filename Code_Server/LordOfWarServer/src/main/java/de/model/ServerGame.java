@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
+/**
+ * Represents a running game.
+ * @author Cem Arslan
+ */
 public class ServerGame {
     private final User[] players;
     private final User[] livingPlayers;
@@ -30,6 +34,10 @@ public class ServerGame {
         return livingPlayers;
     }
 
+    /**
+     * Acknowledges death of player for purpose of deciding when game is over
+     * @param startingPos the starting pos of the dead player
+     */
     public void killPlayer(int startingPos) {
         livingPlayers[startingPos] = null;
         int i = 0;
@@ -42,6 +50,7 @@ public class ServerGame {
             setWinner();
         }
     }
+
     private void setWinner(){
         for (User user:livingPlayers) {
             if (user!=null){
@@ -50,11 +59,20 @@ public class ServerGame {
         }
     }
 
+    /**
+     *
+     * @return {@code null} until the game is over. Then returns the winner {@link User}.
+     */
     public User getWinner(){
         return winner;
     }
 
 
+    /**
+     * Add the given amount of points from the points of to the given user
+     * @param user given user
+     * @param points given points
+     */
     private void addPoints(User user, int points) {
         int score = pointMap.get(user);
         if (score + points < score) {
@@ -63,7 +81,11 @@ public class ServerGame {
             pointMap.put(user, pointMap.get(user) + points);
         }
     }
-
+    /**
+     * Subtracts the given amount of points from the points of the given user
+     * @param user given user
+     * @param points given points
+     */
     private void subtractPoints(User user, int points) {
         int score = pointMap.get(user);
         if (score > points) {
