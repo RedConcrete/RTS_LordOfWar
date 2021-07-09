@@ -13,8 +13,8 @@ public class User {
     private Session uSession;
 
     public User(String username, String password, Integer score, int userID, Session uSession) {
-        if (score==null){
-            score=0;
+        if (score == null) {
+            score = 0;
         }
         this.username = username;
         this.password = password;
@@ -48,18 +48,18 @@ public class User {
     }
 
     public void addScore(int score) {
-        if (score+this.score<this.score){
-            this.score=Integer.MAX_VALUE;
-        }else {
+        if (score + this.score < this.score) {
+            this.score = Integer.MAX_VALUE;
+        } else {
             this.score += score;
         }
     }
 
     public void subtractScore(int score) {
-        if (this.score>score) {
+        if (this.score > score) {
             this.score -= score;
-        }else {
-            this.score=0;
+        } else {
+            this.score = 0;
         }
     }
 
@@ -72,7 +72,7 @@ public class User {
     }
 
 
-   public int getUserID() {
+    public int getUserID() {
         return userID;
     }
 }

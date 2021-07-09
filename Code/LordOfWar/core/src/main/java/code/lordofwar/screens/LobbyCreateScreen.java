@@ -96,14 +96,14 @@ public class LobbyCreateScreen extends Screens implements Screen {
         mapLabel.setFontScale(2f);
 
         SelectBox<Integer> playerAmountSelectBox = new SelectBox(skin);
-        playerAmountSelectBox.setItems(2, 4, 6);
+        playerAmountSelectBox.setItems(2, 3, 4);
 
         SelectBox<String> gameModeSelectBox = new SelectBox(skin);
         gameModeSelectBox.setItems(" Normal ", " Expert ");
 
         SelectBox<String> mapSelctBox = new SelectBox(skin);
         //todo maps müsseten noch überabretet werden
-        mapSelctBox.setItems(" map_1 ", " map_2 ");
+        mapSelctBox.setItems("BIG", "SMALL");
 
 
         lobbyCreateButton.addListener(new InputListener() {
@@ -133,7 +133,7 @@ public class LobbyCreateScreen extends Screens implements Screen {
                         Gdx.app.postRunnable(
                                 () -> {
                                     if (lobbyCreateScreenEvent.isCreated()) {
-                                        game.setScreen(new LobbyScreen(game, skin, new String[]{lobbyName.getText(), mapSelctBox.getSelected(), String.valueOf(playerAmountSelectBox.getSelected()), gameModeSelectBox.getSelected()}));
+                                        game.setScreen(new LobbyScreen(game, skin, new String[]{lobbyName.getText(), mapSelctBox.getSelected(), String.valueOf(playerAmountSelectBox.getSelected()), gameModeSelectBox.getSelected()}, true));
                                         stage.dispose();
                                     } else {
                                         Rumble.rumble(1f, .2f);

@@ -16,5 +16,6 @@ public enum MessageIdentifier {
     GAME_START,
     GET_LOBBY_INFO,
     UPDATE_SOLDIER_POS,
-    UPDATE_UNIT_HEALTH//Syntax: [MI,starting STARTING POSITION (of enemy),UNITTYPE(Soldier or castle),enemy hashcode, DAMAGE TYPE,ATK]
+    UPDATE_UNIT_HEALTH,//Syntax: [MI,starting STARTING POSITION (of enemy),UNITTYPE(Soldier or castle),enemy hashcode, DAMAGE TYPE,ATK]
+    UPDATE_CASTLE_POS
 }

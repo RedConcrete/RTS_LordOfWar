@@ -4,6 +4,10 @@ import java.util.ArrayList;
 
 import static code.lordofwar.backend.Constants.STRINGSEPERATOR;
 
+/**
+ *
+ * @author Robin Hefner
+ */
 public class DataPacker {
 
     public static String stringCombiner(ArrayList<String> arrayList){

@@ -37,7 +37,7 @@ public class RegisterScreen extends Screens implements Screen {
         usernameLabel.setWidth(Gdx.graphics.getWidth());
 
 
-        TextField usernameTextField = new TextField("Username", skin);
+        TextField usernameTextField = new TextField("", skin);
 
         Label passwordLabel = new Label("Password", skin);
         passwordLabel.setAlignment(Align.center);
@@ -60,7 +60,7 @@ public class RegisterScreen extends Screens implements Screen {
         errorWindow.add(okButton).row();
         errorWindow.setPosition(stage.getWidth() / 2.75f, stage.getHeight() / 2f);
 
-        TextField passwordTextField = new TextField("Password", skin);
+        TextField passwordTextField = new TextField("", skin);
         passwordTextField.setPasswordCharacter('*');
         passwordTextField.setPasswordMode(true);
 

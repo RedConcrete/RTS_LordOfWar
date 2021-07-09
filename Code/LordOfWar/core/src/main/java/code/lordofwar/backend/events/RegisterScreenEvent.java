@@ -8,6 +8,10 @@ import java.util.ArrayList;
 
 import static code.lordofwar.backend.MessageIdentifier.REGISTER;
 
+/**
+ * The event from the
+ * @author Franz Klose,Robin Hefner,Cem Arslan
+ */
 public class RegisterScreenEvent extends Events{
 
     boolean registerAnswer;
@@ -21,7 +25,9 @@ public class RegisterScreenEvent extends Events{
     isRegisterValid checks if the Registration is Valid and creates a new Account.
     @author Robin Hefner
  */
-
+    /**
+     * sends the User data
+     */
     public void sendUserData(ArrayList<String> arr) {
         webSocket.send(DataPacker.packData(REGISTER, DataPacker.stringCombiner(arr)));
     }

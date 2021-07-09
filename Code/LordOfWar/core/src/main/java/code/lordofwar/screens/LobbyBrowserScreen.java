@@ -90,7 +90,7 @@ public class LobbyBrowserScreen extends Screens implements Screen {
                         String[] strings = lobbyBrowserScreenEvent.getLobbyList();
                         for (int i = 4; i < strings.length; i += 4) {
                             TextButton joinButton = new TextButton("join", skin);
-                            Label l = new Label(strings[i - 3] + "  " + strings[i - 2] + "  " + strings[i - 1] + "  " + strings[i], skin);
+                            Label l = new Label("Lobbyname: " +strings[i - 3] + " Map: " + strings[i - 2] + " Mode: " + strings[i - 1] + " Player: " + strings[i], skin);
                             joinButton.setName(strings[i - 3]);
                             joinButton.padLeft(20f).padRight(100f);
 
@@ -107,7 +107,7 @@ public class LobbyBrowserScreen extends Screens implements Screen {
                                         Gdx.app.postRunnable(
                                                 () -> {
                                                     if (lobbyBrowserScreenEvent.getLobbyInfo() != null) {
-                                                        game.setScreen(new LobbyScreen(game, skin, lobbyBrowserScreenEvent.getLobbyInfo()));
+                                                        game.setScreen(new LobbyScreen(game, skin, lobbyBrowserScreenEvent.getLobbyInfo(),false));
                                                         stage.dispose();
 
                                                     } else {

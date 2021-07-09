@@ -1,16 +1,9 @@
 package de.processes;
 
 
-import de.constants.Constants;
 import de.model.User;
 import de.processes.db.DBStatementManager;
 
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.sql.SQLException;
 
 //management class to buffer errors still have to do proper exceptionhandling
@@ -29,10 +22,12 @@ public class DataManager {
         return dbManager.createUser(username, password);
 
     }
-    public boolean deleteUser(String username){
+
+    public boolean deleteUser(String username) {
         return dbManager.deleteUser(username);
     }
-    public User getUser(String username){
+
+    public User getUser(String username) {
         return dbManager.getUser(username);
     }
 

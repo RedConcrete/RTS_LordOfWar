@@ -98,14 +98,14 @@ public class LoginScreen extends Screens implements Screen {
         name.setFontScale(4f);
         name.setWidth(Gdx.graphics.getWidth());
 
-        TextField usernameTextField = new TextField("Username", skin); //Todo wie kann man die Font größe ändern???
+        TextField usernameTextField = new TextField("", skin); //Todo wie kann man die Font größe ändern???
 
         Label password = new Label("Passwort", skin);
         password.setAlignment(Align.center);
         password.setFontScale(4f);
         password.setWidth(Gdx.graphics.getWidth());
 
-        TextField passwordTextField = new TextField("Password", skin); //Todo wie kann man die Font größe ändern???
+        TextField passwordTextField = new TextField("", skin); //Todo wie kann man die Font größe ändern???
         passwordTextField.setPasswordCharacter('*');
         passwordTextField.setPasswordMode(true);
 

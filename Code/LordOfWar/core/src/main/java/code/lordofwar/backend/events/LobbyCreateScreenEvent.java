@@ -3,15 +3,17 @@ package code.lordofwar.backend.events;
 import code.lordofwar.backend.DataPacker;
 import code.lordofwar.backend.Lobby;
 import code.lordofwar.main.LOW;
-import okhttp3.WebSocket;
 
 import java.util.ArrayList;
 
 import static code.lordofwar.backend.MessageIdentifier.CREATE_LOBBY;
 
+
+/**
+ * The event from the
+ * @author Franz Klose,Robin Hefner,Cem Arslan
+ */
 public class LobbyCreateScreenEvent extends Events{
-
-
     private String lobbyID;
     private boolean isCreated;
 

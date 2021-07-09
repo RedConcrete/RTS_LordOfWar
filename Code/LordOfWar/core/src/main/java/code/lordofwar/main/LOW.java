@@ -3,7 +3,6 @@ package code.lordofwar.main;
 import code.lordofwar.backend.BackgroundMusic;
 import code.lordofwar.backend.Constants;
 import code.lordofwar.backend.GameWebSocketListener;
-import code.lordofwar.backend.Sounds;
 import code.lordofwar.screens.LoginScreen;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -53,7 +52,6 @@ public class LOW extends Game {
         this.setScreen(new LoginScreen(this, skin));
 
         player.music("Ireland_2.wav");
-        new Sounds();
 
     }
 
@@ -76,7 +74,6 @@ public class LOW extends Game {
 
         //HttpUrl httpUrl = HttpUrl.parse("http://localhost:8080/api/v1/ws");
         HttpUrl httpUrl = HttpUrl.parse("http://labswp-sose21-team4.it-stud.hs-heilbronn.de:8080/api/v1/ws");
-        //HttpUrl httpUrl = HttpUrl.parse("http://redconcrete.sytes.net:25591/api/v1/ws");
 
         Request request = new Request.Builder()
                 .url(httpUrl)
