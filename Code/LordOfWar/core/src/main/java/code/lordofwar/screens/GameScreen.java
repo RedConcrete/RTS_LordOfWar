@@ -176,7 +176,7 @@ public class GameScreen extends Screens implements Screen {
         myCastleHB.setHeight(myCastleHB.getHeight() - 64);
         hitboxes.put(castle.hashCode(), myCastleHB);
 
-        gameScreenEvent.sendCastlePos(startingPosition, castle.hashCode());
+        gameScreenEvent.sendCastlePos(castle);
         setupUI();
 
     }
@@ -281,18 +281,19 @@ public class GameScreen extends Screens implements Screen {
 
 
         castle.draw(renderer.getBatch());
+        gameScreenEvent.sendCastlePos(castle);
 
         if (castle.isSelected()) {
-            entityHp.setText(castle.getHp());
+            entityHp.setText(castle.getHP());
             entityATK.setText("");
             buttonRecruit.setVisible(true);
             buttonIncreaseMaxUnits.setVisible(true);
             entityName.setText("Castle");
 
-            entityHp.setText(castle.getHp());
+            entityHp.setText(castle.getHP());
             Sprite s = new Sprite(uiAtlas.findRegion("button-normal"));
             s.setColor(castle.getTeam().getColor());
-            s.setSize(castle.getHp(), 10);
+            s.setSize(castle.getHP(), 10);
             s.setPosition(castle.getX() + castle.getSprite().getWidth() / 2 / 3, castle.getY() + castle.getSprite().getHeight() - 50);
             s.draw(renderer.getBatch());
         }//TODO select enemy castle
@@ -304,6 +305,13 @@ public class GameScreen extends Screens implements Screen {
 
         for (Castle c : enemyCastleHashMap.values()) {
             c.draw(renderer.getBatch());
+
+            Sprite s = new Sprite(uiAtlas.findRegion("button-normal"));
+            s.setColor(c.getTeam().getColor());
+            s.setSize(c.getHP(), 10);
+            s.setPosition(c.getX() + c.getSprite().getWidth() / 2 / 3, c.getY() + c.getSprite().getHeight() - 50);
+            s.draw(renderer.getBatch());
+
         }
 
         for (Soldier enemySoldiers : enemySoldierHashMap.values()) {
@@ -316,85 +324,85 @@ public class GameScreen extends Screens implements Screen {
             sprite.draw(renderer.getBatch());
         }
 
-        for (Soldier ownSoldiers : ownSoldierHashMap.values()) {
-            ownSoldiers.draw(renderer.getBatch());
-            soldierSendArraylist.add(ownSoldiers.toString());
-            soldierSendArraylist.add(String.valueOf(ownSoldiers.hashCode()));
+        for (Soldier ownSoldier : ownSoldierHashMap.values()) {
+            ownSoldier.draw(renderer.getBatch());
+            soldierSendArraylist.add(ownSoldier.toString());//x and y position + current health
+            soldierSendArraylist.add(String.valueOf(ownSoldier.hashCode()));
 
-            if (ownSoldiers.getDestination() != null) {
-                if (ownSoldiers.getDestination().isEmpty()) {
-                    ownSoldiers.setDestination(null);
+            if (ownSoldier.getDestination() != null) {
+                if (ownSoldier.getDestination().isEmpty()) {
+                    ownSoldier.setDestination(null);
                 } else {
 
-                    int vX = (int) ((ownSoldiers.getX() + 32) / 64);
-                    int vY = (int) ((ownSoldiers.getY() + 32) / 64);
+                    int vX = (int) ((ownSoldier.getX() + 32) / 64);
+                    int vY = (int) ((ownSoldier.getY() + 32) / 64);
 
-                    if (vX != ownSoldiers.getDestination().get(0).coords.x || vY != ownSoldiers.getDestination().get(0).coords.y) {
+                    if (vX != ownSoldier.getDestination().get(0).coords.x || vY != ownSoldier.getDestination().get(0).coords.y) {
 
-                        if (ownSoldiers.getDestination().get(0).coords.x < vX) {
-                            ownSoldiers.translateX(-2);
-                        } else if (ownSoldiers.getDestination().get(0).coords.x > vX) {
-                            ownSoldiers.translateX(2);
+                        if (ownSoldier.getDestination().get(0).coords.x < vX) {
+                            ownSoldier.translateX(-2);
+                        } else if (ownSoldier.getDestination().get(0).coords.x > vX) {
+                            ownSoldier.translateX(2);
                         }
-                        if (ownSoldiers.getDestination().get(0).coords.y < vY) {
-                            ownSoldiers.translateY(-2);
-                        } else if (ownSoldiers.getDestination().get(0).coords.y > vY) {
-                            ownSoldiers.translateY(2);
+                        if (ownSoldier.getDestination().get(0).coords.y < vY) {
+                            ownSoldier.translateY(-2);
+                        } else if (ownSoldier.getDestination().get(0).coords.y > vY) {
+                            ownSoldier.translateY(2);
                         }
 
                         //TODO maybe do a isColliding method in soldier? idk discuss
-                        if (isColliding(ownSoldiers)) {
+                        if (isColliding(ownSoldier)) {
                             //reverse direction
-                            if (ownSoldiers.getDestination().get(0).coords.x < vX) {
-                                ownSoldiers.setX(ownSoldiers.getX() + ownSoldiers.getWidth() / 2);
-                            } else if (ownSoldiers.getDestination().get(0).coords.x > vX) {
-                                ownSoldiers.setX(ownSoldiers.getX() - ownSoldiers.getWidth() / 2);
+                            if (ownSoldier.getDestination().get(0).coords.x < vX) {
+                                ownSoldier.setX(ownSoldier.getX() + ownSoldier.getWidth() / 2);
+                            } else if (ownSoldier.getDestination().get(0).coords.x > vX) {
+                                ownSoldier.setX(ownSoldier.getX() - ownSoldier.getWidth() / 2);
                             }
-                            if (ownSoldiers.getDestination().get(0).coords.y < vY) {
-                                ownSoldiers.setY(ownSoldiers.getY() - ownSoldiers.getHeight() / 2);
+                            if (ownSoldier.getDestination().get(0).coords.y < vY) {
+                                ownSoldier.setY(ownSoldier.getY() - ownSoldier.getHeight() / 2);
 
-                            } else if (ownSoldiers.getDestination().get(0).coords.y > vY) {
-                                ownSoldiers.setY(ownSoldiers.getY() - ownSoldiers.getHeight() / 2);
+                            } else if (ownSoldier.getDestination().get(0).coords.y > vY) {
+                                ownSoldier.setY(ownSoldier.getY() - ownSoldier.getHeight() / 2);
                             }
-                            getPathFinding(ownSoldiers, (int) ownSoldiers.getDestination().get(ownSoldiers.getDestination().size() - 1).coords.x * collisionUnitLayer.getTileWidth(), (int) (ownSoldiers.getDestination().get(ownSoldiers.getDestination().size() - 1).coords.y * collisionUnitLayer.getTileHeight()));
+                            getPathFinding(ownSoldier, (int) ownSoldier.getDestination().get(ownSoldier.getDestination().size() - 1).coords.x * collisionUnitLayer.getTileWidth(), (int) (ownSoldier.getDestination().get(ownSoldier.getDestination().size() - 1).coords.y * collisionUnitLayer.getTileHeight()));
                         }
 
-                    } else if (vX == ownSoldiers.getDestination().get(0).coords.x && vY == ownSoldiers.getDestination().get(0).coords.y) {
-                        if (ownSoldiers.getDestination().size() >= 1) {
-                            ownSoldiers.getDestination().remove(0);
-                            hitboxes.put(ownSoldiers.hashCode(), ownSoldiers.getBoundingRectangle());//set hitbox when having reached a tile
+                    } else if (vX == ownSoldier.getDestination().get(0).coords.x && vY == ownSoldier.getDestination().get(0).coords.y) {
+                        if (ownSoldier.getDestination().size() >= 1) {
+                            ownSoldier.getDestination().remove(0);
+                            hitboxes.put(ownSoldier.hashCode(), ownSoldier.getBoundingRectangle());//set hitbox when having reached a tile
                         }
                     }
                 }
             } else {
-                hitboxes.put(ownSoldiers.hashCode(), ownSoldiers.getBoundingRectangle());//set hitbox when having stopped moving
+                hitboxes.put(ownSoldier.hashCode(), ownSoldier.getBoundingRectangle());//set hitbox when having stopped moving
             }
 
-            if (ownSoldiers.isSelected()) {
+            if (ownSoldier.isSelected()) {
                 buttonRecruit.setVisible(false);
                 buttonIncreaseMaxUnits.setVisible(false);
-                entityHp.setText(ownSoldiers.getHP());
-                entityATK.setText(ownSoldiers.getATK()); //todo atk von Soldier!!!
+                entityHp.setText(ownSoldier.getHP());
+                entityATK.setText(ownSoldier.getATK()); //todo atk von Soldier!!!
                 entityName.setText("Soldier");
 
                 Sprite sprite = new Sprite(uiAtlas.findRegion("button-normal"));
-                sprite.setColor(ownSoldiers.getTeam().getColor());
-                sprite.setSize(ownSoldiers.getHP(), 10);
-                sprite.setPosition(ownSoldiers.getX() + 5, ownSoldiers.getY() + 60);
+                sprite.setColor(ownSoldier.getTeam().getColor());
+                sprite.setSize(ownSoldier.getHP(), 10);
+                sprite.setPosition(ownSoldier.getX() + 5, ownSoldier.getY() + 60);
                 sprite.draw(renderer.getBatch());
             }
 
             //combat checks
-            if (ownSoldiers.isAlive()) {
-                if (ownSoldiers.canAttack()) {
+            if (ownSoldier.isAlive()) {
+                if (ownSoldier.canAttack()) {
                     HashMap<String, CombatEntity> enemyMap = new HashMap<>(enemySoldierHashMap);
                     enemyMap.putAll(enemyCastleHashMap);
                     for (Map.Entry<String, Rectangle> hitbox : enemyHitboxes.entrySet()) {
                         if (enemyMap.get(hitbox.getKey()).isAlive()) {
-                            if (ownSoldiers.getTarget() == null || enemyMap.get(hitbox.getKey()) == ownSoldiers.getTarget()) {
-                                if (ownSoldiers.getCombatReach().overlaps(hitbox.getValue())) {
+                            if (ownSoldier.getTarget() == null || enemyMap.get(hitbox.getKey()) == ownSoldier.getTarget()) {
+                                if (ownSoldier.getCombatReach().overlaps(hitbox.getValue())) {
                                     //  enemySoldierHashMap.get(hitbox.getKey()).receiveDmg(s.dealDmg());//transmit dmg to appropiate color via msg instead of calculating here?
-                                    gameScreenEvent.sendAtkRequest(ownSoldiers.dealDmg(), hitbox.getKey(), enemyMap.get(hitbox.getKey()));//send atk data
+                                    gameScreenEvent.sendAtkRequest(ownSoldier.dealDmg(), hitbox.getKey(), enemyMap.get(hitbox.getKey()));//send atk data
                                 }
                             }
                         }
@@ -928,9 +936,11 @@ public class GameScreen extends Screens implements Screen {
                     enemySprite.setColor(team.getColor());
                     Soldier soldier = new Soldier(enemySprite, collisionUnitLayer, team);
                     soldier.setPosition(Float.parseFloat(pos[0]), Float.parseFloat(pos[1]));
+                    soldier.setHP(Integer.parseInt(pos[2]));
                     enemySoldierHashMap.put(enemyArrList.get(i + 1), soldier);
                     enemyHitboxes.put(enemyArrList.get(i + 1), soldier.getBoundingRectangle());
                 } else {
+                    enemySoldierHashMap.get(enemyArrList.get(i + 1)).setHP(Integer.parseInt(pos[2]));
                     enemySoldierHashMap.get(enemyArrList.get(i + 1)).setPosition(Float.parseFloat(pos[0]), Float.parseFloat(pos[1]));
                     enemyHitboxes.put(enemyArrList.get(i + 1), enemySoldierHashMap.get(enemyArrList.get(i + 1)).getBoundingRectangle());
                 }
@@ -975,19 +985,21 @@ public class GameScreen extends Screens implements Screen {
                 return;
         }
         if (enemyCastleHashMap != null) {
-            if (!enemyCastleHashMap.containsKey(enemyArrList.get(1))) {
+            if (!enemyCastleHashMap.containsKey(enemyArrList.get(2))) {
                 //Position [x anzahl von koordinaten und hashcodes]
                 Castle castle = new Castle(castleSprite, collisionUnitLayer, team);
                 castle.setPosition(castlePosition[0], castlePosition[1]);
-                enemyCastleHashMap.put(enemyArrList.get(1), castle);
+                castle.setHP(Integer.parseInt(enemyArrList.get(1)));
+                enemyCastleHashMap.put(enemyArrList.get(2), castle);
 
                 Rectangle castleHB = new Rectangle(castle.getBoundingRectangle());
                 castleHB.setWidth(castleHB.getWidth());
                 castleHB.setHeight(castleHB.getHeight() - 64);
-                enemyHitboxes.put(enemyArrList.get(1), castleHB);
+                enemyHitboxes.put(enemyArrList.get(2), castleHB);
             } else {
-                enemyCastleHashMap.get(enemyArrList.get(1)).setPosition(castlePosition[0], castlePosition[1]);
-                enemyHitboxes.put(enemyArrList.get(1), enemyCastleHashMap.get(enemyArrList.get(1)).getBoundingRectangle().setHeight(enemyCastleHashMap.get(enemyArrList.get(1)).getBoundingRectangle().getHeight() - 64));
+                enemyCastleHashMap.get(enemyArrList.get(2)).setPosition(castlePosition[0], castlePosition[1]);
+                enemyCastleHashMap.get(enemyArrList.get(2)).setHP(Integer.parseInt(enemyArrList.get(1)));
+                enemyHitboxes.put(enemyArrList.get(2), enemyCastleHashMap.get(enemyArrList.get(2)).getBoundingRectangle().setHeight(enemyCastleHashMap.get(enemyArrList.get(2)).getBoundingRectangle().getHeight() - 64));
             }
         }
         //how to handle dead castle?
@@ -1009,7 +1021,6 @@ public class GameScreen extends Screens implements Screen {
                 Soldier soldier = ownSoldierHashMap.get(unitHash);
                 if (soldier != null) {
                     soldier.receiveDmg(new Pair<>(dmgType, dmg));
-                    System.out.println(soldier.getHP());
                     if (!soldier.isAlive()) {
                         ownSoldierHashMap.remove(unitHash);
                         hitboxes.remove(soldier.hashCode());
@@ -1021,6 +1032,7 @@ public class GameScreen extends Screens implements Screen {
             } else if (unitType.equals(Castle.UNIT_TYPE)) {
                 if (castle.hashCode() == unitHash) {
                     castle.receiveDmg(new Pair<>(dmgType, dmg));
+                    gameScreenEvent.sendCastlePos(castle);
                     if (!castle.isAlive()) {
                         // System.out.println("castle kill");
                         //todo kill castle and lose game here
@@ -1034,6 +1046,10 @@ public class GameScreen extends Screens implements Screen {
 
     public GameScreenEvent getGameScreenEvent() {
         return gameScreenEvent;
+    }
+
+    public void endGame(String[] playerscores){
+
     }
 
     private ArrayList<String> ArrayToArraylist(String[] strings) {

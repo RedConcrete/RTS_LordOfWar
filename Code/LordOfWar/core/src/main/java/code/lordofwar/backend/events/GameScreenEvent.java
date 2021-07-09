@@ -27,7 +27,6 @@ import static code.lordofwar.backend.MessageIdentifier.*;
  * The event from the Gamescreenclass
  *
  * @author Franz Klose,Robin Hefner,Cem Arslan
- *
  */
 public class GameScreenEvent extends Events {
     private int points;
@@ -36,9 +35,9 @@ public class GameScreenEvent extends Events {
     private HashMap<String, Team> teamHashMap;
     private GameScreen gameScreen;
     private ArrayList<String> enemyUnits;
+    private String[] gameOverArray;
 
     /**
-     *
      * @param aGame
      * @param lobbyID
      * @param gameScreen
@@ -50,6 +49,7 @@ public class GameScreenEvent extends Events {
         this.gameScreen = gameScreen;
         teamHashMap = new HashMap<>();
         enemyUnits = new ArrayList<>();
+        gameOverArray=null;
 
 
     }
@@ -65,7 +65,8 @@ public class GameScreenEvent extends Events {
     }
 
     /**
-     *  processes the points of the player
+     * processes the points of the player
+     *
      * @param arr
      */
     public void updatePoints(String[] arr) {
@@ -86,6 +87,7 @@ public class GameScreenEvent extends Events {
 
     /**
      * Creates a team with the specified startingPosition
+     *
      * @param startingPosition
      */
     public void createTeams(int startingPosition) {
@@ -143,8 +145,7 @@ public class GameScreenEvent extends Events {
             }
 
             camera.update();
-        }
-        else if (xClicked <= 5 && yClicked >= camera.viewportHeight - 50) {
+        } else if (xClicked <= 5 && yClicked >= camera.viewportHeight - 50) {
             posCameraDesired.x -= CAMERASPEED * Gdx.graphics.getDeltaTime();
             posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
 
@@ -171,8 +172,7 @@ public class GameScreenEvent extends Events {
             }
 
             camera.update();
-        }
-        else if (xClicked >= camera.viewportWidth - 5 && yClicked <= 50) {
+        } else if (xClicked >= camera.viewportWidth - 5 && yClicked <= 50) {
             posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
             posCameraDesired.y += CAMERASPEED * Gdx.graphics.getDeltaTime();
 
@@ -199,8 +199,7 @@ public class GameScreenEvent extends Events {
             }
 
             camera.update();
-        }
-        else if (xClicked >= camera.viewportWidth - 5 && yClicked >= camera.viewportHeight - 50) {
+        } else if (xClicked >= camera.viewportWidth - 5 && yClicked >= camera.viewportHeight - 50) {
             posCameraDesired.x += CAMERASPEED * Gdx.graphics.getDeltaTime();
             posCameraDesired.y -= CAMERASPEED * Gdx.graphics.getDeltaTime();
 
@@ -278,6 +277,7 @@ public class GameScreenEvent extends Events {
 
     /**
      * moves the camera with the arrowskeys
+     *
      * @param camera
      * @param CAMERASPEED
      * @param posCameraDesired
@@ -303,6 +303,7 @@ public class GameScreenEvent extends Events {
 
     /**
      * Special Keys for special moves
+     *
      * @param windowExit
      * @param yesButton
      * @param noButton
@@ -323,6 +324,7 @@ public class GameScreenEvent extends Events {
 
     /**
      * Sends the position of the own soldiers to the server
+     *
      * @param s
      */
     public void updateSoldier(ArrayList<String> s) {
@@ -338,9 +340,10 @@ public class GameScreenEvent extends Events {
     public void updateSoldierPos(ArrayList<String> a) {
         webSocket.send(DataPacker.packData(UPDATE_SOLDIER_POS, DataPacker.stringCombiner(a)));
     }
-    
+
     /**
      * Sends the ATKRequest to the server
+     *
      * @param dmgPair
      * @param enemyHashcode
      * @param entity
@@ -355,11 +358,13 @@ public class GameScreenEvent extends Events {
         atkData.add(enemyHashcode);
         atkData.add(String.valueOf(dmgPair.getFirst()));
         atkData.add(String.valueOf(dmgPair.getSecond()));
-        webSocket.send(DataPacker.packData(UPDATE_UNIT_HEALTH, DataPacker.stringCombiner(atkData)));
+        webSocket.send(DataPacker.packData(ATTACK_UNIT_UPDATE, DataPacker.stringCombiner(atkData)));
     }
+
 
     /**
      * Receives the DMGs that was dealt to a Unit
+     *
      * @param dmgData
      */
     public void receiveDmg(String[] dmgData) {
@@ -372,11 +377,12 @@ public class GameScreenEvent extends Events {
     }
 
     /**
-     *  Receives the soldiers from other players.
+     * Receives the soldiers from other players.
+     *
      * @param data
      */
     public void processSoldiers(String[] data) {
-        // data [0] = MessageID / data [1] = startigPos / data[2] = x Pos,y Pos / data[3] = SoldatenHash
+        // data [0] = MessageID / data [1] = startigPos / data[2] = x Pos,y Pos,health / data[3] = SoldatenHash
         String[] enemyArray = new String[data.length - 1];
         System.arraycopy(data, 1, enemyArray, 0, data.length - 1);
         this.enemyUnits.addAll(Arrays.asList(enemyArray));
@@ -385,6 +391,7 @@ public class GameScreenEvent extends Events {
 
     /**
      * Receives the castles from other players.
+     *
      * @param data
      */
     public void processCastles(String[] data) {
@@ -397,15 +404,16 @@ public class GameScreenEvent extends Events {
 
     /**
      * Sends the own castle pos to the server
-     * @param startingPos
-     * @param hashcode
+     *
+     * @param castle
      */
-    public void sendCastlePos(int startingPos, int hashcode) {
+    public void sendCastlePos(Castle castle) {
         ArrayList<String> castleData = new ArrayList<>();
         castleData.add(game.getSessionID());
         castleData.add(lobbyID);
-        castleData.add(String.valueOf(startingPos));
-        castleData.add(String.valueOf(hashcode));
+        castleData.add(String.valueOf(castle.getTeam().getStartingPos()));
+        castleData.add(String.valueOf(castle.getHP()));
+        castleData.add(String.valueOf(castle.hashCode()));
         webSocket.send(DataPacker.packData(UPDATE_CASTLE_POS, DataPacker.stringCombiner(castleData)));//send castle data to server
     }
 
@@ -428,5 +436,11 @@ public class GameScreenEvent extends Events {
 
     public ArrayList<String> getEnemyUnits() {
         return enemyUnits;
+    }
+
+    public void gameOver(String[] data) {
+        gameOverArray=new String[data.length-1];
+        System.arraycopy(data, 1, gameOverArray, 0, data.length - 1);
+        gameScreen.endGame(data);
     }
 }

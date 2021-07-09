@@ -12,7 +12,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -88,8 +87,8 @@ public class GameWebSocketHandler {
             genSoldierPosArray(data);
         } else if (data[0].equals(UPDATE_CASTLE_POS.toString())) {
             genCastlePosArray(data);
-        } else if (data[0].equals(UPDATE_UNIT_HEALTH.toString())) {
-            updateUnitHealth(data);
+        } else if (data[0].equals(ATTACK_UNIT_UPDATE.toString())) {
+            attackUnitUpdate(data);
         }
     }
 
@@ -225,14 +224,13 @@ public class GameWebSocketHandler {
     }
 
     private void genSoldierPosArray(String[] data) {
-
         ServerLobby lobby = findLobby(data);
         if (lobby != null) {
             if (lobby.getGame() != null) {
                 ArrayList<String> changedData = new ArrayList<>();
                 changedData.add(data[3]);
                 for (int i = 4; i < data.length; i += 2) {
-                    changedData.add(data[i]);
+                    changedData.add(data[i]);//x/y/health
                     changedData.add(data[i + 1]);
                 }
                 for (User user : lobby.getPlayers()) {
@@ -246,25 +244,50 @@ public class GameWebSocketHandler {
     }
 
     private void genCastlePosArray(String[] data) {
-//MI,UID,LID,Startingpos,hashcode
+//MI,UID,LID,Startingpos, health,hashcode
         ServerLobby lobby = findLobby(data);
         if (lobby != null) {
             if (lobby.getGame() != null) {
                 ArrayList<String> changedData = new ArrayList<>();
                 changedData.add(data[3]);
                 changedData.add(data[4]);
+                changedData.add(data[5]);
                 for (User user : lobby.getPlayers()) {
                     if (!sessions.get(data[1]).equals(user.getuSession())) {
                         //1001 error here ; Server thinks client navigates away/closes?
                         user.getuSession().getAsyncRemote().sendText(DataPacker.packData(UPDATE_CASTLE_POS, DataPacker.stringCombiner(changedData)));
+                        if (Integer.parseInt(data[4]) <= 0) {
+                            lobby.getGame().killPlayer(Integer.parseInt(data[3]));
+                            if (lobby.getGame().getWinner() != null) {
+                                endGame(lobby);
+                                //send game over message and points for everyone
+                            }
+                            //TODO send lose msg
+                            //user.getuSession().getAsyncRemote().sendText();
+                        }
                     }
                 }
             }
         }
-
     }
 
-    private void updateUnitHealth(String[] data) {
+    private void endGame(ServerLobby lobby) {
+        ServerGame game = lobby.getGame();
+        lobby.setGame(null);
+        ArrayList<String> gameOverData = new ArrayList<>();
+        gameOverData.add(game.getWinner().getUsername());
+        gameOverData.add(String.valueOf(game.getPoints(game.getWinner().getuSession().getId())));
+        for (User user : game.getPlayers()) {
+            gameOverData.add(user.getUsername());
+            gameOverData.add(String.valueOf(game.getPoints(user.getuSession().getId())));
+        }
+        //[winner,winnerscore,Other players name,other players score]
+        for (User user : lobby.getPlayers()) {
+            user.getuSession().getAsyncRemote().sendText(DataPacker.packData(GAME_OVER, DataPacker.stringCombiner(gameOverData)));
+        }
+    }
+
+    private void attackUnitUpdate(String[] data) {
         //Syntax: [MI,lobbyID,starting STARTING POSITION (of enemy),UNITTYPE(Soldier or castle),enemy hashcode, DAMAGE TYPE,ATK]
         ServerLobby lobby = findLobby(data);
         if (lobby != null) {
@@ -274,7 +297,7 @@ public class GameWebSocketHandler {
                 updateData.add(data[4]);//hashcode
                 updateData.add(data[5]);//dmgtype
                 updateData.add(data[6]);//dmg
-                lobby.getGame().getPlayers()[Integer.parseInt(data[1])].getuSession().getAsyncRemote().sendText(DataPacker.packData(UPDATE_UNIT_HEALTH, DataPacker.stringCombiner(updateData)));
+                lobby.getGame().getPlayers()[Integer.parseInt(data[1])].getuSession().getAsyncRemote().sendText(DataPacker.packData(ATTACK_UNIT_UPDATE, DataPacker.stringCombiner(updateData)));
             }
         }
     }

@@ -108,7 +108,7 @@ public abstract class AbstractCombatEntity extends Sprite implements CombatEntit
         this.target = combatEntity;
     }
 
-    public void setHp(int hp) {
+    public void setHP(int hp) {
         this.hp = hp;
     }
 
@@ -120,9 +120,7 @@ public abstract class AbstractCombatEntity extends Sprite implements CombatEntit
         this.alive = alive;
     }
 
-    public int getHp() {
-        return hp;
-    }
+
 
     public int getDef() {
         return def;

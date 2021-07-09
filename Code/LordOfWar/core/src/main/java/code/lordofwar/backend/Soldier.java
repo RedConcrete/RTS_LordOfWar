@@ -11,7 +11,6 @@ import com.badlogic.gdx.math.Vector2;
 import java.util.List;
 
 /**
- *
  * @author Robin Hefner
  */
 public class Soldier extends AbstractCombatEntity {
@@ -63,7 +62,7 @@ public class Soldier extends AbstractCombatEntity {
 
     @Override
     public String toString() {
-        return this.getX() + "," + this.getY();
+        return this.getX() + "," + this.getY() + "," + this.getHP();
     }
 
     public TiledMapTileLayer getCollisionLayer() {

@@ -6,8 +6,10 @@ import java.util.HashMap;
 
 public class ServerGame {
     private final User[] players;
+    private final User[] livingPlayers;
     private HashMap<String, User> sessionIDMap;
     private HashMap<User, Integer> pointMap;
+    private User winner;
 
     public ServerGame(ArrayList<User> players) {
         this.players = new User[players.size()];
@@ -20,7 +22,38 @@ public class ServerGame {
             i++;
             sessionIDMap.put(user.getuSession().getId(), user);
         }
+        winner=null;
+        livingPlayers = this.players;
     }
+
+    public User[] getLivingPlayers() {
+        return livingPlayers;
+    }
+
+    public void killPlayer(int startingPos) {
+        livingPlayers[startingPos] = null;
+        int i = 0;
+        for (User user : livingPlayers) {
+            if (user != null) {
+                i++;
+            }
+        }
+        if (i==1){
+            setWinner();
+        }
+    }
+    private void setWinner(){
+        for (User user:livingPlayers) {
+            if (user!=null){
+                winner=user;
+            }
+        }
+    }
+
+    public User getWinner(){
+        return winner;
+    }
+
 
     private void addPoints(User user, int points) {
         int score = pointMap.get(user);

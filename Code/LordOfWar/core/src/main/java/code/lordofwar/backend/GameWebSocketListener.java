@@ -8,6 +8,8 @@ import okhttp3.WebSocketListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+
 import static code.lordofwar.backend.Constants.STRINGSEPERATOR;
 import static code.lordofwar.backend.MessageIdentifier.*;
 
@@ -93,9 +95,13 @@ public class GameWebSocketListener extends WebSocketListener {
             if (game.getScreen() instanceof GameScreen) {
                 ((GameScreen) game.getScreen()).getGameScreenEvent().processCastles(strings);
             }
-        } else if (strings[0].equals(UPDATE_UNIT_HEALTH.toString())) {
+        } else if (strings[0].equals(ATTACK_UNIT_UPDATE.toString())) {
             if (game.getScreen() instanceof GameScreen) {
                 ((GameScreen) game.getScreen()).getGameScreenEvent().receiveDmg(strings);
+            }
+        }else if (strings[0].equals(GAME_OVER.toString())){
+            if (game.getScreen() instanceof GameScreen) {
+                ((GameScreen) game.getScreen()).getGameScreenEvent().gameOver(strings);
             }
         }
     }
