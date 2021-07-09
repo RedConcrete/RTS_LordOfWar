@@ -35,7 +35,6 @@ public class GameScreenEvent extends Events {
     private HashMap<String, Team> teamHashMap;
     private GameScreen gameScreen;
     private ArrayList<String> enemyUnits;
-    private String[] gameOverArray;
 
     /**
      * @param aGame
@@ -49,7 +48,6 @@ public class GameScreenEvent extends Events {
         this.gameScreen = gameScreen;
         teamHashMap = new HashMap<>();
         enemyUnits = new ArrayList<>();
-        gameOverArray=null;
 
 
     }
@@ -439,8 +437,8 @@ public class GameScreenEvent extends Events {
     }
 
     public void gameOver(String[] data) {
-        gameOverArray=new String[data.length-1];
+        String[] gameOverArray=new String[data.length-1];
         System.arraycopy(data, 1, gameOverArray, 0, data.length - 1);
-        gameScreen.endGame(data);
+        gameScreen.endGame(gameOverArray);
     }
 }

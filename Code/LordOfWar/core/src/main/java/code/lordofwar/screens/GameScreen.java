@@ -1048,8 +1048,9 @@ public class GameScreen extends Screens implements Screen {
         return gameScreenEvent;
     }
 
-    public void endGame(String[] playerscores){
-
+    public void endGame(String[] data) {
+        game.setScreen(new GameScoreScreen(game, skin, data));//swap over to score screen
+        dispose();
     }
 
     private ArrayList<String> ArrayToArraylist(String[] strings) {

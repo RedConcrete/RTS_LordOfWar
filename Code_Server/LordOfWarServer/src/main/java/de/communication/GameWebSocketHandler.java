@@ -275,15 +275,24 @@ public class GameWebSocketHandler {
         ServerGame game = lobby.getGame();
         lobby.setGame(null);
         ArrayList<String> gameOverData = new ArrayList<>();
+
+        //actual number of plyers,winner name, winner score, Ith player name,Ith player score,lobby max players, lobbyname, lobbymap,gamemode,own player order
+        gameOverData.add(String.valueOf(game.getPlayers().length));
         gameOverData.add(game.getWinner().getUsername());
         gameOverData.add(String.valueOf(game.getPoints(game.getWinner().getuSession().getId())));
         for (User user : game.getPlayers()) {
             gameOverData.add(user.getUsername());
             gameOverData.add(String.valueOf(game.getPoints(user.getuSession().getId())));
         }
-        //[winner,winnerscore,Other players name,other players score]
+        gameOverData.add(String.valueOf(lobby.getPlayerAmount()));
+        gameOverData.add(lobby.getLobbyName());
+        gameOverData.add(lobby.getLobbyMap());
+        gameOverData.add(lobby.getGamemode());
+        //[]
         for (User user : lobby.getPlayers()) {
+            gameOverData.add(String.valueOf(lobby.getPlayerOrder((user))));
             user.getuSession().getAsyncRemote().sendText(DataPacker.packData(GAME_OVER, DataPacker.stringCombiner(gameOverData)));
+            gameOverData.remove(gameOverData.size()-1);
         }
     }
 
