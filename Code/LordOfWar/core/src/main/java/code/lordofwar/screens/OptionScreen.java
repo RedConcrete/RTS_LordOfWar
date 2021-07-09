@@ -64,7 +64,6 @@ public class OptionScreen extends Screens implements Screen {
 
     @Override
     public void dispose() {
-        //todo dispose alles was erstellt wurde (Texturen)
         stage.dispose();
     }
 
@@ -132,7 +131,7 @@ public class OptionScreen extends Screens implements Screen {
             }
 
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });
@@ -151,7 +150,7 @@ public class OptionScreen extends Screens implements Screen {
             }
 
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });
@@ -179,7 +178,7 @@ public class OptionScreen extends Screens implements Screen {
             }
 
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });

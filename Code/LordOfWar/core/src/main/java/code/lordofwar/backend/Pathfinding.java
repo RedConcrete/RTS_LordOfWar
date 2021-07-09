@@ -52,7 +52,6 @@ public class Pathfinding {
      */
     public PathCell algorithm() {
 
-        //todo wenn man auf x:0 und y:0 drückt crashed es hier!!!
         PathCell current = new PathCell(cache, new double[]{getCellDistancesToEnd(cache.x, cache.y), 0, getCellDistancesToEnd(cache.x, cache.y)}, null);
         HashMap<Vector2, PathCell> closed = new HashMap<>();
         HashMap<Vector2, PathCell> open = new HashMap<>();
@@ -65,7 +64,6 @@ public class Pathfinding {
                 open.remove(current.coords);
                 closed.put(current.coords, current);
                 for (Map.Entry<Vector2, double[]> entry : getSurrounding(current.coords).entrySet()) {
-                    //TODO current is not goal
                     PathCell newCell = new PathCell(entry.getKey(), entry.getValue(), current);
                     if (traversable(newCell)) {
                         if (closed.containsKey(newCell.coords)) {//should return smthing since equals same vector works also
@@ -99,7 +97,7 @@ public class Pathfinding {
                 current = newCurrent;
             } else {
                 //System.out.println("TEST SUCCESS");
-                return current;//TODO CURRENT IS GOAL
+                return current;
             }
         }
 
@@ -120,11 +118,11 @@ public class Pathfinding {
                 TiledMapTile tile = cell.getTile();
                 if (tile != null) {
                     MapProperties properties = tile.getProperties();
-                    if (!properties.containsKey(Constants.BLOCK_TILE_PROPERTY)) {//todo change this to generic blocked
+                    if (!properties.containsKey(Constants.BLOCK_TILE_PROPERTY)) {
                         for (Rectangle hitbox : hitboxes) {
                             if (hitbox.overlaps(//check wether hitbox overlaps with tile
                                     new Rectangle(((int) pathCell.coords.x) * collisionLayer.getTileWidth()-2, ((int) pathCell.coords.y) * collisionLayer.getTileHeight()-2,
-                                            collisionLayer.getTileWidth() - 2, collisionLayer.getTileHeight() - 2))) {//todo put this offset into a variable?
+                                            collisionLayer.getTileWidth() - 2, collisionLayer.getTileHeight() - 2))) {
 
                                 //System.out.println(pathCell.coords.x + " " + pathCell.coords.y + " BLOCKED");
                                 return false;
@@ -221,25 +219,6 @@ public class Pathfinding {
         yEndCell = yClicked / 64;
     }
 
-    /**
-     * https://www.calculatorsoup.com/calculators/geometry-plane/distance-two-points.php
-     */
-//    public void checkMoveableCell() {
-//        for (Vector2 v : cellArr) {
-//
-//            if (v.x >= 0 && v.y >= 0) {
-//                TiledMapTileLayer.Cell cell = collisionLayer.getCell((int) v.x, (int) v.y);
-//                TiledMapTile tile = cell.getTile();
-//                MapProperties properties = tile.getProperties();
-//
-//                if (properties.containsKey("isCastle")) {
-//                    //Todo costen der cell sehr hoch machen
-//                }
-//            } else {
-//                //todo del diese Werte aus der Arraylist
-//            }
-//        }
-//    }
     public TiledMapTileLayer getCollisionLayer() {
         return collisionLayer;
     }

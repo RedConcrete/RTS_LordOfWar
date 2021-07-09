@@ -46,8 +46,6 @@ public class LOW extends Game {
         FitViewport fitViewport = new FitViewport(WORLD_WIDTH_PIXEL, WORLD_HEIGHT_PIXEL);
         stage = new Stage(fitViewport);
 
-        //TODO progressbar machen !! und Assetloader
-
         this.setScreen(new LoginScreen(this, skin));
         player.music("Ireland_2.wav");
 

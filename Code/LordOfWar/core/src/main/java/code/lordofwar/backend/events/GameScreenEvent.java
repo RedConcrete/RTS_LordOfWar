@@ -300,27 +300,6 @@ public class GameScreenEvent extends Events {
     }
 
     /**
-     * Special Keys for special moves
-     *
-     * @param windowExit
-     * @param yesButton
-     * @param noButton
-     * @param stage
-     */
-    //TODO remove this
-    //TODO move this to input listener
-    public void StageKeyEvents(Window windowExit, TextButton yesButton, TextButton noButton, Stage stage) {
-
-        if (Gdx.input.isKeyPressed(Input.Keys.F10)) {
-            windowExit.setVisible(true);
-            yesButton.getLabel().setFontScale(2f);
-            noButton.getLabel().setFontScale(2f);
-            stage.addActor(windowExit);
-        }
-
-    }
-
-    /**
      * Sends the position of the own soldiers to the server
      *
      * @param s

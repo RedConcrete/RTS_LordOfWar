@@ -91,7 +91,7 @@ public class GameWebSocketListener extends WebSocketListener {
             if (game.getScreen() instanceof GameScreen) {
                 ((GameScreen) game.getScreen()).getGameScreenEvent().processSoldiers(strings);
             }
-        } else if (strings[0].equals(UPDATE_CASTLE_POS.toString())) {//message is never sent so TODO SEND MESSAGE
+        } else if (strings[0].equals(UPDATE_CASTLE_POS.toString())) {
             if (game.getScreen() instanceof GameScreen) {
                 ((GameScreen) game.getScreen()).getGameScreenEvent().processCastles(strings);
             }

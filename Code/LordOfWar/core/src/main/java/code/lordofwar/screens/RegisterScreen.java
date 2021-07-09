@@ -71,8 +71,6 @@ public class RegisterScreen extends Screens implements Screen {
         registerButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-
-                //TODO Get rid of code copying
                 ArrayList<String> registerArray = new ArrayList<>();
                 registerArray.add(game.getSessionID());
                 registerArray.add(usernameTextField.getText());
@@ -92,7 +90,6 @@ public class RegisterScreen extends Screens implements Screen {
                                 @Override
                                 public void run() {
                                     if (registerScreenEvent.isRegisterAnswer()) {
-                                        //TODO FEEDBACK GEBEN
                                         game.setScreen(new LoginScreen(game, skin));//CHANGED TO loginscreen
                                         stage.dispose();
                                     } else {

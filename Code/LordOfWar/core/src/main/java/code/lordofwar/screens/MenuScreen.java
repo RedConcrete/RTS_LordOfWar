@@ -111,8 +111,6 @@ public class MenuScreen extends Screens implements Screen {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 game.setScreen(new LobbyBrowserScreen(game, skin));
-                //Todo server muss daten von erstellten lobbys senden!
-
             }
 
             @Override

@@ -19,8 +19,6 @@ public interface CombatEntity {
      * @return a {@link Pair<Integer,Double>} where the Integer represents the damage type and double represents the amount of dmg dealt.
      */
     public Pair<Integer, Integer> dealDmg();
-    //TODO implement dmg types (normal dmg, true dmg, max health dmg, maybe slicing vs penetration dmg? (sword vs spear vs shields?)
-    // point being many possibilities
 
     /**
      * This method represents the dmg a unit is dealt.

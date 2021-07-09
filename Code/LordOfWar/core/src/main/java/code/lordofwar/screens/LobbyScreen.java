@@ -54,7 +54,7 @@ public class LobbyScreen extends Screens implements Screen {
             String[] gameData = lobbyScreenEvent.getGameData();
             //[1]=lobbyname[2]=gamemode[3]=map
             //System.out.println(Arrays.toString(gameData));
-            game.setScreen(new GameScreen(game, skin, gameData[0], lobbyScreenEvent.getPosition(), lobbyScreenEvent.getPlayers()));//todo insert data here via lobbyScreenEvent.getData
+            game.setScreen(new GameScreen(game, skin, gameData[0], lobbyScreenEvent.getPosition(), lobbyScreenEvent.getPlayers()));
         }
         if (!lobbyScreenEvent.isRecievedData()) {//later data requests (map etc) also go here
             lobbyScreenEvent.sendPlayerRequest(gameInfoArr[0]);//possible to move this to the end of setupUi()?
@@ -104,7 +104,7 @@ public class LobbyScreen extends Screens implements Screen {
         windowLobby.defaults().pad(50f);
 
         TextButton startButton = new TextButton("Start Game", skin);
-        startButton.setVisible(lobbyAdmin); // todo genial !!!!!!!!!!!!! ;D
+        startButton.setVisible(lobbyAdmin);
         startButton.getLabel().setFontScale(3f);
 
         playerList = new List<>(skin);
@@ -124,7 +124,7 @@ public class LobbyScreen extends Screens implements Screen {
             }
 
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {  //Todo wird das wirklich benötigt ??
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
 

@@ -81,7 +81,7 @@ public class LobbyScreenEvent extends Events {
     public void setPlayers(String[] players) {
         this.players = new String[players.length - 2];
         if (players.length - 2 >= 0) {
-            recievedData = true;//todo move later
+            recievedData = true;
             System.arraycopy(players, 1, this.players, 0, players.length - 2);
             position = Integer.parseInt(players[players.length - 1]);//set starting position here
         }

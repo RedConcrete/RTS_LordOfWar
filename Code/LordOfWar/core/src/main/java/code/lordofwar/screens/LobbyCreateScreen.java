@@ -111,7 +111,7 @@ public class LobbyCreateScreen extends Screens implements Screen {
         gameModeSelectBox.setItems(" Normal ", " Expert ");
 
         SelectBox<String> mapSelctBox = new SelectBox(skin);
-        //todo maps müsseten noch überabretet werden
+
         mapSelctBox.setItems("BIG", "SMALL");
 
 
@@ -119,7 +119,6 @@ public class LobbyCreateScreen extends Screens implements Screen {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
 
-                //Todo Abfrage entwickeln!!!
 
                 if (lobbyName.getText().isEmpty()) {
 

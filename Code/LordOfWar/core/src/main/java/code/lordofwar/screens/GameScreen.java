@@ -37,7 +37,6 @@ import java.util.*;
  * @author Franz Klose,Robin Hefner,Cem Arslan
  */
 public class GameScreen extends Screens implements Screen {
-    //TODO remove this from finished version
     private static final ShapeRenderer debugRenderer = new ShapeRenderer();
     private static final ShapeRenderer debugMovement = new ShapeRenderer();
 
@@ -122,7 +121,6 @@ public class GameScreen extends Screens implements Screen {
         TmxMapLoader loader = new TmxMapLoader();
         camera = new OrthographicCamera();
 
-        //todo zeigt alle verbunden players
         gameScreenEvent.getConnectedPlayer(ArrayToArraylist(connectedPlayersArray), startingPosition);
 
         String mapPath = "maps/map_1.tmx";
@@ -138,7 +136,7 @@ public class GameScreen extends Screens implements Screen {
                 mapProperties.get("width", Integer.class) * mapProperties.get("tilewidth", Integer.class),
                 mapProperties.get("height", Integer.class) * mapProperties.get("tileheight", Integer.class)
         };
-        //TODO way to tell maps apart
+
         float[] castlePosition = {};
         System.out.println(startingPosition);
         switch (startingPosition) {
@@ -168,9 +166,6 @@ public class GameScreen extends Screens implements Screen {
 
         castle = new Castle(castleSprite, collisionUnitLayer, new Team(startingPosition));
         castle.setPosition(castlePosition[0], castlePosition[1]);
-
-        //TODO get enemy castles and add them to enemyCastleMap
-        //TODO add enemy castles to hitboxes()
 
         Rectangle myCastleHB = new Rectangle(castle.getBoundingRectangle());
         myCastleHB.setWidth(myCastleHB.getWidth());
@@ -300,7 +295,7 @@ public class GameScreen extends Screens implements Screen {
             s.setSize(castle.getHP(), 10);
             s.setPosition(castle.getX() + castle.getSprite().getWidth() / 2 / 3, castle.getY() + castle.getSprite().getHeight() - 50);
             s.draw(renderer.getBatch());
-        }//TODO select enemy castle
+        }
 
         ArrayList<String> soldierSendArraylist = new ArrayList<>();
         soldierSendArraylist.add(game.getSessionID());
@@ -323,7 +318,7 @@ public class GameScreen extends Screens implements Screen {
 
             Sprite sprite = new Sprite(uiAtlas.findRegion("button-normal"));
             sprite.setColor(enemySoldiers.getTeam().getColor());
-            sprite.setSize(enemySoldiers.getHP(), 10); //todo hp soldier von gegeerHolen
+            sprite.setSize(enemySoldiers.getHP(), 10);
             sprite.setPosition(enemySoldiers.getX() + 5, enemySoldiers.getY() + 60);
             sprite.draw(renderer.getBatch());
         }
@@ -354,7 +349,6 @@ public class GameScreen extends Screens implements Screen {
                             ownSoldier.translateY(2);
                         }
 
-                        //TODO maybe do a isColliding method in soldier? idk discuss
                         if (isColliding(ownSoldier)) {
                             //reverse direction
                             if (ownSoldier.getDestination().get(0).coords.x < vX) {
@@ -386,7 +380,7 @@ public class GameScreen extends Screens implements Screen {
                 buttonRecruit.setVisible(false);
                 buttonIncreaseMaxUnits.setVisible(false);
                 entityHp.setText(ownSoldier.getHP());
-                entityATK.setText(ownSoldier.getATK()); //todo atk von Soldier!!!
+                entityATK.setText(ownSoldier.getATK());
                 entityName.setText("Soldier");
 
                 Sprite sprite = new Sprite(uiAtlas.findRegion("button-normal"));
@@ -414,7 +408,6 @@ public class GameScreen extends Screens implements Screen {
                         }
                     }
                 }
-                //TODO after enemy hitbox
             }
         }
 
@@ -441,7 +434,6 @@ public class GameScreen extends Screens implements Screen {
 
         if (rectangleStart != null && rectangleEnd != null) {
             //calc Rectangle
-            //todo find a more efficient way to do this?
             rectangleBounds[0] = Math.min(rectangleStart.x, rectangleEnd.x);
             rectangleBounds[1] = Math.min(rectangleStart.y, rectangleEnd.y);
             rectangleBounds[2] = Math.max(rectangleStart.x, rectangleEnd.x) - rectangleBounds[0];
@@ -988,8 +980,7 @@ public class GameScreen extends Screens implements Screen {
                 enemyHitboxes.put(enemyArrList.get(2), enemyCastleHashMap.get(enemyArrList.get(2)).getBoundingRectangle().setHeight(enemyCastleHashMap.get(enemyArrList.get(2)).getBoundingRectangle().getHeight() - 64));
             }
         }
-        //how to handle dead castle?
-        //TODO create message that client sends when own castle is destroyed so it gets removed from all other clients
+
     }
 
     /**
@@ -1021,9 +1012,6 @@ public class GameScreen extends Screens implements Screen {
                     gameScreenEvent.sendCastlePos(castle);
                     if (!castle.isAlive()) {
 
-
-                        //todo kill castle and lose game here
-                        //todo window du hast verloren zeigen und man kann noch weiter zu schauen mehr net
                     }
                 }
 

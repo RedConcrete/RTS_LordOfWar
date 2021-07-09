@@ -11,8 +11,7 @@ public class Constants {
     public static final float CAMERASPEED = 500f;
     public static final String STRINGSEPERATOR = "///";
     public static final String BLOCK_TILE_PROPERTY="blocked";
-    //GAME STATICS
-    //TODO FILL THESE ARRAYS with actual coords
+
     public static final float[] MAP1CC1=new float[]{416,352};//insert coords here (416/352)
     public static final float[] MAP1CC2=new float[]{416,4192};//insert coords here (416/4192)
     public static final float[] MAP1CC3=new float[]{4320,4320};//insert coords here (4320/4320)

@@ -32,7 +32,6 @@ public class GameScoreScreen extends Screens implements Screen {
      * builds the Ui for the Screen
      */
     private void setupUI() {
-        //TODO SHOW Score
         Window windowGameScore = new Window("", skin, "border");
         Label label = new Label("Score",skin);
         windowGameScore.defaults().padLeft(20f).padRight(20f);

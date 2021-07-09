@@ -101,7 +101,6 @@ public class Soldier extends AbstractCombatEntity {
     @Override
     public void die() {
         this.setAlive(false);
-        //TODO do i need to do more here?
     }
 
     @Override
