@@ -12,6 +12,7 @@ import java.util.Set;
 
 /**
  * A* Pathfinding
+ *  * @author Cem Arslan
  */
 public class Pathfinding {
 

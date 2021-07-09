@@ -93,18 +93,20 @@ public abstract class Screens extends Constants {
      *
      * @author Robin Hefner
      */
-
-    protected void backButton(Stage stage, Skin skin, LOW game, Window window) {
+    protected void backButton(Stage stage, Skin skin, LOW game, Window window,boolean isBackToMenu) {
         TextButton backButton = new TextButton("Back", skin);
         backButton.getLabel().setFontScale(3f);
 
         backButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-
-                game.setScreen(new MenuScreen(game, skin));
-                stage.dispose();
-
+                if(isBackToMenu){
+                    game.setScreen(new MenuScreen(game, skin));
+                    stage.dispose();
+                }
+                else{
+                    window.setVisible(false);
+                }
             }
 
             @Override

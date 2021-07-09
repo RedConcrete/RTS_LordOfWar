@@ -185,7 +185,7 @@ public class OptionScreen extends Screens implements Screen {
         windowOptionen.add(fpsButton).row();
         windowOptionen.add(fullscreenButton).row();
 
-        backButton(stage, skin, game, windowOptionen);
+        backButton(stage, skin, game, windowOptionen,true);
         packAndSetWindow(windowOptionen, stage);
 
         stage.setDebugAll(false);

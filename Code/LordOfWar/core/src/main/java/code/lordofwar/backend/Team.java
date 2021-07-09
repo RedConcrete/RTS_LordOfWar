@@ -2,6 +2,10 @@ package code.lordofwar.backend;
 
 import com.badlogic.gdx.graphics.Color;
 
+/**
+ * the Teamclass defines the team object
+ * @author Robin Hefner,Franz Klose
+ */
 public class Team {
 
     private int color;
@@ -13,6 +17,10 @@ public class Team {
         startingPos = color;
     }
 
+    /**
+     * gives the color for a specified a startigpos back
+     * @return
+     */
     public Color getColor() {
         Color defineColor = new Color();
         switch (color) {

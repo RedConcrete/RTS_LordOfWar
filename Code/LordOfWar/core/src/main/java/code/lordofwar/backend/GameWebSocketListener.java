@@ -14,8 +14,8 @@ import static code.lordofwar.backend.Constants.STRINGSEPERATOR;
 import static code.lordofwar.backend.MessageIdentifier.*;
 
 /**
- *
- * @author Robin Hefner
+ *  This class handles the communication between the server an the Server
+ * @author Franz Klose,Cem Arslan
  */
 public class GameWebSocketListener extends WebSocketListener {
 
@@ -49,7 +49,7 @@ public class GameWebSocketListener extends WebSocketListener {
     }
 
     /**
-     * Comunicats with the Server
+     * Communicates with the Server
      * @param strings
      */
     private void checkDataDir(String[] strings) {

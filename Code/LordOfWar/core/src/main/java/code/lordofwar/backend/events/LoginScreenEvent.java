@@ -20,7 +20,7 @@ public class LoginScreenEvent extends Events {
     }
 
     /**
-     * send user date
+     * sends user date
      * @param arr
      */
     public void sendUserData(ArrayList<String> arr) {

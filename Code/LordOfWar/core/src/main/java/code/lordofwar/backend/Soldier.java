@@ -11,7 +11,8 @@ import com.badlogic.gdx.math.Vector2;
 import java.util.List;
 
 /**
- * @author Robin Hefner
+ * the Soldierclass defines the soldier object
+ * @author Cem Arslan,Franz Klose
  */
 public class Soldier extends AbstractCombatEntity {
 

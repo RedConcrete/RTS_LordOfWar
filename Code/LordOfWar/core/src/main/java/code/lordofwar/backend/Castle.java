@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Rectangle;
 
 /**
  * The Class Backgroundmusic is supposed to play Backgroundmusik in the menu as well as in the Game itself.
- * @author Robin Hefner
+ * @author Franz Klose,Robin Hefner,Cem Arslan
  */
 public class Castle extends AbstractCombatEntity {
     public final static String UNIT_TYPE = "CASTLE";
@@ -41,6 +41,9 @@ public class Castle extends AbstractCombatEntity {
         setPosition(getX(), getY());
     }
 
+    /**
+     * increases the Villager count every min
+     */
     private void increaseVillagerPerMinute() {
         new Thread(() -> {
             try {
@@ -53,6 +56,9 @@ public class Castle extends AbstractCombatEntity {
         }).start();
     }
 
+    /**
+     * increases the Gold every 10 secs
+     */
     private void increaseGoldEveryTenSeconds() {
         new Thread(() -> {
             try {

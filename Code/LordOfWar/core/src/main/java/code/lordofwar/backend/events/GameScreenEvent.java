@@ -24,7 +24,7 @@ import java.util.HashMap;
 import static code.lordofwar.backend.MessageIdentifier.*;
 
 /**
- * The event from the Gamescreenclass
+ * The event from the Gamescreen
  *
  * @author Franz Klose,Robin Hefner,Cem Arslan
  */
@@ -334,10 +334,7 @@ public class GameScreenEvent extends Events {
         soldierLabel.setText(castle.getVillager());
         goldLabel.setText(castle.getGold());
     }
-
-    public void updateSoldierPos(ArrayList<String> a) {
-        webSocket.send(DataPacker.packData(UPDATE_SOLDIER_POS, DataPacker.stringCombiner(a)));
-    }
+    
 
     /**
      * Sends the ATKRequest to the server

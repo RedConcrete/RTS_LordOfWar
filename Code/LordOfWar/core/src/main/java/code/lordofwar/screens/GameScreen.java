@@ -31,7 +31,8 @@ import java.awt.geom.Point2D;
 import java.util.*;
 
 /**
- * The gamescreen that show that game
+ * The GameScreen that shows the game and creates the Units.
+ *  most of the Time a player will be in this screen.
  *
  * @author Franz Klose,Robin Hefner,Cem Arslan
  */
@@ -181,6 +182,9 @@ public class GameScreen extends Screens implements Screen {
 
     }
 
+    /**
+     * displays all elements to the screen
+     */
     @Override
     public void show() {
 
@@ -244,6 +248,7 @@ public class GameScreen extends Screens implements Screen {
     }
 
     /**
+     *
      * @param sprite
      * @return
      */
@@ -259,6 +264,10 @@ public class GameScreen extends Screens implements Screen {
         return false;
     }
 
+    /**
+     * renders all sprites
+     * @param delta
+     */
     @Override
     public void render(float delta) {
         clearStage();
@@ -398,11 +407,13 @@ public class GameScreen extends Screens implements Screen {
                     HashMap<String, CombatEntity> enemyMap = new HashMap<>(enemySoldierHashMap);
                     enemyMap.putAll(enemyCastleHashMap);
                     for (Map.Entry<String, Rectangle> hitbox : enemyHitboxes.entrySet()) {
-                        if (enemyMap.get(hitbox.getKey()).isAlive()) {
-                            if (ownSoldier.getTarget() == null || enemyMap.get(hitbox.getKey()) == ownSoldier.getTarget()) {
-                                if (ownSoldier.getCombatReach().overlaps(hitbox.getValue())) {
-                                    //  enemySoldierHashMap.get(hitbox.getKey()).receiveDmg(s.dealDmg());//transmit dmg to appropiate color via msg instead of calculating here?
-                                    gameScreenEvent.sendAtkRequest(ownSoldier.dealDmg(), hitbox.getKey(), enemyMap.get(hitbox.getKey()));//send atk data
+                        if (ownSoldier.canAttack()) {
+                            if (enemyMap.get(hitbox.getKey()).isAlive()) {
+                                if (ownSoldier.getTarget() == null || enemyMap.get(hitbox.getKey()) == ownSoldier.getTarget()) {
+                                    if (ownSoldier.getCombatReach().overlaps(hitbox.getValue())) {
+                                        //  enemySoldierHashMap.get(hitbox.getKey()).receiveDmg(s.dealDmg());//transmit dmg to appropiate color via msg instead of calculating here?
+                                        gameScreenEvent.sendAtkRequest(ownSoldier.dealDmg(), hitbox.getKey(), enemyMap.get(hitbox.getKey()));//send atk data
+                                    }
                                 }
                             }
                         }
@@ -489,7 +500,7 @@ public class GameScreen extends Screens implements Screen {
     }
 
     /**
-     * inits the Ui
+     * builds the Ui for the Screen
      */
     private void setupUI() {
         createResourceBarWindow();
@@ -498,6 +509,9 @@ public class GameScreen extends Screens implements Screen {
         stage.setDebugAll(false);
     }
 
+    /**
+     * creates the ResourceBarWindow and defines it
+     */
     private void createResourceBarWindow() {
 
         Window resourceBarWindow = new Window("", skin);
@@ -525,6 +539,9 @@ public class GameScreen extends Screens implements Screen {
 
     }
 
+    /**
+     * creates the EntityWindow and defines it
+     */
     private void createEntityWindow() {
 
         // No Villager Window
@@ -533,7 +550,7 @@ public class GameScreen extends Screens implements Screen {
         windowNoVillager.setVisible(false);
         windowNoVillager.setMovable(false);
         windowNoVillager.add(new Label("You have not enough Villager to recruit a Soldier", skin)).padTop(20f).padRight(10f).padLeft(10f).row();
-        backButton(stage, skin, game, windowNoVillager);
+        backButton(stage, skin, game, windowNoVillager, false);
 
         // No Gold Window
         Window windowNoGold = new Window("", skin, "border");
@@ -541,9 +558,9 @@ public class GameScreen extends Screens implements Screen {
         windowNoGold.setVisible(false);
         windowNoGold.setMovable(false);
         windowNoGold.add(new Label("You have not enough Gold", skin)).padTop(20f).padRight(10f).padLeft(10f).row();
-        backButton(stage, skin, game, windowNoGold);
+        backButton(stage, skin, game, windowNoGold, false);
 
-        // Entity Window
+
         Window entityWindow = new Window("", skin);
         entityWindow.setMovable(false);
 
@@ -551,7 +568,7 @@ public class GameScreen extends Screens implements Screen {
         Label atkLabel = new Label("ATK", skin);
 
         buttonRecruit = new TextButton("Recruit", skin);
-        TextButton buttonIncreaseMaxUnits = new TextButton("Upgrade Max Units", skin);
+        buttonIncreaseMaxUnits = new TextButton("Upgrade Max Units", skin);
 
         buttonRecruit.addListener(new InputListener() {
             @Override
@@ -583,28 +600,24 @@ public class GameScreen extends Screens implements Screen {
         });
 
 
-        buttonIncreaseMaxUnits.addListener(new
+        buttonIncreaseMaxUnits.addListener(new InputListener() {
 
-                                                   InputListener() {
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
 
-                                                       @Override
-                                                       public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                if (castle.getGold() - castle.getMaxUnits() >= 0) {
+                    castle.setGold(castle.getGold() - castle.getMaxUnits());
+                    castle.setMaxUnits(castle.getMaxUnits() + 10);
+                } else {
+                    windowNoGold.setVisible(true);
+                }
+            }
 
-                                                           if (castle.getGold() - castle.getMaxUnits() >= 0) {
-                                                               castle.setGold(castle.getGold() - castle.getMaxUnits());
-                                                               castle.setMaxUnits(castle.getMaxUnits() + 10);
-                                                           } else {
-                                                               windowNoGold.setVisible(true);
-                                                           }
-                                                       }
-
-                                                       @Override
-                                                       public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                                                           return true;
-                                                       }
-
-
-                                                   });
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+        });
 
         entityWindow.add(entityName).padLeft(30f).padBottom(30f).padTop(10f).colspan(2).row();
         entityWindow.add(hpLabel).padLeft(30f);
@@ -622,10 +635,12 @@ public class GameScreen extends Screens implements Screen {
         stage.addActor(entityWindow);
     }
 
+    /**
+     * creates the ExitWindow and defines it
+     */
     private void createExitWindow() {
         Window exitWindow = new Window("", skin);
         exitWindow.setMovable(false);
-
 
         Window windowExit = new Window("Surrender?", skin, "border");
         windowExit.setMovable(false);
@@ -746,7 +761,7 @@ public class GameScreen extends Screens implements Screen {
     }
 
     /**
-     * shows a debug line
+     * displays a debug line
      *
      * @param start
      * @param end
@@ -813,29 +828,7 @@ public class GameScreen extends Screens implements Screen {
             castle.setSelected(false);
         }
 
-        //todo wenn enemyCastle gesendent wird verwerdne um hp anzu zeigen!
-
-//        for (Castle c : enemyCastleArrayList) {
-//            hitbox = hitboxes.get(c.hashCode());
-//
-//            if (hitboxCheckXY(hitbox, coords)) {//should never happen but better be sure
-//                c.setSelected(!c.isSelected());
-//            } else {
-//                c.setSelected(false);
-//            }
-//        }
-
-//        try {
-//            if (collisionUnitLayer.getCell((int) coords[0] / collisionUnitLayer.getTileWidth(), (int) coords[1] / collisionUnitLayer.getTileHeight())
-//                    .getTile().getProperties().containsKey("isCastel")) {
-//                myCastle.setSelected(!myCastle.isSelected());
-//            }
-//        } catch (Exception e) {
-//
-//        }
     }
-
-    //[0]=x[1]=y
 
     /**
      * @param x
@@ -1034,7 +1027,8 @@ public class GameScreen extends Screens implements Screen {
                     castle.receiveDmg(new Pair<>(dmgType, dmg));
                     gameScreenEvent.sendCastlePos(castle);
                     if (!castle.isAlive()) {
-                        // System.out.println("castle kill");
+
+
                         //todo kill castle and lose game here
                         //todo window du hast verloren zeigen und man kann noch weiter zu schauen mehr net
                     }
@@ -1048,6 +1042,10 @@ public class GameScreen extends Screens implements Screen {
         return gameScreenEvent;
     }
 
+    /**
+     * ends the game when all players except one have lost the game
+     * @param data
+     */
     public void endGame(String[] data) {
         game.setScreen(new GameScoreScreen(game, skin, data));//swap over to score screen
         dispose();

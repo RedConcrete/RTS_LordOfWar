@@ -15,6 +15,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * The LobbyBrowserScreen that shows the lobbybrowser and defines it
+ *
+ * @author Franz Klose,Cem Arslan
+ */
 public class LobbyBrowserScreen extends Screens implements Screen {
 
 
@@ -68,6 +73,9 @@ public class LobbyBrowserScreen extends Screens implements Screen {
         stage.dispose();
     }
 
+    /**
+     * builds the Ui for the Screen
+     */
     private void setupUI() {
 
         Window windowLobbyBrowser = new Window("", skin, "border");
@@ -160,7 +168,7 @@ public class LobbyBrowserScreen extends Screens implements Screen {
         windowLobbyBrowser.setSize(1000, 600);
         windowLobbyBrowser.setMovable(false);
         windowLobbyBrowser.setPosition(stage.getWidth() * 1 / 4, stage.getHeight() * 1 / 3);
-        backButton(stage, skin, game, windowLobbyBrowser);
+        backButton(stage, skin, game, windowLobbyBrowser,true);
         //packAndSetWindow(windowLobbyBrowser, stage);
         stage.addActor(windowLobbyBrowser);
         stage.setDebugAll(false);

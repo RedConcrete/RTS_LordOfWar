@@ -2,7 +2,7 @@ package code.lordofwar.backend;
 
 /**
  *
- * @author Robin Hefner
+ * @author Franz Klose,Cem Arslan
  */
 public enum MessageIdentifier {
 

@@ -7,13 +7,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 
 import javax.swing.*;
 
+/**
+ * shows the Credits
+ * @author Franz Klose, Robin Hefner
+ */
 public class CreditScreen extends Screens implements Screen {
 
-    /**
-     *
-     * @param aGame
-     * @param aSkin
-     */
     public CreditScreen(LOW aGame, Skin aSkin) {
         super(aGame, aSkin);
         createBackground(stage);
@@ -48,6 +47,9 @@ public class CreditScreen extends Screens implements Screen {
     @Override
     public void dispose() { stage.dispose(); }
 
+    /**
+     * builds the Ui for the Screen
+     */
     private void setupUI() {
 
         Window creditWindow = new Window("",skin,"border");
@@ -70,8 +72,7 @@ public class CreditScreen extends Screens implements Screen {
         creditWindow.add(assetDesigner).row();
         creditWindow.add(glebster51).row();
 
-
-        backButton(stage, skin, game, creditWindow);
+        backButton(stage, skin, game, creditWindow,true);
         packAndSetWindow(creditWindow, stage);
 
         stage.setDebugAll(false);

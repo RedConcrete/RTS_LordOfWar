@@ -7,7 +7,7 @@ import java.io.IOException;
 /**
  * The Class Backgroundmusic is supposed to play Backgroundmusik in the menu as well as in the Game itself.
  *
- * @author Robin Hefner
+ * @author Cem Arslan
  */
 public class BackgroundMusic {
     private String currentTrack;//currently playing track

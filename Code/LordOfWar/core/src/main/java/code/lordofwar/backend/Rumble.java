@@ -8,7 +8,7 @@ import java.util.Random;
  * Source:
  * https://gamedev.stackexchange.com/questions/163662/how-to-make-shake-effect-on-camera-in-libgdx
  * https://carelesslabs.wordpress.com/2017/08/14/making-a-libgdx-roguelike-survival-game-part-9-screen-shake-inventory-gamedev/
- * @author Franz Klose
+ * @author unknow
  */
 
 public class Rumble {

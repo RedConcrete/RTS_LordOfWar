@@ -6,7 +6,7 @@ import kotlin.Pair;
 
 /**
  * Reduces logic repetition for the combatUnit entities
- * @author Franz Klose,Robin Hefner,Cem Arslan
+ * @author Cem Arslan
  */
 public abstract class AbstractCombatEntity extends Sprite implements CombatEntity {
     private int maxHP;

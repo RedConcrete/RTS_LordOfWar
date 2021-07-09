@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import static code.lordofwar.backend.MessageIdentifier.*;
 
 /**
- * The event from the
+ * The event from the lobbyscreen
  * @author Franz Klose,Robin Hefner,Cem Arslan
  */
 public class LobbyScreenEvent extends Events {
