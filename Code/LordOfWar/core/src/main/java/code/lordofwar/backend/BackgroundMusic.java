@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * The Class Backgroundmusic is supposed to play Backgroundmusik in the menu as well as in the Game itself.
+ * The Class Backgroundmusic is supposed to play backgroundmusic in the menu as well as in the Game itself.
  *
  * @author Cem Arslan
  */

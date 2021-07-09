@@ -32,7 +32,8 @@ import java.util.*;
 
 /**
  * The GameScreen that shows the game and creates the Units.
- *  most of the Time a player will be in this screen.
+ * Handles Game Logic.
+ * most of the Time a player will be in this screen.
  *
  * @author Franz Klose,Robin Hefner,Cem Arslan
  */
@@ -238,9 +239,10 @@ public class GameScreen extends Screens implements Screen {
     }
 
     /**
+     * Checks whether given Sprite is colliding with a hitbox.
      *
-     * @param sprite
-     * @return
+     * @param sprite given sprite.
+     * @return {@code true} if given sprites collides with a hitbox
      */
     private boolean isColliding(Sprite sprite) {
         for (Map.Entry<Integer, Rectangle> hitbox : hitboxes.entrySet()) {
@@ -255,8 +257,9 @@ public class GameScreen extends Screens implements Screen {
     }
 
     /**
-     * renders all sprites
-     * @param delta
+     * renders everything
+     *
+     * @param delta time in seconds since last render call
      */
     @Override
     public void render(float delta) {
@@ -818,9 +821,11 @@ public class GameScreen extends Screens implements Screen {
     }
 
     /**
-     * @param x
-     * @param y
-     * @return
+     * translates given coordinates from screen to world
+     *
+     * @param x the given x
+     * @param y the given y coord
+     * @return a float[] containing x at [0] and y at [1]
      */
     private float[] translateXYCoordinatesFromScreen(float x, float y) {
         Vector3 mousePos = new Vector3(x, y, 0);
@@ -829,9 +834,11 @@ public class GameScreen extends Screens implements Screen {
     }
 
     /**
-     * @param x
-     * @param y
-     * @return
+     * translates given coordinates from world to screen
+     *
+     * @param x the given x
+     * @param y the given y coord
+     * @return a float[] containing x at [0] and y at [1]
      */
     private float[] translateXYCoordinatesToScreen(float x, float y) {
         Vector3 mousePos = new Vector3(x, y, 0);
@@ -884,7 +891,7 @@ public class GameScreen extends Screens implements Screen {
     }
 
     /**
-     * count´s the Points
+     * manages sending of point requests
      *
      * @param delta
      */
@@ -1025,6 +1032,7 @@ public class GameScreen extends Screens implements Screen {
 
     /**
      * ends the game when all players except one have lost the game
+     *
      * @param data
      */
     public void endGame(String[] data) {

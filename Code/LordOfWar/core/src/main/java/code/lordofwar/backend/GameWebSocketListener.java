@@ -49,8 +49,8 @@ public class GameWebSocketListener extends WebSocketListener {
     }
 
     /**
-     * Communicates with the Server
-     * @param strings
+     * decision tree based on {@link MessageIdentifier}
+     * @param strings received data
      */
     private void checkDataDir(String[] strings) {
         if (strings[0].equals(LOGIN_VALID.toString())) {

@@ -11,8 +11,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A* Pathfinding
- *  * @author Cem Arslan
+ * Based on the A* Algorithm.
+ * Uses collisionlayer and hitboxes to determine obstacles.
+ * Adapted so obstacles can not be walked around diagonally for graphical reasons.
+ * @author Cem Arslan
  */
 public class Pathfinding {
     private int xStartCell;
@@ -25,6 +27,7 @@ public class Pathfinding {
 
     private TiledMapTileLayer collisionLayer;
     private Set<Rectangle> hitboxes;
+
 
     public Pathfinding(int xClicked, int yClicked, int xPosUnit, int yPosUnit, TiledMapTileLayer collisionLayer,Set<Rectangle> hitboxes) {
         this.collisionLayer = collisionLayer;
@@ -197,21 +200,21 @@ public class Pathfinding {
         return returnMap;
     }
 
-    public double getCellDistancesToStart(float x, float y) {
+    private double getCellDistancesToStart(float x, float y) {
         double calculatiedX = x - xStartCell;
         double calculatiedY = y - yStartCell;
         double squareSum = Math.pow(calculatiedX, 2) + Math.pow(calculatiedY, 2);
         return Math.sqrt(squareSum);
     }
 
-    public double getCellDistancesToEnd(float x, float y) {
+    private double getCellDistancesToEnd(float x, float y) {
         double xCalced = x - xEndCell;
         double yCalced = y - yEndCell;
         double squareSum = Math.pow(xCalced, 2) + Math.pow(yCalced, 2);
         return Math.sqrt(squareSum);
     }
 
-    public void getStartAndEndCell(int xPosUnit, int yPosUnit, int xClicked, int yClicked) {
+    private void getStartAndEndCell(int xPosUnit, int yPosUnit, int xClicked, int yClicked) {
         xStartCell = xPosUnit / 64;
         yStartCell = yPosUnit / 64;
 

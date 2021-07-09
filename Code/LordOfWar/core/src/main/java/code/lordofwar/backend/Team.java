@@ -3,7 +3,8 @@ package code.lordofwar.backend;
 import com.badlogic.gdx.graphics.Color;
 
 /**
- * the Teamclass defines the team object
+ * {@link Team} defines a team. A Team is defined by its color and starting Postion.
+ *
  * @author Robin Hefner,Franz Klose
  */
 public class Team {
@@ -19,6 +20,7 @@ public class Team {
 
     /**
      * gives the color for a specified a startigpos back
+     *
      * @return
      */
     public Color getColor() {

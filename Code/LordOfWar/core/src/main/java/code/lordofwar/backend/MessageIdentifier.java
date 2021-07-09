@@ -1,7 +1,7 @@
 package code.lordofwar.backend;
 
 /**
- *
+ * Represents message type.
  * @author Franz Klose,Cem Arslan
  */
 public enum MessageIdentifier {
