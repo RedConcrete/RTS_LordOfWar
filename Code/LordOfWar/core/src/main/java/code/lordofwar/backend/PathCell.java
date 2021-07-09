@@ -2,6 +2,10 @@ package code.lordofwar.backend;
 
 import com.badlogic.gdx.math.Vector2;
 
+/**
+ *
+ * @author Robin Hefner
+ */
 public class PathCell {
     public Vector2 coords;
     public double[] distances;

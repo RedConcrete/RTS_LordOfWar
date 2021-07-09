@@ -10,12 +10,15 @@ import com.badlogic.gdx.math.Vector2;
 
 import java.util.List;
 
+/**
+ *
+ * @author Robin Hefner
+ */
 public class Soldier extends AbstractCombatEntity {
 
     public final static String UNIT_TYPE = "SOLDIER";
     private boolean selected;
     private Vector2 velocity = new Vector2();
-    private float speed = 60 * 2;
     private List<PathCell> destination;
 
     private Sprite sprite;

@@ -9,14 +9,16 @@ import javax.swing.*;
 
 public class CreditScreen extends Screens implements Screen {
 
+    /**
+     *
+     * @param aGame
+     * @param aSkin
+     */
     public CreditScreen(LOW aGame, Skin aSkin) {
         super(aGame, aSkin);
-
         createBackground(stage);
-
         setupUI();
     }
-
 
     @Override
     public void show() { Gdx.input.setInputProcessor(stage); }
@@ -30,17 +32,14 @@ public class CreditScreen extends Screens implements Screen {
 
     @Override
     public void resize(int width, int height) {
-
     }
 
     @Override
     public void pause() {
-
     }
 
     @Override
     public void resume() {
-
     }
 
     @Override
@@ -52,7 +51,6 @@ public class CreditScreen extends Screens implements Screen {
     private void setupUI() {
 
         Window creditWindow = new Window("",skin,"border");
-
         Label headline = new Label("Programmer",skin);
         headline.setFontScale(3f);
         Label franz = new Label("Franz Klose",skin);
@@ -62,9 +60,6 @@ public class CreditScreen extends Screens implements Screen {
         Label assetDesigner = new Label("Asset Designer",skin);
         assetDesigner.setFontScale(3f);
         Label glebster51 = new Label("glebster51 | OpenGameArt.org",skin);
-
-
-
 
         creditWindow.defaults().pad(20f);
         creditWindow.add(headline).row();
@@ -80,8 +75,5 @@ public class CreditScreen extends Screens implements Screen {
         packAndSetWindow(creditWindow, stage);
 
         stage.setDebugAll(false);
-
-
-
     }
 }

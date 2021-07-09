@@ -1,5 +1,9 @@
 package code.lordofwar.backend;
 
+/**
+ *
+ * @author Robin Hefner
+ */
 public enum MessageIdentifier {
 
     CONNECTION,
@@ -15,5 +19,6 @@ public enum MessageIdentifier {
     GET_LOBBYS,
     LOBBY_PLAYERS,
     UPDATE_SOLDIER_POS,
-    UPDATE_UNIT_HEALTH//Syntax: [MI,starting STARTING POSITION (of enemy),UNITTYPE(Soldier or castle), DAMAGE TYPE,ATK]
+    UPDATE_UNIT_HEALTH,//Syntax: [MI,starting STARTING POSITION (of enemy),UNITTYPE(Soldier or castle), DAMAGE TYPE,ATK]
+    UPDATE_CASTLE_POS
 }

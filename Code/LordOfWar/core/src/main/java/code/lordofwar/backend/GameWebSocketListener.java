@@ -11,23 +11,22 @@ import org.jetbrains.annotations.Nullable;
 import static code.lordofwar.backend.Constants.STRINGSEPERATOR;
 import static code.lordofwar.backend.MessageIdentifier.*;
 
+/**
+ *
+ * @author Robin Hefner
+ */
 public class GameWebSocketListener extends WebSocketListener {
 
     LOW game;
-
     public GameWebSocketListener(LOW aGame) {
         game = aGame;
     }
-
     private WebSocket gameWebSocket = null;
-
-    Constants constants = new Constants();
 
     @Override
     public void onClosed(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
         System.out.println("closing " + reason);
         super.onClosed(webSocket, code, reason);
-
     }
 
     @Override
@@ -39,7 +38,6 @@ public class GameWebSocketListener extends WebSocketListener {
 
     @Override
     public void onMessage(@NotNull WebSocket webSocket, @NotNull String message) {
-        //  System.out.println(message);
         String[] dataArray = depackData(message);
         checkDataDir(dataArray);
     }
@@ -48,6 +46,10 @@ public class GameWebSocketListener extends WebSocketListener {
         return message.split(STRINGSEPERATOR);
     }
 
+    /**
+     * Comunicats with the Server
+     * @param strings
+     */
     private void checkDataDir(String[] strings) {
         if (strings[0].equals(LOGIN_VALID.toString())) {
             if (game.getScreen() instanceof LoginScreen) {
@@ -87,9 +89,12 @@ public class GameWebSocketListener extends WebSocketListener {
             if (game.getScreen() instanceof GameScreen) {
                 ((GameScreen) game.getScreen()).getGameScreenEvent().processSoldiers(strings);
             }
-        }else if (strings[0].equals(UPDATE_UNIT_HEALTH.toString())){
+        } else if (strings[0].equals(UPDATE_CASTLE_POS.toString())) {//message is never sent so TODO SEND MESSAGE
             if (game.getScreen() instanceof GameScreen) {
-                System.out.println("processing");
+                ((GameScreen) game.getScreen()).getGameScreenEvent().processCastles(strings);
+            }
+        } else if (strings[0].equals(UPDATE_UNIT_HEALTH.toString())) {
+            if (game.getScreen() instanceof GameScreen) {
                 ((GameScreen) game.getScreen()).getGameScreenEvent().receiveDmg(strings);
             }
         }
@@ -97,9 +102,7 @@ public class GameWebSocketListener extends WebSocketListener {
 
     @Override
     public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
-
         game.getConstants().setWEBSOCKET_OPEN(true);
-
     }
 
     public void setWebSocket(WebSocket websocket) {

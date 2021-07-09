@@ -1,5 +1,9 @@
 package code.lordofwar.backend;
 
+/**
+ *
+ * @author Robin Hefner
+ */
 public class Lobby {
 
     private String lobbyname;

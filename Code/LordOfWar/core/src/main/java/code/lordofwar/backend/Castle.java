@@ -7,7 +7,10 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 
-
+/**
+ * The Class Backgroundmusic is supposed to play Backgroundmusik in the menu as well as in the Game itself.
+ * @author Robin Hefner
+ */
 public class Castle extends AbstractCombatEntity {
     public final static String UNIT_TYPE = "CASTLE";
     private boolean selected;
@@ -48,7 +51,6 @@ public class Castle extends AbstractCombatEntity {
                 e.printStackTrace();
             }
         }).start();
-
     }
 
     private void increaseGoldEveryTenSeconds() {
@@ -61,10 +63,12 @@ public class Castle extends AbstractCombatEntity {
                 e.printStackTrace();
             }
         }).start();
-
-
     }
 
+    @Override
+    public String toString() {
+        return this.getX() + "," + this.getY();
+    }
 
     public void setVillager(int villager) {
         this.villager = villager;

@@ -6,6 +6,7 @@ import kotlin.Pair;
 
 /**
  * Reduces logic repetition for the combatUnit entities
+ * @author Franz Klose,Robin Hefner,Cem Arslan
  */
 public abstract class AbstractCombatEntity extends Sprite implements CombatEntity {
     private int maxHP;
@@ -21,14 +22,14 @@ public abstract class AbstractCombatEntity extends Sprite implements CombatEntit
     public AbstractCombatEntity(Sprite sprite, int maxHP, int def, Integer dmgType, Integer atk, float combatTimerLimit,Team team) {
         super(sprite);
         this.maxHP = maxHP;
-        hp = maxHP;
+        this.combatTimerLimit = combatTimerLimit;
+        this.team=team;
         this.def = def;
+        hp = maxHP;
         alive = true;
         damagePair = new Pair<>(dmgType, atk);
         target = null;
         combatTimer = combatTimerLimit;
-        this.combatTimerLimit = combatTimerLimit;
-        this.team=team;
     }
 
     @Override
@@ -37,6 +38,10 @@ public abstract class AbstractCombatEntity extends Sprite implements CombatEntit
         return damagePair;
     }
 
+    /**
+     *
+     * @param incomingDMG the Damage type and amount of incoming dmg.
+     */
     @Override
     public void receiveDmg(Pair<Integer, Integer> incomingDMG) {
         double dmg;
@@ -126,9 +131,11 @@ public abstract class AbstractCombatEntity extends Sprite implements CombatEntit
     public float getCombatTimer() {
         return combatTimer;
     }
+
     public void incrementCombatTimer(float delta){
         combatTimer+=delta;
     }
+
     public Team getTeam(){
         return team;
     }

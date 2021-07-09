@@ -8,9 +8,12 @@ import java.util.ArrayList;
 
 import static code.lordofwar.backend.MessageIdentifier.CREATE_LOBBY;
 
-public class LobbyCreateScreenEvent extends Events {
 
-
+/**
+ * The event from the
+ * @author Franz Klose,Robin Hefner,Cem Arslan
+ */
+public class LobbyCreateScreenEvent extends Events{
     private String lobbyID;
     private boolean isCreated;
 

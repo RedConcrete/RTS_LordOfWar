@@ -1,7 +1,9 @@
 package code.lordofwar.backend;
 
-
-
+/**
+ *
+ * @author Robin Hefner
+ */
 public class Constants {
 
     public static final int WORLD_WIDTH_PIXEL = 1920;
@@ -11,10 +13,10 @@ public class Constants {
     public static final String BLOCK_TILE_PROPERTY="blocked";
     //GAME STATICS
     //TODO FILL THESE ARRAYS with actual coords
-    public static final float[] MAP1CC1=new float[]{400,300};//insert coords here
-    public static final float[] MAP1CC2=new float[]{600,300};//insert coords here
-    public static final float[] MAP1CC3=new float[]{800,300};//insert coords here
-    public static final float[] MAP1CC4=new float[]{900,300};//insert coords here
+    public static final float[] MAP1CC1=new float[]{416,352};//insert coords here (416/352)
+    public static final float[] MAP1CC2=new float[]{416,4192};//insert coords here (416/4192)
+    public static final float[] MAP1CC3=new float[]{4320,4320};//insert coords here (4320/4320)
+    public static final float[] MAP1CC4=new float[]{4320,352};//insert coords here (4320/352)
 
     public Boolean WEBSOCKET_OPEN;
     public Boolean FPS;

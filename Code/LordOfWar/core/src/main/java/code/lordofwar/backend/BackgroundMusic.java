@@ -37,28 +37,25 @@ public class BackgroundMusic {
         if (currentTrack == null) {//TODO return something here so the program knows it plays
             currentTrack = track;
             final String trackName = "assets/music/" + currentTrack;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    File musicFile = new File(trackName).getAbsoluteFile();
-                    if (musicFile.exists()) {
-                        try {
-                            synchronized (synchronizer) {
-                                currentStream = AudioSystem.getAudioInputStream(musicFile);
-                                currentClip = AudioSystem.getClip();
-                                currentClip.open(currentStream);
-                                setVolume(constants.musicVolume);
-                                currentClip.start();
-                                currentClip.loop(Clip.LOOP_CONTINUOUSLY);
-                                synchronizer.wait();//waits for notify here
-                                currentClip.stop();
-                                currentClip = null;
-                                currentStream = null;
-                                currentTrack = null;
-                            }
-                        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException | InterruptedException e) {
-                            e.printStackTrace();
+            new Thread(() -> {
+                File musicFile = new File(trackName).getAbsoluteFile();
+                if (musicFile.exists()) {
+                    try {
+                        synchronized (synchronizer) {
+                            currentStream = AudioSystem.getAudioInputStream(musicFile);
+                            currentClip = AudioSystem.getClip();
+                            currentClip.open(currentStream);
+                            setVolume(constants.musicVolume);
+                            currentClip.start();
+                            currentClip.loop(Clip.LOOP_CONTINUOUSLY);
+                            synchronizer.wait();//waits for notify here
+                            currentClip.stop();
+                            currentClip = null;
+                            currentStream = null;
+                            currentTrack = null;
                         }
+                    } catch (UnsupportedAudioFileException | IOException | LineUnavailableException | InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }
             }).start();
@@ -81,9 +78,8 @@ public class BackgroundMusic {
      * @param volume the given volume in percent
      */
     public synchronized void setVolume(int volume) {
-        //6.0206 -80.0 were the values on my pc TODO Check the sout on others pc
-        //Volume is basically 0 at 50% maybe find way to
-        if (currentClip != null && constants.MUSIC) {
+         //Volume is basically 0 at 50% maybe find way to fix this TODO
+        if (currentClip != null&&constants.MUSIC) {
             constants.musicVolume = volume;
             float range = Math.abs(((FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN)).getMinimum() - ((FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN)).getMaximum());
             ((FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN)).setValue(((range / 100) * volume) + ((FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN)).getMinimum());
@@ -101,21 +97,6 @@ public class BackgroundMusic {
             setVolume(constants.musicVolume);
         }
     }
-
-
-    //might delete later TODO
-//    /**
-//     * @return a float array containing the minimum and maximum values allowed by the current clip in that order. If no clip is currently playing null is returned.
-//     */
-//    public synchronized float[] getBounds() {
-//        if (currentClip != null) {
-//            return new float[]{((FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN)).getMinimum(),
-//                    ((FloatControl) currentClip.getControl(FloatControl.Type.MASTER_GAIN)).getMaximum()
-//            };
-//        } else return null;
-//    }
-
-
 }
 
 

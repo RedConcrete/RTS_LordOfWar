@@ -24,9 +24,9 @@ import static de.constants.MessageIdentifier.*;
 
 public class GameWebSocketHandler {
 
-    private Map<String, Session> sessions = new ConcurrentHashMap<>();
-    private Map<String, User> userSessions = new ConcurrentHashMap<>();
-    private Map<String, ServerLobby> lobbys = new ConcurrentHashMap<>();
+    private Map<String, Session> sessions = new ConcurrentHashMap<>();//connected sessions (sessionid,Session)
+    private Map<String, User> userSessions = new ConcurrentHashMap<>();//logged in users (sessionId,User object)
+    private Map<String, ServerLobby> lobbys = new ConcurrentHashMap<>();//current lobbys (sessionID, lobby)
     private DataManager dataManager = new DataManager();
 
     @OnOpen
@@ -37,11 +37,6 @@ public class GameWebSocketHandler {
 
     }
 
-    // @OnClose
-    // public void onClose() {//two players in one lobby : result both close
-    //     System.out.println("closed");
-    // }
-
     @OnError
     public void onError(Throwable throwable) {
         System.err.println(throwable.getMessage());
@@ -49,7 +44,6 @@ public class GameWebSocketHandler {
 
     @OnMessage
     public void onMessage(String message) {
-        // System.out.println(message);
         String[] dataArray = depackData(message);
         checkDataDir(dataArray);
     }
@@ -59,6 +53,7 @@ public class GameWebSocketHandler {
                         CloseReason closeReason) {
         System.out.println(session.getId());
         System.out.println(closeReason.toString());
+        //TODO remove closed ppl
     }
 
     private String[] depackData(String message) {
@@ -66,15 +61,7 @@ public class GameWebSocketHandler {
     }
 
     private void checkDataDir(String[] data) {
-        //um... with multiple players connected this will only work for the last one to connect right?
-        // bc the currentSessionCounter is the value used?
-        //send session id on connect to identify? send username with every query and check if said username is currently logged in? idk
-        //TODO change data processing (see dataSendConvention.txt)
-        //TODO change all methods associated with data processing
-
-
         if (data[0].equals(LOGIN.toString())) {
-
             User newUser = new Login(dataManager).isLoginValid(data, sessions.get(data[1]));
             loginUser(newUser);
         } else if (data[0].equals(REGISTER.toString())) {
@@ -98,12 +85,12 @@ public class GameWebSocketHandler {
         } else if (data[0].equals(LOBBY_PLAYERS.toString())) {
             sendPlayerListUpdate(data);
         } else if (data[0].equals(UPDATE_SOLDIER_POS.toString())) {
-            genPosArray(data);
+            genSoldierPosArray(data);
+        } else if (data[0].equals(UPDATE_CASTLE_POS.toString())) {
+            genCastlePosArray(data);
         } else if (data[0].equals(UPDATE_UNIT_HEALTH.toString())) {
-            //System.out.println("recieved data " + Arrays.toString(data));
             updateUnitHealth(data);
         }
-
     }
 
     private void startGame(String[] data) {
@@ -139,7 +126,7 @@ public class GameWebSocketHandler {
             }
         }
         sessions.get(userID).getAsyncRemote().sendText(DataPacker.packData(GET_LOBBYS, DataPacker.stringCombiner(arr)));
-        System.out.println(arr.toString());
+
     }
 
     private void leaveLobby(String[] data) {
@@ -237,7 +224,7 @@ public class GameWebSocketHandler {
         }
     }
 
-    private void genPosArray(String[] data) {
+    private void genSoldierPosArray(String[] data) {
 
         ServerLobby lobby = findLobby(data);
         if (lobby != null) {
@@ -258,8 +245,27 @@ public class GameWebSocketHandler {
         }
     }
 
+    private void genCastlePosArray(String[] data) {
+//MI,UID,LID,Startingpos,hashcode
+        ServerLobby lobby = findLobby(data);
+        if (lobby != null) {
+            if (lobby.getGame() != null) {
+                ArrayList<String> changedData = new ArrayList<>();
+                changedData.add(data[3]);
+                changedData.add(data[4]);
+                for (User user : lobby.getPlayers()) {
+                    if (!sessions.get(data[1]).equals(user.getuSession())) {
+                        //1001 error here ; Server thinks client navigates away/closes?
+                        user.getuSession().getAsyncRemote().sendText(DataPacker.packData(UPDATE_CASTLE_POS, DataPacker.stringCombiner(changedData)));
+                    }
+                }
+            }
+        }
+
+    }
+
     private void updateUnitHealth(String[] data) {
-//Syntax: [MI,lobbyID,starting STARTING POSITION (of enemy),UNITTYPE(Soldier or castle),enemy hashcode, DAMAGE TYPE,ATK]
+        //Syntax: [MI,lobbyID,starting STARTING POSITION (of enemy),UNITTYPE(Soldier or castle),enemy hashcode, DAMAGE TYPE,ATK]
         ServerLobby lobby = findLobby(data);
         if (lobby != null) {
             if (lobby.getGame() != null) {

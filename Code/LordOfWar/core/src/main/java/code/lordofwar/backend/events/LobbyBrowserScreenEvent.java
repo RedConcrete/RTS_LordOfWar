@@ -8,7 +8,11 @@ import java.util.ArrayList;
 import static code.lordofwar.backend.MessageIdentifier.GET_LOBBYS;
 import static code.lordofwar.backend.MessageIdentifier.JOIN_LOBBY;
 
-public class LobbyBrowserScreenEvent extends Events {
+/**
+ * The event from the lobbybrowserscreen
+ * @author Franz Klose,Robin Hefner,Cem Arslan
+ */
+public class LobbyBrowserScreenEvent extends Events{
 
     private String[] lobbyList;
     private String[] lobbyInfo;

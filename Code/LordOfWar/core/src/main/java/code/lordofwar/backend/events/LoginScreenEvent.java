@@ -7,27 +7,24 @@ import java.util.ArrayList;
 
 import static code.lordofwar.backend.MessageIdentifier.LOGIN;
 
-/*
-        isLoginValid checks if the Login is valid and logs the User in.
-        @author Robin Hefner
-     */
-
+/**
+ * The event from the
+ * @author Franz Klose,Robin Hefner,Cem Arslan
+ */
 public class LoginScreenEvent extends Events {
 
-
     boolean loginAnswer;
-
 
     public LoginScreenEvent(LOW aGame) {
         super(aGame);
     }
 
-
-    //todo methode schreiben zum senden der Login daten
-
+    /**
+     * send user date
+     * @param arr
+     */
     public void sendUserData(ArrayList<String> arr) {
         webSocket.send(DataPacker.packData(LOGIN, DataPacker.stringCombiner(arr)));
-
     }
 
     public boolean isLoginAnswer() {

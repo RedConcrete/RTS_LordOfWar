@@ -1,5 +1,6 @@
 package code.lordofwar.screens;
 
+import code.lordofwar.backend.Lobby;
 import code.lordofwar.backend.events.LobbyScreenEvent;
 import code.lordofwar.main.LOW;
 import com.badlogic.gdx.Gdx;
@@ -23,19 +24,17 @@ public class LobbyScreen extends Screens implements Screen {
     public String[] gameInfoArr;
     private List<String> playerList;
     private LobbyScreenEvent lobbyScreenEvent;
+    private boolean lobbyAdmin;
 
-    public LobbyScreen(LOW aGame, Skin aSkin, String[] lobbyInfo) {
+    public LobbyScreen(LOW aGame, Skin aSkin, String[] lobbyInfo, Boolean admin) {
         super(aGame, aSkin);
-        gameInfoArr=new String[4];
-        System.arraycopy(lobbyInfo,0,gameInfoArr,0,4);
-        playerNameArr = new String[]{""}; // todo alle verbundenen spieler
-
+        gameInfoArr = new String[4];
+        System.arraycopy(lobbyInfo, 0, gameInfoArr, 0, 4);
+        playerNameArr = new String[]{""};
+        lobbyAdmin = admin;
         lobbyScreenEvent = new LobbyScreenEvent(game);
-
         createBackground(stage);
-
         setupUI();
-
     }
 
     @Override
@@ -50,7 +49,7 @@ public class LobbyScreen extends Screens implements Screen {
             String[] gameData = lobbyScreenEvent.getGameData();
             //[1]=lobbyname[2]=gamemode[3]=map
             //System.out.println(Arrays.toString(gameData));
-            game.setScreen(new GameScreen(game, skin, gameData[0],lobbyScreenEvent.getPosition(),lobbyScreenEvent.getPlayers()));//todo insert data here via lobbyScreenEvent.getData
+            game.setScreen(new GameScreen(game, skin, gameData[0], lobbyScreenEvent.getPosition(), lobbyScreenEvent.getPlayers()));//todo insert data here via lobbyScreenEvent.getData
         }
         if (!lobbyScreenEvent.isRecievedData()) {//later data requests (map etc) also go here
             lobbyScreenEvent.sendPlayerRequest(gameInfoArr[0]);//possible to move this to the end of setupUi()?
@@ -58,15 +57,15 @@ public class LobbyScreen extends Screens implements Screen {
 
         Gdx.graphics.getGL20().glClearColor(0, 0, 0, 1);
         Gdx.graphics.getGL20().glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-
         fps(stage, skin);
 
         playerNameArr = lobbyScreenEvent.getPlayers();
         if (playerNameArr != null) {
-            playerList.setItems(playerNameArr);
-        }// for (int i = 0; i < playerNameArr.length; i++) {
-        //     playerNameArr[i]=playerNameArr[i]+"\n";//TODO formatting properly
-        //  }
+            String[] playerString = new String[playerNameArr.length + 1];
+            playerString[0] = "Users: \n";
+            System.arraycopy(playerNameArr, 0, playerString, 1, playerNameArr.length);
+            playerList.setItems(playerString);
+        }
 
         stage.act();
         stage.draw();
@@ -74,17 +73,14 @@ public class LobbyScreen extends Screens implements Screen {
 
     @Override
     public void resize(int width, int height) {
-
     }
 
     @Override
     public void pause() {
-
     }
 
     @Override
     public void resume() {
-
     }
 
     @Override
@@ -97,21 +93,28 @@ public class LobbyScreen extends Screens implements Screen {
         stage.dispose();
     }
 
+    /**
+     * inits the Ui
+     */
     private void setupUI() {
 
         Window windowLobby = new Window("", skin, "border");
         windowLobby.defaults().pad(50f);
 
         TextButton startButton = new TextButton("Start Game", skin);
+        startButton.setVisible(lobbyAdmin); // todo genial !!!!!!!!!!!!! ;D
         startButton.getLabel().setFontScale(3f);
 
         playerList = new List<>(skin);
         playerList.setItems(playerNameArr);//no point to this anymore right?
 
         List<String> gameInfoList = new List<>(skin);
-        gameInfoList.setItems(gameInfoArr);
 
-
+        gameInfoList.setItems("Lobby Information",
+                "Lobbyname: " + gameInfoArr[0],
+                "Map: " + gameInfoArr[1],
+                "Max Players: " + gameInfoArr[2],
+                "Mode: " + gameInfoArr[3]);
         startButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
@@ -125,9 +128,9 @@ public class LobbyScreen extends Screens implements Screen {
 
         });
         windowLobby.add(playerList);
-        windowLobby.add(gameInfoList).row();
+        windowLobby.add(gameInfoList).padBottom(30f).row();
 
-        windowLobby.add(startButton);
+        windowLobby.add(startButton).padTop(30f);
 
         backButton(stage, skin, game, windowLobby);
         packAndSetWindow(windowLobby, stage);
@@ -146,16 +149,13 @@ public class LobbyScreen extends Screens implements Screen {
                 lobbyScreenEvent.sendLeaveLobbyNotice(LobbyScreen.this.gameInfoArr[0]);
                 game.setScreen(new MenuScreen(game, skin));
                 stage.dispose();
-
             }
-
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });
-
-        window.add(backButton).row();
+        window.add(backButton).padTop(30f).row();
     }
 
     public LobbyScreenEvent getLobbyScreenEvent() {
