@@ -11,8 +11,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.utils.Align;
 
+/**
+ * The MenuScreen that shows the MenuScreen
+ *
+ * @author Franz Klose,Cem Arslan
+ */
 public class MenuScreen extends Screens implements Screen {
-
 
     public MenuScreen(LOW aGame, Skin aSkin) {
         super(aGame, aSkin);
@@ -60,6 +64,9 @@ public class MenuScreen extends Screens implements Screen {
         stage.dispose();
     }
 
+    /**
+     * builds the Ui for the Screen
+     */
     private void setupUI() {
 
         Label lordOfWarLabel = new Label("Lord of War", skin);

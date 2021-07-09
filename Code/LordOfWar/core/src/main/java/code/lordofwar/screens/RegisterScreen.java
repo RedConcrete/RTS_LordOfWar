@@ -12,7 +12,6 @@ import com.badlogic.gdx.utils.Align;
 
 import java.util.ArrayList;
 
-
 /**
  * The class Register Screen allows the User to create a Account, that he can use the Login the next time.
  *
@@ -29,6 +28,9 @@ public class RegisterScreen extends Screens implements Screen {
         setupUI();
     }
 
+    /**
+     * builds the Ui for the Screen
+     */
     private void setupUI() {
 
         Label usernameLabel = new Label("Username", skin);
@@ -158,7 +160,6 @@ public class RegisterScreen extends Screens implements Screen {
         packAndSetWindow(registerWindow, stage);
 
     }
-
 
     @Override
     public void show() {

@@ -11,7 +11,11 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
-
+/**
+ * The OptionScreen that shows the LoginScreen
+ *
+ * @author Franz Klose,Cem Arslan,Robin Hefner
+ */
 public class OptionScreen extends Screens implements Screen {
 
 
@@ -64,6 +68,9 @@ public class OptionScreen extends Screens implements Screen {
         stage.dispose();
     }
 
+    /**
+     * builds the Ui for the Screen
+     */
     private void setupUI() {
 
         Window windowOptionen = new Window("", skin, "border");
