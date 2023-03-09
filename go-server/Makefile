@@ -1,4 +1,4 @@
-PHONY: prepare run test docker-start docker-stop
+.PHONY: prepare run test docker-start docker-stop
 
 all:
 
