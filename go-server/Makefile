@@ -8,10 +8,13 @@ prepare:
 	go vet ./...
 
 build:
-	go build
+	go build -o ./bin ./cmd/main.go
 
 run: prepare build
-	./go-server
+	go run ./cmd/main.go
 
 test:
 	go test
+
+docker:
+	docker build ./build/Dockerfile
