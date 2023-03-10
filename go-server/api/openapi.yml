@@ -1,0 +1,18 @@
+openapi: 3.1.0
+info:
+  title: RTS-LordOfWar
+  description: Better Version of the Server written in Golang
+  version: 0.1.0
+
+servers:
+  - url: http://localhost:8080
+    description: for local testing
+
+paths:
+  /auth:
+    get:
+      summary: for login
+    post:
+      summary: for registration
+      
+  

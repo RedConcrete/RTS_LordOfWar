@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  rts-server:
+    build: ../
+    container_name: rts-api
+  rts-db:
+    image: postgres:latest
+    container_name: rts-database
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
