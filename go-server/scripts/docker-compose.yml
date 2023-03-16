@@ -12,3 +12,6 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports:
       - '5432:5432'
+    volumes:
+      - ../internal/database/sql/create-tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      
